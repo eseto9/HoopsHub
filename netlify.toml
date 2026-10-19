@@ -1,0 +1,11 @@
+# Netlify build config. The Next.js runtime (@netlify/plugin-nextjs) is
+# installed automatically; don't pin it. Secrets (DATABASE_URL,
+# BETTER_AUTH_SECRET, BETTER_AUTH_URL, ENCRYPTION_KEY) are set in the Netlify
+# UI/API, never here: this file is committed.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "24"

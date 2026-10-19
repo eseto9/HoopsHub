@@ -1,0 +1,196 @@
+[
+  {
+    "avatar": null,
+    "display_name": "Manager 9",
+    "is_bot": false,
+    "is_owner": false,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on"
+    },
+    "settings": null,
+    "user_id": "202219487372513280"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 10",
+    "is_bot": false,
+    "is_owner": true,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "archived": "off",
+      "mention_pn": "on",
+      "team_name": "Team 10"
+    },
+    "settings": null,
+    "user_id": "202219876658454528"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 11",
+    "is_bot": false,
+    "is_owner": true,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on",
+      "team_name": "Team 11"
+    },
+    "settings": null,
+    "user_id": "338737602486075392"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 12",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "archived": "on",
+      "mention_pn": "on"
+    },
+    "settings": null,
+    "user_id": "606717542320394240"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 13",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on",
+      "team_name": "Team 13"
+    },
+    "settings": null,
+    "user_id": "884532444194336768"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 14",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on",
+      "team_name": "Team 14"
+    },
+    "settings": null,
+    "user_id": "960465114077937664"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 1",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on"
+    },
+    "settings": null,
+    "user_id": "1002627601883648000"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 2",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on"
+    },
+    "settings": null,
+    "user_id": "1105499113795276800"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 3",
+    "is_bot": false,
+    "is_owner": false,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on",
+      "team_name": ""
+    },
+    "settings": null,
+    "user_id": "1238516325463109632"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 4",
+    "is_bot": false,
+    "is_owner": false,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "allow_sms": "on",
+      "mention_pn": "on",
+      "team_name": "Team 4"
+    },
+    "settings": null,
+    "user_id": "1382096208385839104"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 5",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on",
+      "team_name": "Team 5"
+    },
+    "settings": null,
+    "user_id": "1382123698781163520"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 6",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on"
+    },
+    "settings": null,
+    "user_id": "1382123948338089984"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 7",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "mention_pn": "on"
+    },
+    "settings": null,
+    "user_id": "1382126594390245376"
+  },
+  {
+    "avatar": null,
+    "display_name": "Manager 8",
+    "is_bot": false,
+    "is_owner": null,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "allow_pn": "on",
+      "allow_sms": "on",
+      "mention_pn": "on",
+      "team_name": "Team 8"
+    },
+    "settings": null,
+    "user_id": "1382182443972325376"
+  }
+]

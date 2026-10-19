@@ -261,10 +261,11 @@ export interface WaiverOrderRow {
   teamId: UnifiedId;
   /** 1 = first claim. */
   rank: number;
+  /** All roster moves when the platform doesn't break them down (Sleeper). */
   acquisitions: number;
-  drops: number;
-  trades: number;
-  moveToIR: number;
+  drops?: number;
+  trades?: number;
+  moveToIR?: number;
 }
 
 export interface DraftPick {

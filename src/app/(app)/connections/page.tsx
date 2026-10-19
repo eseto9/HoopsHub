@@ -7,6 +7,7 @@ import { Globe } from "@/components/icons";
 import { Group, IconTile, Row } from "@/components/list";
 import { PlatformIcon } from "@/components/platform-badge";
 import { SignOutRow } from "@/components/sign-out-button";
+import { SleeperConnectForm } from "@/components/sleeper-connect-form";
 import { listConnections, listLeaguePreferences } from "@/lib/services/connections";
 import { getCurrentUser, requireUser } from "@/lib/session";
 import { yahooConfigured } from "@/lib/yahoo/oauth";
@@ -158,6 +159,28 @@ async function Yahoo({ searchParams }: { searchParams: Promise<{ yahoo?: string 
   );
 }
 
+async function Sleeper() {
+  const user = await requireUser();
+  const sleeper = (await listConnections(user.id)).filter((c) => c.platform === "sleeper");
+  return (
+    <section id="sleeper-account" className="flex scroll-mt-20 flex-col gap-4">
+      <Group header="Sleeper" footer="Read-only: Sleeper doesn't let other apps change lineups or make moves, so those stay in the Sleeper app.">
+        {sleeper.map((c) => (
+          <Row
+            key={c.id}
+            icon={<PlatformIcon platform="sleeper" />}
+            title={c.displayName}
+            subtitle={<span className="text-success">Connected</span>}
+            value={<RemoveButton action={removeConnectionAction} name="connectionId" value={c.id} />}
+          />
+        ))}
+        {sleeper.length === 0 && <Row icon={<PlatformIcon platform="sleeper" />} title="Not connected" subtitle="Add your username to see your leagues" />}
+      </Group>
+      {sleeper.length === 0 && <SleeperConnectForm />}
+    </section>
+  );
+}
+
 export default function ConnectionsPage({ searchParams }: PageProps<"/connections">) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
@@ -175,9 +198,9 @@ export default function ConnectionsPage({ searchParams }: PageProps<"/connection
         <Yahoo searchParams={searchParams as Promise<{ yahoo?: string }>} />
       </Suspense>
 
-      <Group header="Coming soon" footer="Sleeper only needs your username.">
-        <Row icon={<PlatformIcon platform="sleeper" />} title="Sleeper" value={<span className="text-[15px]">Soon</span>} />
-      </Group>
+      <Suspense fallback={<div className="list-group h-[120px] animate-pulse" />}>
+        <Sleeper />
+      </Suspense>
 
       <div className="list-group">
         <SignOutRow />

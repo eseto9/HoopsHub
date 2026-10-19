@@ -98,6 +98,8 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
   const week = sp.week && /^d{1,2}$/.test(sp.week) ? Number(sp.week) : undefined;
   const data = await getLeagueTab(resolved, tab, { teamId: sp.team, position: sp.pos && sp.pos !== "All" ? sp.pos : undefined, period: week });
   const preDraft = resolved.league.status === "pre_draft" || resolved.league.status === "drafting";
+  // Player pages exist only where the platform has player details.
+  const playerBase = getAdapter(resolved.league.platform).getPlayerDetail ? `${base}/player` : undefined;
 
   switch (data.tab) {
     case "roster": {
@@ -113,7 +115,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
             platformName={platformLabel(resolved.league.platform)}
             showFantasyPoints={points}
             title={team.name}
-            playerBase={`${base}/player`}
+            playerBase={playerBase}
           />
         );
       }
@@ -133,7 +135,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
             showFantasyPoints={points}
             title={team.isMine ? team.name : `${team.name} · ${team.ownerName}`}
             editable={false}
-            playerBase={`${base}/player`}
+            playerBase={playerBase}
           />
         </div>
       );
@@ -210,7 +212,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
           </div>
           <MatchupView
             points={points}
-            playerBase={`${base}/player`}
+            playerBase={playerBase}
             sides={data.rosters.map(({ team: t, slots }) => ({
               team: { id: t.id, name: t.name, isMine: t.isMine },
               score: sides.find((x) => x.teamId === t.id)?.score,
@@ -230,6 +232,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
           teams={data.teams.map((t) => ({ id: t.id, externalId: t.externalId, name: t.name, avatarUrl: t.avatarUrl, isMine: t.isMine }))}
           base={base}
           points={points}
+          playerBase={playerBase}
         />
       );
 
@@ -245,6 +248,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
           platformName={platformLabel(resolved.league.platform)}
           points={points}
           base={base}
+          playerBase={playerBase}
         />
       );
 
@@ -259,6 +263,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
           platformName={platformLabel(resolved.league.platform)}
           leagueUrl={resolved.league.url}
           canAct={resolved.viaAccount}
+          playerBase={playerBase}
         />
       );
 

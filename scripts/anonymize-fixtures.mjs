@@ -65,3 +65,55 @@ for (const [file, doc] of docs) {
   writeFileSync(file, JSON.stringify(doc, null, 2));
 }
 console.log(`Anonymized ${messages} owner-name message(s).`);
+
+// ---------------------------------------------------------------------------
+// Sleeper: replace managers' usernames, display names, team names and avatars.
+// Ids stay, so rosters, matchups and draft picks still line up.
+// ---------------------------------------------------------------------------
+const SLEEPER = path.join(process.cwd(), "fixtures", "sleeper");
+if (existsSync(SLEEPER)) {
+  const sleeperFiles = jsonFiles(SLEEPER).filter((f) => !f.endsWith(".full.json"));
+  const sdocs = new Map(sleeperFiles.map((f) => [f, JSON.parse(readFileSync(f, "utf8"))]));
+  const userIds = new Set();
+  for (const [file, doc] of sdocs) {
+    if (file.endsWith("users.json") && Array.isArray(doc)) doc.forEach((u) => u?.user_id && userIds.add(String(u.user_id)));
+    if (file.endsWith(`${path.sep}user.json`) && doc?.user_id) userIds.add(String(doc.user_id));
+  }
+  const n = new Map([...userIds].sort().map((id, i) => [id, i + 1]));
+  const scrubUser = (u) => {
+    const i = n.get(String(u.user_id));
+    if (!i) return;
+    u.display_name = `Manager ${i}`;
+    if ("username" in u) u.username = `manager${i}`;
+    u.avatar = null;
+    if (u.metadata) {
+      if (u.metadata.team_name) u.metadata.team_name = `Team ${i}`;
+      delete u.metadata.avatar;
+    }
+  };
+  let touched = 0;
+  for (const [file, doc] of sdocs) {
+    let changed = false;
+    if (Array.isArray(doc) && doc.some((x) => x && typeof x === "object" && "user_id" in x && "display_name" in x)) {
+      doc.forEach(scrubUser);
+      changed = true;
+    } else if (doc && typeof doc === "object" && "user_id" in doc && "display_name" in doc) {
+      scrubUser(doc);
+      changed = true;
+    }
+    // League objects carry the chat's last author.
+    for (const l of Array.isArray(doc) ? doc : [doc]) {
+      if (l && typeof l === "object" && "last_author_display_name" in l) {
+        l.last_author_display_name = null;
+        l.last_author_avatar = null;
+        l.last_message_text_map = null;
+        changed = true;
+      }
+    }
+    if (changed) {
+      writeFileSync(file, JSON.stringify(doc, null, 2));
+      touched++;
+    }
+  }
+  console.log(`Anonymized ${n.size} Sleeper managers across ${touched} file(s).`);
+}

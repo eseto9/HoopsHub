@@ -2,6 +2,10 @@
  * Fetch real Sleeper NBA data and save it to /fixtures/sleeper.
  *
  *   npx tsx scripts/fetch-sleeper.ts <sleeper_username> [season]
+ *   npx tsx scripts/fetch-sleeper.ts --league <league_id>
+ *
+ * With --league, the league's owner (or first manager) stands in as "the
+ * user", so user.json and leagues-<season>.json come from them.
  *
  * Sleeper's API is public (no auth), so there are no credentials to strip.
  * Responses are saved raw so the adapter types can be written from real shapes.
@@ -12,6 +16,9 @@
  *   fixtures/sleeper/leagues-<season>.json
  *   fixtures/sleeper/league-<id>/{league,users,rosters,traded_picks}.json
  *   fixtures/sleeper/league-<id>/matchups-week-<n>.json
+ *   fixtures/sleeper/league-<id>/transactions-week-<n>.json
+ *   fixtures/sleeper/league-<id>/drafts.json, draft-picks.json
+ *   fixtures/sleeper/league-<id>/winners_bracket.json
  *   fixtures/sleeper/trending-add.json
  *   fixtures/sleeper/players-nba.json        (only players on fetched rosters)
  *   fixtures/sleeper/players-nba.full.json   (full dump, gitignored)
@@ -43,9 +50,18 @@ function field(obj: unknown, key: string): unknown {
 }
 
 async function main() {
-  const [username, seasonArg] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const leagueArg = args[0] === "--league" ? args[1] : undefined;
+  let [username, seasonArg] = leagueArg ? [undefined, undefined] : args;
+  if (leagueArg) {
+    const league = await get(`/league/${leagueArg}`);
+    const users = (await get(`/league/${leagueArg}/users`)) as unknown[];
+    const owner = users.find((u) => field(u, "is_owner")) ?? users[0];
+    username = String(field(owner, "display_name") ?? "");
+    seasonArg = String(field(league, "season") ?? "");
+  }
   if (!username) {
-    console.error("Usage: npx tsx scripts/fetch-sleeper.ts <sleeper_username> [season]");
+    console.error("Usage: npx tsx scripts/fetch-sleeper.ts <sleeper_username> [season]  |  --league <league_id>");
     process.exit(1);
   }
 
@@ -61,7 +77,9 @@ async function main() {
 
   const season = seasonArg ?? String(field(state, "season") ?? new Date().getFullYear());
   console.log(`Fetching NBA leagues for season ${season}...`);
-  const leagues = (await get(`/user/${userId}/leagues/nba/${season}`)) as unknown[];
+  const all = (await get(`/user/${userId}/leagues/nba/${season}`)) as unknown[];
+  // With --league, only capture that league (the stand-in user may be in many).
+  const leagues = leagueArg ? all.filter((l) => String(field(l, "league_id")) === leagueArg) : all;
   await save(`leagues-${season}.json`, leagues);
 
   if (!Array.isArray(leagues) || leagues.length === 0) {
@@ -80,6 +98,11 @@ async function main() {
     const rosters = (await get(`/league/${id}/rosters`)) as unknown[];
     await save(`league-${id}/rosters.json`, rosters);
     await save(`league-${id}/traded_picks.json`, await get(`/league/${id}/traded_picks`));
+    await save(`league-${id}/winners_bracket.json`, await get(`/league/${id}/winners_bracket`).catch(() => []));
+    const drafts = (await get(`/league/${id}/drafts`)) as unknown[];
+    await save(`league-${id}/drafts.json`, drafts);
+    const draftId = drafts?.[0] ? field(drafts[0], "draft_id") : undefined;
+    if (draftId) await save(`league-${id}/draft-picks.json`, await get(`/draft/${draftId}/picks`));
 
     for (const r of rosters ?? []) {
       for (const key of ["players", "starters", "reserve", "taxi"]) {
@@ -93,6 +116,7 @@ async function main() {
     for (const w of weeks) {
       try {
         await save(`league-${id}/matchups-week-${w}.json`, await get(`/league/${id}/matchups/${w}`));
+        await save(`league-${id}/transactions-week-${w}.json`, await get(`/league/${id}/transactions/${w}`));
       } catch (e) {
         console.log(`  matchups week ${w}: ${(e as Error).message}`);
       }

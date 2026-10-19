@@ -48,3 +48,4 @@ fixtures/**/*.full.json
 # Netlify CLI link state
 .netlify
 certificates
+fixtures/sleeper/players-nba.full.json

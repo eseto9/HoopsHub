@@ -46,7 +46,7 @@ function dayLabel(iso: string) {
 }
 const timeLabel = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
-function MoveLine({ move, teamName, playerBase }: { move: ActivityMove; teamName: (id: string | null) => string; playerBase: string }) {
+function MoveLine({ move, teamName, playerBase }: { move: ActivityMove; teamName: (id: string | null) => string; playerBase?: string }) {
   const p = move.player;
   const badge =
     move.action === "added"
@@ -63,9 +63,13 @@ function MoveLine({ move, teamName, playerBase }: { move: ActivityMove; teamName
       </span>
       <PlayerAvatar src={p?.headshotUrl} name={p?.name ?? "?"} size={move.action === "moved" ? "sm" : "md"} />
       <span className="min-w-0 flex-1">
-        <Link href={`${playerBase}/${move.playerId.split(":")[1]}`} className="block truncate text-[15px] hover:text-accent">
-          {p?.name ?? `Player ${move.playerId.split(":")[1]}`}
-        </Link>
+        {playerBase ? (
+          <Link href={`${playerBase}/${move.playerId.split(":")[1]}`} className="block truncate text-[15px] hover:text-accent">
+            {p?.name ?? `Player ${move.playerId.split(":")[1]}`}
+          </Link>
+        ) : (
+          <span className="block truncate text-[15px]">{p?.name ?? `Player ${move.playerId.split(":")[1]}`}</span>
+        )}
         <span className="block truncate text-[13px] text-muted">
           {p ? `${p.nbaTeam ?? "FA"} · ${p.positions.join(", ")}` : ""}
           {move.action === "traded" && ` · to ${teamName(move.toTeamId)}`}
@@ -92,7 +96,7 @@ function ActivityItem({
   team: (id: string | null) => TeamInfo | undefined;
   teamName: (id: string | null) => string;
   action?: React.ReactNode;
-  playerBase: string;
+  playerBase?: string;
 }) {
   const t = team(a.teamId);
   const others = a.kind === "trade" ? a.teamIds.filter((id) => id !== a.teamId) : [];
@@ -146,6 +150,7 @@ export function ActivityFeed({
   platformName,
   leagueUrl,
   canAct,
+  playerBase,
 }: {
   feed: LeagueActivity[];
   pending: LeagueActivity[];
@@ -156,6 +161,8 @@ export function ActivityFeed({
   leagueUrl?: string;
   /** Connected through the user's account, so their own pending moves can be cancelled. */
   canAct: boolean;
+  /** Player page base URL, when the platform has player pages. */
+  playerBase?: string;
 }) {
   const router = useRouter();
   const byId = useMemo(() => new Map<string, TeamInfo>(teams.map((t) => [t.id, t])), [teams]);
@@ -223,7 +230,6 @@ export function ActivityFeed({
     return undefined;
   };
   const team = (id: string | null) => (id ? byId.get(id) : undefined);
-  const playerBase = `/leagues/${platform}/${leagueId}/player`;
   // Offers someone else proposed that involve you are waiting on your answer.
   const isMine = (a: LeagueActivity) => !!(a.teamId && byId.get(a.teamId)?.isMine);
   const incoming = pending.filter((a) => a.kind === "trade" && !isMine(a));

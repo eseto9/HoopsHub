@@ -28,6 +28,7 @@ export function PlayersExplorer({
   platformName,
   points,
   base,
+  playerBase,
 }: {
   pool: PlayerListing[];
   mySlots: RosterSlot[] | null;
@@ -38,6 +39,8 @@ export function PlayersExplorer({
   platformName: string;
   points: boolean;
   base: string;
+  /** Player page base URL, when the platform has player pages. */
+  playerBase?: string;
 }) {
   const router = useRouter();
   const teamById = useMemo(() => new Map<string, TeamInfo>(teams.map((t) => [t.id, t])), [teams]);
@@ -187,7 +190,7 @@ export function PlayersExplorer({
         {filtered.length} player{filtered.length === 1 ? "" : "s"} · tap a column to sort
       </p>
 
-      <StatsTable rows={rows} source={source} mode={mode} points={points} sort={sort} onSort={toggleSort} playerBase={`${base}/player`} />
+      <StatsTable rows={rows} source={source} mode={mode} points={points} sort={sort} onSort={toggleSort} playerBase={playerBase} />
       {filtered.length === 0 && <p className="px-5 py-6 text-center text-[15px] text-muted">No players match these filters.</p>}
 
       {filtered.length > shown && (

@@ -1,0 +1,67 @@
+[
+  {
+    "created": 1783879659649,
+    "creators": [
+      "202219876658454528",
+      "338737602486075392"
+    ],
+    "draft_id": "1382095101836136448",
+    "draft_order": {
+      "1002627601883648000": 10,
+      "1105499113795276800": 6,
+      "1238516325463109632": 11,
+      "1382096208385839104": 1,
+      "1382123698781163520": 13,
+      "1382123948338089984": 5,
+      "1382126594390245376": 8,
+      "1382182443972325376": 14,
+      "202219487372513280": 9,
+      "202219876658454528": 3,
+      "338737602486075392": 2,
+      "606717542320394240": 4,
+      "884532444194336768": 12,
+      "960465114077937664": 7
+    },
+    "last_message_id": "1386123116580708352",
+    "last_message_time": 1784840013217,
+    "last_picked": 1784840011949,
+    "league_id": "1382095100900802562",
+    "metadata": {
+      "description": "",
+      "league_type": "2",
+      "name": "Bruno Caboclo Stockholders",
+      "scoring_type": "dynasty",
+      "show_team_names": "0"
+    },
+    "season": "2026",
+    "season_type": "regular",
+    "settings": {
+      "alpha_sort": 0,
+      "autopause_enabled": 0,
+      "autopause_end_time": 900,
+      "autopause_start_time": 180,
+      "autostart": 0,
+      "cpu_autopick": 1,
+      "enforce_position_limits": 1,
+      "nomination_timer": 60,
+      "pick_timer": 86400,
+      "player_type": 0,
+      "reversal_round": 0,
+      "rounds": 27,
+      "slots_bn": 13,
+      "slots_c": 1,
+      "slots_f": 1,
+      "slots_g": 1,
+      "slots_pf": 1,
+      "slots_pg": 1,
+      "slots_sf": 1,
+      "slots_sg": 1,
+      "slots_util": 5,
+      "teams": 14
+    },
+    "sport": "nba",
+    "start_time": 1783903300625,
+    "status": "complete",
+    "type": "snake"
+  }
+]

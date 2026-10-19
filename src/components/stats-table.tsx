@@ -117,6 +117,8 @@ export function StatsTable({
   playerBase?: string;
 }) {
   const th = { sort, onSort };
+  // Platforms without ownership data (Sleeper) don't get empty %Ros / +/- columns.
+  showOwnership = showOwnership && rows.some((r) => r.player?.ownership);
   return (
     <div className="list-group overflow-x-auto">
       <table

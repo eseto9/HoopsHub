@@ -12,8 +12,8 @@
  *   ESPN_SWID={...}    cookie "SWID", including the curly braces
  *
  * Every saved file has the exact espn_s2 and SWID values replaced with
- * placeholders, so fixtures are safe to commit. Leaguemates' display names
- * are kept as-is.
+ * placeholders. Before committing, run `node scripts/anonymize-fixtures.mjs`
+ * to replace leaguemates' names (the repo is public).
  *
  * Output:
  *   fixtures/espn/game.json                       game metadata (current season etc.)

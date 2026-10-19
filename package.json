@@ -14,7 +14,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "fetch:sleeper": "tsx scripts/fetch-sleeper.ts",
-    "fetch:espn": "tsx scripts/fetch-espn.ts"
+    "fetch:espn": "tsx scripts/fetch-espn.ts",
+    "fixtures:anonymize": "node scripts/anonymize-fixtures.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

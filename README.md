@@ -2,7 +2,7 @@
 
 A fantasy basketball dashboard that brings your ESPN, Yahoo and Sleeper leagues into one place: rosters, matchups, standings and free agents across every league.
 
-**Status:** ESPN works (private leagues via pasted cookies, public leagues by ID). Yahoo and Sleeper are next.
+**Status:** ESPN works: private leagues via pasted cookies, public leagues by ID, league pages with player stats, and lineup editing (Move → Here → confirm, sent to ESPN). Add/drop and trades are next, then Yahoo and Sleeper.
 
 ## Stack
 

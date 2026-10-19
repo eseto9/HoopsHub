@@ -1,0 +1,172 @@
+/**
+ * Raw ESPN fantasy basketball (fba) response types.
+ *
+ * Written from real responses saved in fixtures/espn (season 2027). Only the
+ * fields Hoops Hub reads are typed; ESPN returns many more.
+ */
+
+export interface EspnGame {
+  currentSeasonId: number;
+  currentSeason: { id: number; currentScoringPeriod: { id: number } };
+}
+
+export interface EspnProTeam {
+  id: number; // 0 = free agent
+  abbrev: string;
+  location: string;
+  name: string;
+}
+
+export interface EspnProTeamsResponse {
+  settings: { proTeams: EspnProTeam[] };
+}
+
+export interface EspnFanProfile {
+  preferences?: {
+    type?: { code?: string };
+    metaData?: {
+      entry?: {
+        abbrev?: string; // "FBA" for fantasy basketball
+        gameId?: number;
+        seasonId?: number;
+        groups?: { groupId: number; groupName: string }[];
+      };
+    };
+  }[];
+}
+
+export interface EspnRecordLine {
+  wins: number;
+  losses: number;
+  ties: number;
+  percentage: number;
+  pointsFor: number;
+  pointsAgainst: number;
+  gamesBack: number;
+  streakLength: number;
+  streakType: string;
+}
+
+export interface EspnTeam {
+  id: number;
+  abbrev: string;
+  name: string;
+  logo?: string;
+  owners?: string[]; // SWIDs, e.g. "{XXXXXXXX-...}"
+  primaryOwner?: string;
+  playoffSeed: number;
+  points: number;
+  record: { overall: EspnRecordLine; home: EspnRecordLine; away: EspnRecordLine; division: EspnRecordLine };
+}
+
+export interface EspnMember {
+  id: string; // SWID
+  displayName: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface EspnScoringItem {
+  statId: number;
+  points: number;
+  isReverseItem: boolean;
+  pointsOverrides?: Record<string, number>;
+}
+
+export interface EspnStatus {
+  currentMatchupPeriod: number;
+  firstScoringPeriod: number;
+  finalScoringPeriod: number;
+  latestScoringPeriod: number;
+  isActive: boolean;
+  isExpired?: boolean;
+}
+
+export interface EspnDraftDetail {
+  drafted: boolean;
+  inProgress: boolean;
+}
+
+export interface EspnSettings {
+  name: string;
+  size: number;
+  isPublic: boolean;
+  scoringSettings: {
+    scoringType: string; // observed: "H2H_POINTS"
+    scoringItems: EspnScoringItem[];
+  };
+  rosterSettings: { lineupSlotCounts: Record<string, number> };
+  scheduleSettings: {
+    matchupPeriodCount: number;
+    matchupPeriods: Record<string, number[]>; // matchup period -> scoring periods (days)
+  };
+}
+
+/** league?view=mSettings&view=mStatus&view=mTeam */
+export interface EspnLeagueSettingsResponse {
+  id: number;
+  seasonId: number;
+  scoringPeriodId: number;
+  draftDetail: EspnDraftDetail;
+  status: EspnStatus;
+  settings: EspnSettings;
+  teams: EspnTeam[];
+  members: EspnMember[];
+}
+
+export interface EspnPlayer {
+  id: number;
+  fullName: string;
+  proTeamId: number;
+  defaultPositionId: number;
+  eligibleSlots: number[];
+  injured: boolean;
+  injuryStatus?: string; // observed: ACTIVE, DAY_TO_DAY, OUT
+  active?: boolean;
+  ownership?: { percentOwned: number; percentStarted: number; averageDraftPosition: number };
+}
+
+export interface EspnPlayerPoolEntry {
+  id: number;
+  onTeamId: number;
+  status?: string; // "FREEAGENT" | "WAIVERS" | ...
+  player: EspnPlayer;
+}
+
+export interface EspnRosterEntry {
+  playerId: number;
+  lineupSlotId: number;
+  injuryStatus?: string;
+  playerPoolEntry: EspnPlayerPoolEntry;
+}
+
+/** league?view=mRoster. Pre-draft leagues return no `teams`. */
+export interface EspnRosterResponse {
+  teams?: { id: number; roster: { entries: EspnRosterEntry[] } }[];
+}
+
+export interface EspnMatchupSide {
+  teamId: number;
+  totalPoints: number;
+  totalPointsLive?: number;
+}
+
+export interface EspnScheduleItem {
+  id: number;
+  matchupPeriodId: number;
+  winner: string; // observed: "UNDECIDED"; presumably "HOME" | "AWAY" | "TIE" once decided
+  playoffTierType: string;
+  home: EspnMatchupSide;
+  away?: EspnMatchupSide;
+}
+
+/** league?view=mMatchup&view=mMatchupScore */
+export interface EspnMatchupsResponse {
+  status: EspnStatus;
+  schedule: EspnScheduleItem[];
+}
+
+/** league?view=kona_player_info with X-Fantasy-Filter */
+export interface EspnFreeAgentsResponse {
+  players: EspnPlayerPoolEntry[];
+}

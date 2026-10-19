@@ -1,0 +1,25 @@
+{
+  "abbrev": "FBA",
+  "active": true,
+  "currentSeason": {
+    "abbrev": "FBA 2027",
+    "active": true,
+    "currentScoringPeriod": {
+      "id": 1
+    },
+    "display": true,
+    "displayOrder": 0,
+    "endDate": 1844319600000,
+    "gameId": 3,
+    "id": 2027,
+    "name": "Fantasy Basketball 2027",
+    "startDate": 1781161200000
+  },
+  "currentSeasonId": 2027,
+  "display": true,
+  "displayOrder": 3,
+  "id": 3,
+  "name": "Fantasy Basketball",
+  "proSportAbbrev": "NBA",
+  "proSportName": "basketball"
+}

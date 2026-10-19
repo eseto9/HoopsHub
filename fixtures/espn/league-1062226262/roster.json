@@ -1,0 +1,105 @@
+{
+  "draftDetail": {
+    "drafted": false,
+    "inProgress": false
+  },
+  "gameId": 3,
+  "id": 1062226262,
+  "scoringPeriodId": 0,
+  "seasonId": 2027,
+  "segmentId": 0,
+  "status": {
+    "createdAsLeagueType": 2,
+    "currentLeagueType": 2,
+    "currentMatchupPeriod": 1,
+    "finalScoringPeriod": 167,
+    "firstScoringPeriod": 1,
+    "isActive": false,
+    "isExpired": false,
+    "isFull": false,
+    "isPlayoffMatchupEdited": false,
+    "isToBeDeleted": false,
+    "isViewable": false,
+    "isWaiverOrderEdited": false,
+    "latestScoringPeriod": 0,
+    "previousSeasons": [
+      2026
+    ],
+    "teamsJoined": 9,
+    "transactionScoringPeriod": 0,
+    "waiverLastExecutionDate": 1781185830206,
+    "waiverProcessStatus": {}
+  },
+  "teams": [
+    {
+      "id": 1,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 2,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 3,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 4,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 5,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 6,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 7,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 8,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 9,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    },
+    {
+      "id": 10,
+      "roster": {
+        "entries": [],
+        "tradeReservedEntries": 0
+      }
+    }
+  ]
+}

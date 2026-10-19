@@ -1,0 +1,418 @@
+{
+  "id": "{REDACTED-SWID}",
+  "anon": false,
+  "profile": {
+    "createDate": 1570664693754,
+    "lastUpdateDate": 1792198268973,
+    "hasNotificationPreferences": false,
+    "useSortGlobal": true,
+    "isInsider": false,
+    "isPremium": false
+  },
+  "lastAccessDate": "2026-10-18T22:58:16Z",
+  "createDate": "2019-10-09T23:44:53Z",
+  "lastUpdateDate": "2026-10-17T00:51:08Z",
+  "showNFLConsentModal": false,
+  "bettingFeatures": [
+    {
+      "name": "bettingContentEnabled",
+      "value": true
+    },
+    {
+      "name": "bettingLinksEnabled",
+      "value": false
+    }
+  ],
+  "preferences": [
+    {
+      "id": "2:1062226262:3:2027",
+      "createDate": 1781185830331,
+      "metaData": {
+        "entry": {
+          "entryId": 2,
+          "entryMetadata": {
+            "teamName": "Wembanyamonk",
+            "teamAbbrev": "Chi",
+            "leagueFormatTypeId": 2,
+            "leagueSubTypeId": 0,
+            "customizable": true,
+            "active": false,
+            "draftComplete": false,
+            "scoringTypeId": 1,
+            "leagueTypeId": 0,
+            "draftInProgress": false,
+            "scoringTypeName": "H2H_POINTS",
+            "leagueSubTypeName": "NONE"
+          },
+          "firstScoringPeriodId": 1,
+          "gameId": 3,
+          "groups": [
+            {
+              "groupId": 1062226262,
+              "groupSize": 10,
+              "groupName": "Temple BBall",
+              "groupManager": false,
+              "draftDate": null,
+              "draftType": 1,
+              "draftStatus": 1,
+              "leagueStatus": 0,
+              "fantasyCastHref": "https://fantasy.espn.com/basketball/fantasycast?leagueId=1062226262&teamId=2",
+              "href": "https://fantasy.espn.com/basketball/league?leagueId=1062226262&seasonId=2027",
+              "draftTypeName": "Snake"
+            }
+          ],
+          "logoType": "CUSTOM_UPLOAD",
+          "logoUrl": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/dc27a770-a966-11f0-90f7-112fa0f42e74",
+          "restrictionType": 0,
+          "seasonId": 2027,
+          "entryURL": "https://fantasy.espn.com/basketball/team?leagueId=1062226262&teamId=2&seasonId=2027",
+          "scoreboardFeedURL": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/1062226262?view=scoreboard&filter=%7B%22schedule%22%3A%7B%22filterTeamIds%22%3A%7B%22value%22%3A%5B2%5D%7D%2C%22filterCurrentMatchupPeriod%22%3A%7B%22value%22%3Atrue%7D%7D%7D&peek=true",
+          "abbrev": "FBA",
+          "name": "Fantasy Basketball 2027",
+          "description": "Fantasy Basketball",
+          "logoURL": "https://g.espncdn.com/s/fbalm/15/images/shell/bgHead.png",
+          "signupURL": "https://fantasy.espn.com/basketball/welcome",
+          "href": "https://www.espn.com/fantasy/basketball/",
+          "lineup": {
+            "proGameToNumPlayersStarting": {
+              "401909090": 1
+            }
+          },
+          "currentLineup": {
+            "3032976": 11,
+            "3064514": 3,
+            "3908809": 0,
+            "4395651": 5,
+            "4433247": 12,
+            "4437244": 12,
+            "4566434": 13,
+            "4684793": 12,
+            "4869780": 11,
+            "4871145": 2,
+            "4898371": 11,
+            "5061575": 1,
+            "5104157": 4,
+            "5106060": 6
+          },
+          "restrictionTypeName": "NONE"
+        },
+        "inSeason": true,
+        "isLive": false,
+        "currentScoringPeriodId": 1
+      },
+      "contentSourceId": 10,
+      "sortGlobal": 12,
+      "isHidden": false,
+      "typeId": 9,
+      "type": {
+        "id": 9,
+        "name": "Fantasy League Manager",
+        "code": "fantasy",
+        "isDeletable": false,
+        "isDelegated": false,
+        "maxAllowed": 500
+      },
+      "bu": 0
+    },
+    {
+      "id": "12:1151450222:3:2027",
+      "createDate": 1791935325135,
+      "lastUpdateDate": 1792198268973,
+      "metaData": {
+        "entry": {
+          "entryId": 12,
+          "entryMetadata": {
+            "teamName": "The Great White",
+            "teamAbbrev": "GWO",
+            "leagueFormatTypeId": 2,
+            "leagueSubTypeId": 0,
+            "customizable": true,
+            "active": true,
+            "draftComplete": true,
+            "scoringTypeId": 1,
+            "leagueTypeId": 0,
+            "draftInProgress": false,
+            "scoringTypeName": "H2H_POINTS",
+            "leagueSubTypeName": "NONE"
+          },
+          "firstScoringPeriodId": 1,
+          "gameId": 3,
+          "groups": [
+            {
+              "groupId": 1151450222,
+              "groupSize": 12,
+              "groupName": "570 Temple Squadron",
+              "groupManager": false,
+              "draftDate": 1792107000000,
+              "draftType": 1,
+              "draftStatus": 2,
+              "leagueStatus": 3,
+              "fantasyCastHref": "https://fantasy.espn.com/basketball/fantasycast?leagueId=1151450222&teamId=12",
+              "href": "https://fantasy.espn.com/basketball/league?leagueId=1151450222&seasonId=2027",
+              "draftTypeName": "Snake"
+            }
+          ],
+          "logoType": "CUSTOM_UPLOAD",
+          "logoUrl": "https://mystique-api.fantasy.espn.com/apis/v1/domains/lm/images/d74e1e30-c9c4-11f1-9793-9d655baf8ec7",
+          "restrictionType": 0,
+          "seasonId": 2027,
+          "entryURL": "https://fantasy.espn.com/basketball/team?leagueId=1151450222&teamId=12&seasonId=2027",
+          "scoreboardFeedURL": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/1151450222?view=scoreboard&filter=%7B%22schedule%22%3A%7B%22filterTeamIds%22%3A%7B%22value%22%3A%5B12%5D%7D%2C%22filterCurrentMatchupPeriod%22%3A%7B%22value%22%3Atrue%7D%7D%7D&peek=true",
+          "abbrev": "FBA",
+          "name": "Fantasy Basketball 2027",
+          "description": "Fantasy Basketball",
+          "logoURL": "https://g.espncdn.com/s/fbalm/15/images/shell/bgHead.png",
+          "signupURL": "https://fantasy.espn.com/basketball/welcome",
+          "href": "https://www.espn.com/fantasy/basketball/",
+          "lineup": {
+            "proGameToNumPlayersStarting": {
+              "401909090": 1
+            }
+          },
+          "currentLineup": {
+            "6442": 0,
+            "3155526": 6,
+            "3155942": 4,
+            "4066457": 1,
+            "4395651": 12,
+            "4432573": 3,
+            "4433136": 11,
+            "4591725": 11,
+            "5037871": 11,
+            "5041939": 2,
+            "5044385": 12,
+            "5144091": 5,
+            "5203685": 12
+          },
+          "restrictionTypeName": "NONE"
+        },
+        "inSeason": true,
+        "isLive": false,
+        "currentScoringPeriodId": 1
+      },
+      "contentSourceId": 10,
+      "sortGlobal": 13,
+      "isHidden": false,
+      "typeId": 9,
+      "type": {
+        "id": 9,
+        "name": "Fantasy League Manager",
+        "code": "fantasy",
+        "isDeletable": false,
+        "isDelegated": false,
+        "maxAllowed": 500
+      },
+      "bu": 0
+    }
+  ],
+  "fantasyData": {
+    "totalFantasyLeagues": 2,
+    "leaguesBySportLeague": {
+      "NFL": 0,
+      "MLB": 0,
+      "NBA": 2,
+      "NHL": 0,
+      "WNBA": 0
+    },
+    "totalChallengeEntries": 0,
+    "challengeInformation": [
+      {
+        "id": 288,
+        "gameType": "PICKEM",
+        "challengeName": "NFL Pick'em",
+        "challengeAbbrev": "NFL Pick'em",
+        "endDate": 1799643540000,
+        "scoringFormatIds": [
+          1,
+          3,
+          2,
+          7
+        ],
+        "state": "LIVE",
+        "logoUrls": {
+          "logo": "https://chui-assets-cdn.espn.com/4099270e-a32e-4f9e-879a-74952cb81661.png",
+          "logoDark": "https://chui-assets-cdn.espn.com/41d27548-4991-4d66-8e33-534cd8840ed0.png",
+          "logo1x1": "https://chui-assets-cdn.espn.com/6cd79e7a-5e4d-4fbe-8623-3b8ac31ec14d.png",
+          "logo1x1Dark": "https://chui-assets-cdn.espn.com/6cd79e7a-5e4d-4fbe-8623-3b8ac31ec14d.png"
+        },
+        "mappings": [
+          {
+            "type": "SPORT",
+            "value": "football"
+          },
+          {
+            "type": "LEAGUE",
+            "value": "nfl"
+          },
+          {
+            "type": "GAMECAST_SUPPORTED",
+            "value": "true"
+          }
+        ],
+        "userEntryCount": 0
+      },
+      {
+        "id": 289,
+        "gameType": "PICKEM",
+        "challengeName": "College Pick'em",
+        "challengeAbbrev": "College Pick'em",
+        "endDate": 1796619540000,
+        "scoringFormatIds": [
+          1,
+          3,
+          2
+        ],
+        "state": "LIVE",
+        "logoUrls": {
+          "logo": "https://chui-assets-cdn.espn.com/056a9567-dae4-4185-b4d6-a723df87f988.png",
+          "logoDark": "https://chui-assets-cdn.espn.com/5b9dcbf1-9be9-4a35-9db4-33cfe56b9e3a.png",
+          "logo1x1": "https://chui-assets-cdn.espn.com/c7f88874-19f6-4352-a54b-60f7d94bed2f.png",
+          "logo1x1Dark": "https://chui-assets-cdn.espn.com/c7f88874-19f6-4352-a54b-60f7d94bed2f.png"
+        },
+        "mappings": [
+          {
+            "type": "SPORT",
+            "value": "football"
+          },
+          {
+            "type": "LEAGUE",
+            "value": "college-football"
+          },
+          {
+            "type": "GAMECAST_SUPPORTED",
+            "value": "true"
+          }
+        ],
+        "userEntryCount": 0
+      },
+      {
+        "id": 290,
+        "gameType": "BRACKET",
+        "challengeName": "Postseason Baseball Challenge",
+        "challengeAbbrev": "Postseason Baseball Challenge",
+        "endDate": 1793505540000,
+        "scoringFormatIds": [
+          5
+        ],
+        "state": "LIVE",
+        "logoUrls": {
+          "logo": "https://chui-assets-cdn.espn.com/3ff798d1-616f-4895-a7f6-34c649318b37.png",
+          "logoDark": "https://chui-assets-cdn.espn.com/a613bf14-1c8e-4208-9ae6-d3857bebd2b4.png",
+          "logo1x1": "https://chui-assets-cdn.espn.com/d4ab7db7-bd5d-4b92-a110-f6676611ccfe.png",
+          "logo1x1Dark": "https://chui-assets-cdn.espn.com/d4ab7db7-bd5d-4b92-a110-f6676611ccfe.png"
+        },
+        "mappings": [
+          {
+            "type": "SPORT",
+            "value": "baseball"
+          },
+          {
+            "type": "LEAGUE",
+            "value": "mlb"
+          },
+          {
+            "type": "GAMECAST_SUPPORTED",
+            "value": "true"
+          }
+        ],
+        "userEntryCount": 0
+      },
+      {
+        "id": 285,
+        "gameType": "GROUP_RANKING",
+        "challengeName": "NFL Playoff Predictor",
+        "challengeAbbrev": "NFL Playoff Predictor",
+        "endDate": 1799643540000,
+        "scoringFormatIds": [
+          6
+        ],
+        "state": "LIVE",
+        "logoUrls": {
+          "logo": "https://chui-assets-cdn.espn.com/ab7efe76-ac0b-4489-9438-617bddc7110d.png",
+          "logoDark": "https://chui-assets-cdn.espn.com/05e5ec49-0b37-4913-b535-6b6abe74992d.png",
+          "logo1x1": "https://chui-assets-cdn.espn.com/7695f3a5-4ae9-4710-bd5f-9bf59a6212be.png",
+          "logo1x1Dark": "https://chui-assets-cdn.espn.com/7695f3a5-4ae9-4710-bd5f-9bf59a6212be.png"
+        },
+        "mappings": [
+          {
+            "type": "SPORT",
+            "value": "football"
+          },
+          {
+            "type": "LEAGUE",
+            "value": "nfl"
+          }
+        ],
+        "userEntryCount": 0
+      },
+      {
+        "id": 286,
+        "gameType": "PICKEM",
+        "challengeName": "NFL Win Totals",
+        "challengeAbbrev": "NFL Win Totals",
+        "endDate": 1799643540000,
+        "scoringFormatIds": [
+          1
+        ],
+        "state": "LIVE",
+        "logoUrls": {
+          "logo": "https://chui-assets-cdn.espn.com/1c0752e8-e899-4818-b1ce-5a8c1019e020.png",
+          "logoDark": "https://chui-assets-cdn.espn.com/25b59710-5840-4ea0-9ad7-fbbd47ba019c.png",
+          "logo1x1": "https://chui-assets-cdn.espn.com/61a35a54-2a18-47fe-854a-6baaa606edc0.png",
+          "logo1x1Dark": "https://chui-assets-cdn.espn.com/61a35a54-2a18-47fe-854a-6baaa606edc0.png"
+        },
+        "mappings": [
+          {
+            "type": "SPORT",
+            "value": "football"
+          },
+          {
+            "type": "LEAGUE",
+            "value": "nfl"
+          }
+        ],
+        "userEntryCount": 0
+      },
+      {
+        "id": 287,
+        "gameType": "CONTESTANT_POOL",
+        "challengeName": "NFL Survivor",
+        "challengeAbbrev": "NFL Survivor",
+        "endDate": 1799643540000,
+        "scoringFormatIds": [
+          4
+        ],
+        "state": "LIVE",
+        "logoUrls": {
+          "logo": "https://chui-assets-cdn.espn.com/06c273c6-ba73-4abe-845c-d0d147d415a3.png",
+          "logoDark": "https://chui-assets-cdn.espn.com/72364946-be63-4638-90e0-3c95724b476d.png",
+          "logo1x1": "https://chui-assets-cdn.espn.com/92708734-a51b-497c-b587-dad9696f5d31.png",
+          "logo1x1Dark": "https://chui-assets-cdn.espn.com/92708734-a51b-497c-b587-dad9696f5d31.png"
+        },
+        "mappings": [
+          {
+            "type": "SPORT",
+            "value": "football"
+          },
+          {
+            "type": "LEAGUE",
+            "value": "nfl"
+          },
+          {
+            "type": "GAMECAST_SUPPORTED",
+            "value": "true"
+          }
+        ],
+        "userEntryCount": 0
+      }
+    ],
+    "challengeScoreboardEnabled": true,
+    "leagueScoreboardEnabled": {
+      "1": true,
+      "2": true,
+      "3": true,
+      "4": true,
+      "5": true
+    }
+  }
+}

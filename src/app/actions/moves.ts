@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { markFresh } from "@/lib/cache";
 import { PLATFORMS, type Platform } from "@/lib/schema";
-import { addDropPlayer, cancelPendingMove, proposeTrade, type MoveOutcome } from "@/lib/services/moves";
+import { addDropPlayer, cancelPendingMove, proposeTrade, respondToTradeOffer, type MoveOutcome } from "@/lib/services/moves";
 import { requireUser } from "@/lib/session";
 
 const ID = /^\d{1,12}$/;
@@ -68,6 +68,14 @@ export async function cancelPendingAction(input: { platform: string; leagueId: s
   const user = await requireUser();
   if (!valid(input.platform, input.leagueId) || !TXN.test(input.transactionId)) return { ok: false, error: "Invalid request." };
   const res = await cancelPendingMove(user.id, input.platform, input.leagueId, input.transactionId);
+  if (res.ok || (!res.ok && res.stale)) await refresh(input.platform, input.leagueId);
+  return res;
+}
+
+export async function respondToTradeAction(input: { platform: string; leagueId: string; transactionId: string; accept: boolean }): Promise<MoveOutcome> {
+  const user = await requireUser();
+  if (!valid(input.platform, input.leagueId) || !TXN.test(input.transactionId) || typeof input.accept !== "boolean") return { ok: false, error: "Invalid request." };
+  const res = await respondToTradeOffer(user.id, input.platform, input.leagueId, input.transactionId, input.accept);
   if (res.ok || (!res.ok && res.stale)) await refresh(input.platform, input.leagueId);
   return res;
 }

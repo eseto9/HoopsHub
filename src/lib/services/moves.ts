@@ -64,6 +64,20 @@ export async function proposeTrade(userId: string, platform: Platform, leagueId:
   });
 }
 
+export async function respondToTradeOffer(userId: string, platform: Platform, leagueId: string, transactionId: string, accept: boolean): Promise<MoveOutcome> {
+  const own = await ownTeam(userId, platform, leagueId);
+  if (!own.ok) return own;
+  if (!own.adapter.respondToTrade || !own.adapter.capabilities.trades) return { ok: false, error: "Answering trades isn't supported here yet." };
+  return run(own.conn, async () => {
+    await own.adapter.respondToTrade!(own.conn, leagueId, own.teamId, transactionId, accept);
+    return accept
+      ? { ok: true, message: "Trade accepted. If your league reviews trades, it completes once the review period ends." }
+      : { ok: true, message: "Trade declined." };
+  }).then((r) =>
+    !r.ok && r.stale ? { ...r, error: "That offer was already answered, cancelled or expired. Showing the latest." } : r,
+  );
+}
+
 export async function cancelPendingMove(userId: string, platform: Platform, leagueId: string, transactionId: string): Promise<MoveOutcome> {
   const own = await ownTeam(userId, platform, leagueId);
   if (!own.ok) return own;

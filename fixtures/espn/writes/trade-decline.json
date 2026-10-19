@@ -1,0 +1,39 @@
+{
+  "_note": "Declining an incoming offer (Pending Trades -> Review -> Decline Trade -> Decline) as team 4 in league 282426317. memberId redacted.",
+  "request": {
+    "method": "POST",
+    "url": "https://lm-api-writes.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/282426317/transactions/",
+    "body": {
+      "isLeagueManager": false,
+      "teamId": 4,
+      "type": "TRADE_DECLINE",
+      "memberId": "{REDACTED-SWID}",
+      "scoringPeriodId": 1,
+      "executionType": "EXECUTE",
+      "comment": "",
+      "relatedTransactionId": "aecfbf8c-aab9-44b5-92fe-2bc20fa7b9a6"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "bidAmount": 0,
+      "comment": "",
+      "executionType": "EXECUTE",
+      "id": "54828bdd-1b86-476e-870a-dbb7a13d8b20",
+      "isActingAsTeamOwner": false,
+      "isLeagueManager": false,
+      "isPending": false,
+      "memberId": "{REDACTED-SWID}",
+      "proposedDate": 1792438540038,
+      "rating": 0,
+      "relatedTransactionId": "aecfbf8c-aab9-44b5-92fe-2bc20fa7b9a6",
+      "scoringPeriodId": 1,
+      "skipTransactionCounters": false,
+      "status": "EXECUTED",
+      "subOrder": 0,
+      "teamId": 4,
+      "type": "TRADE_DECLINE"
+    }
+  }
+}

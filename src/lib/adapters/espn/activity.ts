@@ -94,7 +94,10 @@ export function normalizeActivity(
   myTeamId?: string,
 ): ActivityResult {
   const txns = raw.transactions ?? [];
-  const closed = closedIds(txns);
+  // An accept (TRADE_ACCEPT, observed) points at the offer but doesn't end it:
+  // the offer stays PENDING through league review.
+  const accepted = new Set(txns.filter((t) => t.type === "TRADE_ACCEPT").flatMap((t) => (t.relatedTransactionId ? [t.relatedTransactionId] : [])));
+  const closed = closedIds(txns.filter((t) => t.type !== "TRADE_ACCEPT"));
   const feed: LeagueActivity[] = [];
   const pendingForTeam: LeagueActivity[] = [];
 
@@ -105,6 +108,7 @@ export function normalizeActivity(
       feed.push(toActivity(t, kind, "completed", leagueId, players));
     } else if (t.status === "PENDING" && kind !== "lineup" && !closed.has(t.id) && myTeamId) {
       const a = toActivity(t, kind, "pending", leagueId, players);
+      if (accepted.has(t.id)) a.accepted = true;
       // Other teams' open offers and claims stay private, as on ESPN.
       if (a.teamIds.includes(teamKey(leagueId, Number(myTeamId)))) pendingForTeam.push(a);
     }

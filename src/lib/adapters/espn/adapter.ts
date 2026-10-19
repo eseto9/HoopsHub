@@ -4,7 +4,7 @@ import type { League, Player } from "@/lib/schema";
 import type { AdapterConnection, ConnectResult, FreeAgentQuery, LineupChange, PlatformAdapter, RosterResult } from "../types";
 import { invalidate } from "@/lib/cache";
 import { cacheScope, cached, communicationEndpoint, cookiesOf, espnFetch, espnPost, ESPN_READS, fanEndpoint, leagueEndpoint, type EspnCookies } from "./client";
-import { buildAddDrop, buildCancel, buildLineupTransaction, buildTradeProposal, transactionsUrl, type EspnTransactionResponse } from "./writes";
+import { buildAddDrop, buildCancel, buildTradeResponse, buildLineupTransaction, buildTradeProposal, transactionsUrl, type EspnTransactionResponse } from "./writes";
 import { LINEUP_SLOTS } from "./constants";
 import {
   leagueIdsFromFanProfile,
@@ -460,6 +460,24 @@ export const espnAdapter: PlatformAdapter = {
     });
     const res = await postTransaction(conn, cookies, settings.seasonId, leagueId, body);
     if (res.status !== "CANCELED") throw new PlatformError("espn", 409, `ESPN didn't cancel it (status: ${res.status ?? "unknown"})`);
+  },
+
+  async respondToTrade(conn, leagueId, teamId, transactionId, accept) {
+    const { cookies, settings } = await writeContext(conn, leagueId, teamId);
+    const raw = await espnFetch<EspnTransactionsResponse>(leagueEndpoint(settings.seasonId, leagueId, ["mTransactions2"]), fetchOpts(conn));
+    const txns = raw.transactions ?? [];
+    const t = txns.find((x) => x.id === transactionId);
+    const toMe = t?.items?.some((i) => i.type === "TRADE" && (i.toTeamId === Number(teamId) || i.fromTeamId === Number(teamId)));
+    const open = t && t.type === "TRADE_PROPOSAL" && t.status === "PENDING" && t.teamId !== Number(teamId) && toMe && !closedIds(txns).has(t.id);
+    // closedIds counts accepts too, so an offer you already accepted can't be answered twice.
+    if (!open) throw new PlatformError("espn", 409, "That offer isn't open anymore");
+
+    const body = buildTradeResponse({ accept, teamId: Number(teamId), memberId: cookies.swid, scoringPeriodId: settings.scoringPeriodId, relatedTransactionId: t.id });
+    const res = await postTransaction(conn, cookies, settings.seasonId, leagueId, body);
+    // Captured decline reply: status EXECUTED. Accepted trades may then sit in league review.
+    if (res.status && res.status !== "EXECUTED" && res.status !== "PENDING") {
+      throw new PlatformError("espn", 409, `ESPN didn't record your answer (status: ${res.status})`);
+    }
   },
 
   /** Lineup moves, using the request format captured from espn.com (fixtures/espn/writes). */

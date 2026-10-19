@@ -25,7 +25,8 @@ export function activityAlerts(
   for (const a of activity.pendingForTeam) {
     if (a.kind === "trade") {
       const other = a.teamIds.find((id) => id !== myTeamId) ?? null;
-      if (a.teamId === myTeamId) out.push({ kind: "offer_waiting", text: `Your trade offer to ${name(other)} is waiting for a reply.`, date: a.date, urgent: false });
+      if (a.accepted) out.push({ kind: "offer_waiting", text: `Trade with ${name(other === myTeamId ? a.teamId : other)} accepted; waiting on league review.`, date: a.date, urgent: false });
+      else if (a.teamId === myTeamId) out.push({ kind: "offer_waiting", text: `Your trade offer to ${name(other)} is waiting for a reply.`, date: a.date, urgent: false });
       else out.push({ kind: "trade_offer", text: `${name(a.teamId)} sent you a trade offer.`, date: a.date, urgent: true });
     } else if (a.kind === "waiver" && a.teamId === myTeamId) {
       out.push({ kind: "claim_pending", text: `Waiver claim for ${players(a, "added")} is pending.`, date: a.date, urgent: false });

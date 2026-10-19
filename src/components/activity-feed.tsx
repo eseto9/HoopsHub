@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { cancelPendingAction } from "@/app/actions/moves";
+import { cancelPendingAction, respondToTradeAction } from "@/app/actions/moves";
 import { safeAction } from "@/lib/safe-action";
 import type { ActivityMove, LeagueActivity, Team } from "@/lib/schema";
 import { Group, RowBlock } from "./list";
@@ -162,6 +162,7 @@ export function ActivityFeed({
   const [filter, setFilter] = useState<Filter>("all");
   const [teamFilter, setTeamFilter] = useState<string>("");
   const [cancelling, setCancelling] = useState<LeagueActivity | null>(null);
+  const [answering, setAnswering] = useState<{ a: LeagueActivity; accept: boolean } | null>(null);
   const [notice, setNotice] = useState<NoticeState>(null);
   const [busy, start] = useTransition();
 
@@ -176,6 +177,18 @@ export function ActivityFeed({
     });
   }
 
+  function answer() {
+    if (!answering) return;
+    const { a, accept } = answering;
+    const transactionId = a.id.slice(a.id.indexOf(".") + 1);
+    start(async () => {
+      const res = await safeAction(() => respondToTradeAction({ platform, leagueId, transactionId, accept }));
+      setAnswering(null);
+      setNotice(res.ok ? { kind: "ok", text: res.message } : { kind: "error", text: res.error, reconnect: res.reconnect });
+      if (res.ok || ("stale" in res && res.stale)) router.refresh();
+    });
+  }
+
   const pendingAction = (a: LeagueActivity) => {
     const mine = a.teamId ? byId.get(a.teamId)?.isMine : false;
     if (mine && canAct) {
@@ -183,6 +196,21 @@ export function ActivityFeed({
         <button type="button" onClick={() => (setNotice(null), setCancelling(a))} className="shrink-0 text-[15px] text-danger">
           Cancel
         </button>
+      );
+    }
+    if (!mine && a.kind === "trade" && a.accepted) {
+      return <span className="shrink-0 text-[13px] text-muted">Accepted · in review</span>;
+    }
+    if (!mine && a.kind === "trade" && canAct) {
+      return (
+        <span className="flex shrink-0 gap-2">
+          <button type="button" onClick={() => (setNotice(null), setAnswering({ a, accept: false }))} className="rounded-full bg-fill px-3 py-1.5 text-[14px] font-medium text-danger">
+            Decline
+          </button>
+          <button type="button" onClick={() => (setNotice(null), setAnswering({ a, accept: true }))} className="rounded-full bg-accent px-3 py-1.5 text-[14px] font-semibold text-white">
+            Accept
+          </button>
+        </span>
       );
     }
     if (!mine && leagueUrl) {
@@ -224,7 +252,7 @@ export function ActivityFeed({
       {incoming.length > 0 && (
         <Group
           header="Trade offers to you"
-          footer={`Accepting or declining from Hoops Hub isn't available yet, so these open on ${platformName}.`}
+          footer={canAct ? "Accepted trades may wait out a league review period before players move." : `Answer these on ${platformName}.`}
         >
           {incoming.map((a) => (
             <ActivityItem key={a.id} a={a} team={team} teamName={teamName} action={pendingAction(a)} playerBase={playerBase} />
@@ -282,6 +310,30 @@ export function ActivityFeed({
             ))}
           </Group>
         ))
+      )}
+
+      {answering && (
+        <Sheet
+          title={answering.accept ? "Accept this trade?" : "Decline this trade?"}
+          confirmLabel={answering.accept ? "Accept Trade" : "Decline Trade"}
+          pendingLabel={`Sending to ${platformName}…`}
+          pending={busy}
+          destructive={!answering.accept}
+          onConfirm={answer}
+          onCancel={() => setAnswering(null)}
+        >
+          <div className="flex flex-col gap-1 text-center text-[15px]">
+            {answering.a.moves.map((m, i) => {
+              const toMe = !!(m.toTeamId && byId.get(m.toTeamId)?.isMine);
+              return (
+                <p key={i} className={toMe ? "text-success" : "text-danger"}>
+                  {toMe ? "You get" : "You give"} {m.player?.name ?? "a player"}
+                </p>
+              );
+            })}
+            {answering.accept && <p className="mt-2 text-[13px] text-muted">If your league reviews trades, players move once the review period ends.</p>}
+          </div>
+        </Sheet>
       )}
 
       {cancelling && (

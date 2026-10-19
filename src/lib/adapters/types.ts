@@ -102,4 +102,6 @@ export interface PlatformAdapter {
   proposeTrade?(conn: AdapterConnection, leagueId: string, teamId: string, proposal: TradeProposal): Promise<WriteResult>;
   /** Cancel one of your own pending claims or trade offers (external transaction id). */
   cancelPending?(conn: AdapterConnection, leagueId: string, teamId: string, transactionId: string): Promise<void>;
+  /** Accept or decline a trade offer someone made to your team. */
+  respondToTrade?(conn: AdapterConnection, leagueId: string, teamId: string, transactionId: string, accept: boolean): Promise<void>;
 }

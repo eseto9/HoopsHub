@@ -34,6 +34,11 @@ describe("dashboard alerts", () => {
     expect(alerts[1].text).toBe("Your claim went through: Ace Bailey added.");
   });
 
+  it("shows an accepted offer as waiting on review, not as a new offer", () => {
+    const alerts = activityAlerts({ feed: [], pendingForTeam: [act({ teamId: them, accepted: true })] }, me, teams, now);
+    expect(alerts).toEqual([expect.objectContaining({ kind: "offer_waiting", urgent: false, text: "Trade with Rivals accepted; waiting on league review." })]);
+  });
+
   it("ignores other teams' moves", () => {
     expect(activityAlerts({ feed: [act({ kind: "waiver", status: "completed", teamId: them, teamIds: [them] })], pendingForTeam: [] }, me, teams, now)).toEqual([]);
   });

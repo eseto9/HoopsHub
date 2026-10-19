@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildAddDrop, buildCancel, buildTradeProposal, transactionsUrl } from "@/lib/adapters/espn/writes";
+import { buildAddDrop, buildCancel, buildTradeProposal, buildTradeResponse, transactionsUrl } from "@/lib/adapters/espn/writes";
 
 const dir = path.join(__dirname, "..", "fixtures", "espn", "writes");
 type Capture = { request: { url: string; body: Record<string, unknown> } };
@@ -61,5 +61,18 @@ describe("ESPN write requests match espn.com captures", () => {
     const claim = buildAddDrop({ type: "WAIVER", teamId: 8, memberId: MEMBER, scoringPeriodId: 1, addPlayerId: 1, dropPlayerId: 2 });
     const pickup = buildAddDrop({ type: "FREEAGENT", teamId: 8, memberId: MEMBER, scoringPeriodId: 1, addPlayerId: 1, dropPlayerId: 2 });
     expect({ ...pickup, type: "WAIVER" }).toEqual(claim);
+  });
+});
+
+describe("answering a trade offer", () => {
+  const captured = JSON.parse(readFileSync(path.join(__dirname, "..", "fixtures", "espn", "writes", "trade-decline.json"), "utf8"));
+  const opts = { teamId: 4, memberId: "{REDACTED-SWID}", scoringPeriodId: 1, relatedTransactionId: "aecfbf8c-aab9-44b5-92fe-2bc20fa7b9a6" };
+
+  it("declines exactly like espn.com", () => {
+    expect(buildTradeResponse({ ...opts, accept: false })).toEqual(captured.request.body);
+  });
+
+  it("accepts with the same body and type TRADE_ACCEPT", () => {
+    expect(buildTradeResponse({ ...opts, accept: true })).toEqual({ ...captured.request.body, type: "TRADE_ACCEPT" });
   });
 });

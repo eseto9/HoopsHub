@@ -250,7 +250,8 @@ export interface EspnTransactionItem {
 export interface EspnTransaction {
   id: string;
   type: string;
-  status: string;
+  /** Missing on TRADE_ACCEPT records (observed). */
+  status?: string;
   executionType?: string; // EXECUTE | PROCESS | CANCEL
   teamId: number;
   proposedDate: number;

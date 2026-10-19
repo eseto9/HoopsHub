@@ -119,6 +119,25 @@ export function buildCancel(opts: {
   };
 }
 
+/**
+ * Answer a trade offer made to you. Decline is captured
+ * (fixtures/espn/writes/trade-decline.json). Accept is the same body with
+ * type TRADE_ACCEPT: inferred, because ESPN stores accepts and declines with
+ * identical fields (mTransactions2), and verified live before shipping.
+ */
+export function buildTradeResponse(opts: { accept: boolean; teamId: number; memberId: string; scoringPeriodId: number; relatedTransactionId: string }) {
+  return {
+    isLeagueManager: false,
+    teamId: opts.teamId,
+    type: opts.accept ? "TRADE_ACCEPT" : "TRADE_DECLINE",
+    memberId: opts.memberId,
+    scoringPeriodId: opts.scoringPeriodId,
+    executionType: "EXECUTE",
+    comment: "",
+    relatedTransactionId: opts.relatedTransactionId,
+  };
+}
+
 /** Observed: HTTP 200 with status "EXECUTED" (lineups), "PENDING" (claims, offers) or "CANCELED". */
 export interface EspnTransactionResponse {
   id?: string;

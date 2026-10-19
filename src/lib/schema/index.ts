@@ -220,6 +220,8 @@ export interface LeagueActivity {
   moves: ActivityMove[];
   /** League messages (renames, settings, draft): readable lines. */
   lines?: string[];
+  /** Trade offers: both sides agreed and it's waiting out league review. */
+  accepted?: boolean;
 }
 
 // ---------------------------------------------------------------------------

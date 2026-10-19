@@ -123,3 +123,37 @@ describe("ESPN league messages", () => {
     expect(communicationPlayerIds(comm)).toEqual([]);
   });
 });
+
+describe("ESPN offers answered by you", () => {
+  const offer = {
+    id: "450b3d9f-9399-4871-99af-e776a6d91eb5",
+    type: "TRADE_PROPOSAL",
+    status: "PENDING",
+    teamId: 9,
+    proposedDate: 1792438429934,
+    scoringPeriodId: 1,
+    items: [
+      { type: "TRADE", playerId: 4397140, fromTeamId: 4, toTeamId: 9 },
+      { type: "TRADE", playerId: 4709138, fromTeamId: 9, toTeamId: 4 },
+    ],
+  };
+  // Shapes as stored in mTransactions2 after answering on espn.com (league 282426317).
+  const accept = { id: "b1b626c8", type: "TRADE_ACCEPT", teamId: 4, proposedDate: 1792438616600, scoringPeriodId: 1, relatedTransactionId: offer.id };
+  const decline = { id: "54828bdd", type: "TRADE_DECLINE", status: "EXECUTED", teamId: 4, proposedDate: 1792438540038, scoringPeriodId: 1, relatedTransactionId: offer.id };
+
+  it("shows an offer to you as pending until you answer", () => {
+    const { pendingForTeam } = normalizeActivity({ transactions: [offer] }, "282426317", new Map(), "4");
+    expect(pendingForTeam).toHaveLength(1);
+    expect(pendingForTeam[0].accepted).toBeUndefined();
+  });
+
+  it("keeps an accepted offer visible while it waits out league review", () => {
+    const { pendingForTeam } = normalizeActivity({ transactions: [offer, accept] }, "282426317", new Map(), "4");
+    expect(pendingForTeam).toHaveLength(1);
+    expect(pendingForTeam[0].accepted).toBe(true);
+  });
+
+  it("drops a declined offer", () => {
+    expect(normalizeActivity({ transactions: [offer, decline] }, "282426317", new Map(), "4").pendingForTeam).toEqual([]);
+  });
+});

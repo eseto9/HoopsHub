@@ -1,0 +1,38 @@
+{
+  "_note": "Accepting an incoming offer with the body Hoops Hub builds (buildTradeResponse), sent as team 4 in league 282426317. ESPN then showed it under Pending Trades as 'Trade will process at approximately Oct 20, 03:41 PM', same as accepts made on espn.com. memberId redacted.",
+  "request": {
+    "method": "POST",
+    "url": "https://lm-api-writes.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/282426317/transactions/",
+    "body": {
+      "isLeagueManager": false,
+      "teamId": 4,
+      "type": "TRADE_ACCEPT",
+      "memberId": "{REDACTED-SWID}",
+      "scoringPeriodId": 1,
+      "executionType": "EXECUTE",
+      "comment": "",
+      "relatedTransactionId": "8afcbb68-cebe-43bc-b751-ffd89c2b0949"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "bidAmount": 0,
+      "comment": "",
+      "executionType": "EXECUTE",
+      "id": "06689186-fbbe-4e33-9e03-c1e5e21d1f26",
+      "isActingAsTeamOwner": false,
+      "isLeagueManager": false,
+      "isPending": false,
+      "memberId": "{REDACTED-SWID}",
+      "proposedDate": 1792438864273,
+      "rating": 0,
+      "relatedTransactionId": "8afcbb68-cebe-43bc-b751-ffd89c2b0949",
+      "scoringPeriodId": 1,
+      "skipTransactionCounters": false,
+      "subOrder": 0,
+      "teamId": 4,
+      "type": "TRADE_ACCEPT"
+    }
+  }
+}

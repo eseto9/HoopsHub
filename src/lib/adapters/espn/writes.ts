@@ -120,10 +120,10 @@ export function buildCancel(opts: {
 }
 
 /**
- * Answer a trade offer made to you. Decline is captured
- * (fixtures/espn/writes/trade-decline.json). Accept is the same body with
- * type TRADE_ACCEPT: inferred, because ESPN stores accepts and declines with
- * identical fields (mTransactions2), and verified live before shipping.
+ * Answer a trade offer made to you. Decline captured from espn.com
+ * (fixtures/espn/writes/trade-decline.json); accept is the same body with
+ * type TRADE_ACCEPT, sent live and confirmed by ESPN
+ * (fixtures/espn/writes/trade-accept.json). The accept reply has no status.
  */
 export function buildTradeResponse(opts: { accept: boolean; teamId: number; memberId: string; scoringPeriodId: number; relatedTransactionId: string }) {
   return {

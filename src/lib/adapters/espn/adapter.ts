@@ -474,7 +474,7 @@ export const espnAdapter: PlatformAdapter = {
 
     const body = buildTradeResponse({ accept, teamId: Number(teamId), memberId: cookies.swid, scoringPeriodId: settings.scoringPeriodId, relatedTransactionId: t.id });
     const res = await postTransaction(conn, cookies, settings.seasonId, leagueId, body);
-    // Captured decline reply: status EXECUTED. Accepted trades may then sit in league review.
+    // Captured replies: decline has status EXECUTED, accept has no status (then league review).
     if (res.status && res.status !== "EXECUTED" && res.status !== "PENDING") {
       throw new PlatformError("espn", 409, `ESPN didn't record your answer (status: ${res.status})`);
     }

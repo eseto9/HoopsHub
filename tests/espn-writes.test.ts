@@ -72,7 +72,8 @@ describe("answering a trade offer", () => {
     expect(buildTradeResponse({ ...opts, accept: false })).toEqual(captured.request.body);
   });
 
-  it("accepts with the same body and type TRADE_ACCEPT", () => {
-    expect(buildTradeResponse({ ...opts, accept: true })).toEqual({ ...captured.request.body, type: "TRADE_ACCEPT" });
+  it("accepts with the body ESPN took live", () => {
+    const accepted = JSON.parse(readFileSync(path.join(__dirname, "..", "fixtures", "espn", "writes", "trade-accept.json"), "utf8"));
+    expect(buildTradeResponse({ ...opts, accept: true, relatedTransactionId: "8afcbb68-cebe-43bc-b751-ffd89c2b0949" })).toEqual(accepted.request.body);
   });
 });

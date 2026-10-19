@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 /** Round player headshot; falls back to initials when there's no photo. */
-export function PlayerAvatar({ src, name }: { src?: string; name: string }) {
+export function PlayerAvatar({ src, name, size = "md" }: { src?: string; name: string; size?: "sm" | "md" }) {
   const [failed, setFailed] = useState(false);
   const initials = name
     .split(/\s+/)
@@ -13,7 +13,11 @@ export function PlayerAvatar({ src, name }: { src?: string; name: string }) {
     .join("");
 
   return (
-    <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-2 text-[12px] font-semibold text-muted">
+    <span
+      className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-2 font-semibold text-muted ${
+        size === "sm" ? "h-7 w-7 text-[10px]" : "h-9 w-9 text-[12px]"
+      }`}
+    >
       {src && !failed ? (
         // eslint-disable-next-line @next/next/no-img-element -- ESPN CDN, already resized server-side
         <img

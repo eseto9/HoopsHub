@@ -276,7 +276,7 @@ export function PlayersExplorer({
               return (
                 <tr key={p.player.id} className="[&>td]:border-t-[0.5px] [&>td]:border-separator first:[&>td]:border-t-0">
                   <td className="sticky left-0 z-[1] bg-surface py-2 pr-2 pl-3 shadow-[1px_0_0_var(--separator)]">
-                    <div className="flex w-[196px] items-center gap-2 sm:w-[240px]">
+                    <div className="flex w-[168px] items-center gap-1.5 sm:w-[250px] sm:gap-2">
                       <ActionButton
                         p={p}
                         owner={owner}
@@ -284,13 +284,13 @@ export function PlayersExplorer({
                         base={base}
                         onAdd={() => (setNotice(null), setAdding(p))}
                       />
-                      <PlayerAvatar src={p.player.headshotUrl} name={p.player.name} />
+                      <PlayerAvatar src={p.player.headshotUrl} name={p.player.name} size="sm" />
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          <span className="truncate font-medium">{p.player.name}</span>
-                          {inj && <span className="shrink-0 text-[11px] font-bold text-danger">{inj}</span>}
+                        <div className="line-clamp-2 text-[14px] leading-tight font-medium">
+                          {p.player.name}
+                          {inj && <span className="ml-1 text-[10px] font-bold text-danger">{inj}</span>}
                         </div>
-                        <div className="truncate text-[12px] text-muted">
+                        <div className="truncate text-[11px] text-muted">
                           {p.player.nbaTeam ?? "FA"} · {p.player.positions.join(", ")} · <StatusText p={p} owner={owner} />
                         </div>
                       </div>
@@ -299,7 +299,7 @@ export function PlayersExplorer({
                         onClick={() => toggleWatch(p)}
                         aria-label={isWatched ? `Remove ${p.player.name} from watchlist` : `Add ${p.player.name} to watchlist`}
                         aria-pressed={isWatched}
-                        className={`shrink-0 text-[17px] leading-none ${isWatched ? "text-warning" : "text-faint"}`}
+                        className={`-mr-1 shrink-0 p-1 text-[15px] leading-none ${isWatched ? "text-warning" : "text-faint"}`}
                       >
                         {isWatched ? "★" : "☆"}
                       </button>
@@ -377,14 +377,14 @@ function ActionButton({ p, owner, canAdd, base, onAdd }: { p: PlayerListing; own
         onClick={onAdd}
         aria-label={`Add ${p.player.name} to team`}
         title="Add to team"
-        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[19px] leading-none font-semibold text-white ${
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[17px] leading-none font-semibold text-white ${
           p.status === "waivers" ? "bg-warning" : "bg-success"
         }`}
       >
         +
       </button>
     ) : (
-      <span className="w-7 shrink-0" />
+      <span className="w-6 shrink-0" />
     );
   }
   if (owner && !owner.isMine && canAdd) {
@@ -393,13 +393,13 @@ function ActionButton({ p, owner, canAdd, base, onAdd }: { p: PlayerListing; own
         href={`${base}?tab=trade&team=${owner.externalId}`}
         aria-label={`Propose a trade for ${p.player.name}`}
         title="Trade for"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[14px] font-bold text-accent"
+        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[12px] font-bold text-accent"
       >
         ⇄
       </Link>
     );
   }
-  return <span className="w-7 shrink-0" />;
+  return <span className="w-6 shrink-0" />;
 }
 
 function Th({

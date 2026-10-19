@@ -98,6 +98,7 @@ export function StatsTable({
   onSort,
   firstColumn = "Player",
   showOwnership = true,
+  compact = false,
 }: {
   rows: StatsTableRow[];
   source: StatSource;
@@ -108,11 +109,15 @@ export function StatsTable({
   onSort?: (key: string) => void;
   firstColumn?: string;
   showOwnership?: boolean;
+  /** Half-width layout (matchup side by side): tighter cells, no trailing extra columns. */
+  compact?: boolean;
 }) {
   const th = { sort, onSort };
   return (
     <div className="list-group overflow-x-auto">
-      <table className="w-full border-separate border-spacing-0 text-[14px] tabular-nums">
+      <table
+        className={`w-full border-separate border-spacing-0 tabular-nums ${compact ? "text-[13px] [&_td]:px-1.5 [&_th]:px-1.5 [&_td:first-child]:pl-2.5 [&_th:first-child]:pl-2.5" : "text-[14px]"}`}
+      >
         <thead>
           <tr className="text-[11px] font-semibold text-muted uppercase">
             <Th {...th} k="name" sticky align="left">{firstColumn}</Th>
@@ -128,15 +133,16 @@ export function StatsTable({
               </>
             )}
             <Th {...th} k="gms">Gms</Th>
-            {EXTRA_COLS.map((c) => (
-              <Th {...th} key={c.key} k={c.key}>{c.label}</Th>
-            ))}
-            {points && <Th {...th} k="fptot">FPTS</Th>}
+            {!compact &&
+              EXTRA_COLS.map((c) => (
+                <Th {...th} key={c.key} k={c.key}>{c.label}</Th>
+              ))}
+            {points && !compact && <Th {...th} k="fptot">FPTS</Th>}
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <Row key={r.key} r={r} source={source} mode={mode} points={points} showOwnership={showOwnership} />
+            <Row key={r.key} r={r} source={source} mode={mode} points={points} showOwnership={showOwnership} compact={compact} />
           ))}
         </tbody>
       </table>
@@ -180,23 +186,37 @@ function Th({
   );
 }
 
-function Row({ r, source, mode, points, showOwnership }: { r: StatsTableRow; source: StatSource; mode: StatMode; points: boolean; showOwnership: boolean }) {
+function Row({
+  r,
+  source,
+  mode,
+  points,
+  showOwnership,
+  compact,
+}: {
+  r: StatsTableRow;
+  source: StatSource;
+  mode: StatMode;
+  points: boolean;
+  showOwnership: boolean;
+  compact: boolean;
+}) {
   const p = r.player;
   const line = statLineOf(p, source);
   const inj = p?.injuryStatus ? INJURY_LABEL[p.injuryStatus] : undefined;
   const chg = p?.ownership?.percentRosteredChange;
-  const cells = STAT_COLS.length + EXTRA_COLS.length + 2 + (showOwnership ? 2 : 0) + (points ? 2 : 0);
+  const cells = STAT_COLS.length + (compact ? 0 : EXTRA_COLS.length) + 2 + (showOwnership ? 2 : 0) + (points ? (compact ? 1 : 2) : 0);
   const bg = r.highlighted ? "bg-accent-soft" : "bg-surface";
   return (
     <tr className={`[&>td]:border-t-[0.5px] [&>td]:border-separator first:[&>td]:border-t-0 ${r.dimmed ? "opacity-40" : ""}`}>
       <td className={`sticky left-0 z-[1] py-2 pr-2 pl-3 shadow-[1px_0_0_var(--separator)] ${bg}`}>
-        <div className="flex w-[168px] items-center gap-1.5 sm:w-[250px] sm:gap-2">
+        <div className={`flex items-center gap-1.5 ${compact ? "w-[150px] xl:w-[176px]" : "w-[168px] sm:w-[250px] sm:gap-2"}`}>
           {r.lead}
           {p ? (
             <>
               <PlayerAvatar src={p.headshotUrl} name={p.name} size="sm" />
               <div className="min-w-0 flex-1">
-                <div className="line-clamp-2 text-[14px] leading-tight font-medium">
+                <div className={`text-[14px] leading-tight font-medium ${compact ? "truncate" : "line-clamp-2"}`} title={compact ? p.name : undefined}>
                   {p.name}
                   {inj && <span className="ml-1 text-[10px] font-bold text-danger">{inj}</span>}
                 </div>
@@ -225,10 +245,11 @@ function Row({ r, source, mode, points, showOwnership }: { r: StatsTableRow; sou
             </>
           )}
           <Td>{p.schedule?.gamesThisWeek ?? "–"}</Td>
-          {EXTRA_COLS.map((c) => (
-            <StatTd key={c.key} p={p} k={c.key} source={source} mode={mode} />
-          ))}
-          {points && <Td>{line?.fantasyPointsTotal !== undefined ? f0.format(line.fantasyPointsTotal) : "–"}</Td>}
+          {!compact &&
+            EXTRA_COLS.map((c) => (
+              <StatTd key={c.key} p={p} k={c.key} source={source} mode={mode} />
+            ))}
+          {points && !compact && <Td>{line?.fantasyPointsTotal !== undefined ? f0.format(line.fantasyPointsTotal) : "–"}</Td>}
         </>
       ) : (
         <td colSpan={cells} className="bg-surface" />

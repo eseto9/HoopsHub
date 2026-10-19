@@ -4,6 +4,13 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "Hoops Hub", template: "%s · Hoops Hub" },
   description: "All your ESPN, Yahoo and Sleeper fantasy basketball leagues in one place.",
+  applicationName: "Hoops Hub",
+  // iPhone "Add to Home Screen": open full-screen with the app's own name and icon.
+  appleWebApp: { capable: true, title: "Hoops Hub", statusBarStyle: "default" },
+  icons: {
+    icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
 };
 
 export const viewport: Viewport = {

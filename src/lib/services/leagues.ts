@@ -5,7 +5,8 @@ import { PlatformError, ReconnectRequiredError } from "@/lib/errors";
 import type { League, LeagueActivity, NewsItem, Platform, Player, PlayerListing, RosterSlot, Team } from "@/lib/schema";
 import type { DashboardData, DashboardLeague, DashboardProblem, MatchupSummary } from "@/lib/schema/views";
 import { watchedPlayerIds } from "./watchlist";
-import { activityAlerts } from "@/lib/alerts";
+import { activityAlerts, pushPlan } from "@/lib/alerts";
+import { claimAlert, getAlertPrefs, sendToUser } from "./push";
 import { exposure, nameKey } from "@/lib/hub";
 import { mapLimit, playerNews } from "@/lib/nba/news";
 import { getAdapterConnections, listConnections, listLeaguePreferences, markNeedsReconnect, markSynced } from "./connections";
@@ -400,4 +401,25 @@ export async function getMyNews(userId: string, cap = 24): Promise<{ entries: My
     e.news = await playerNews(id);
   });
   return { entries: entries.filter((e) => e.news.length).sort((a, b) => (b.news[0]?.published ?? "").localeCompare(a.news[0]?.published ?? "")), injured };
+}
+
+/**
+ * Push alerts for one user: trade offers, results and lineup reminders that
+ * haven't been sent yet. Returns how many went out.
+ */
+export async function runAlertsForUser(userId: string, now = Date.now()): Promise<number> {
+  const prefs = await getAlertPrefs(userId);
+  const [{ leagues }, { sections }] = await Promise.all([getDashboard(userId), prefs.lineup ? getMyTeams(userId) : Promise.resolve({ sections: [] as MyTeamSection[] })]);
+  const plan = pushPlan(
+    leagues,
+    sections.map((s) => ({ leagueId: s.league.id, leagueName: s.league.name, url: `/leagues/${s.league.platform}/${s.league.externalId}`, slots: s.slots })),
+    prefs,
+    now,
+  );
+  let sent = 0;
+  for (const m of plan) {
+    if (!(await claimAlert(userId, m.key))) continue;
+    sent += (await sendToUser(userId, { title: m.title, body: m.body, url: m.url, tag: m.tag })) > 0 ? 1 : 0;
+  }
+  return sent;
 }

@@ -8,6 +8,7 @@ import { Group, IconTile, Row } from "@/components/list";
 import { PlatformIcon } from "@/components/platform-badge";
 import { SignOutRow } from "@/components/sign-out-button";
 import { SleeperConnectForm } from "@/components/sleeper-connect-form";
+import { AlertsSettings } from "@/components/alerts-settings";
 import { listConnections, listLeaguePreferences } from "@/lib/services/connections";
 import { getCurrentUser, requireUser } from "@/lib/session";
 import { yahooConfigured } from "@/lib/yahoo/oauth";
@@ -201,6 +202,8 @@ export default function ConnectionsPage({ searchParams }: PageProps<"/connection
       <Suspense fallback={<div className="list-group h-[120px] animate-pulse" />}>
         <Sleeper />
       </Suspense>
+
+      <AlertsSettings publicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || null} />
 
       <div className="list-group">
         <SignOutRow />

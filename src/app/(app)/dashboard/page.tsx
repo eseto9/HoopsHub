@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Exclamation, Plus } from "@/components/icons";
+import { InstallHint } from "@/components/install-hint";
 import { LeagueCard } from "@/components/league-card";
 import { Group, IconTile, Row } from "@/components/list";
 import { platformLabel } from "@/components/platform-badge";
@@ -107,6 +108,7 @@ export default function DashboardPage() {
           <Plus />
         </Link>
       </div>
+      <InstallHint />
       <Suspense fallback={<Skeleton />}>
         <Leagues />
       </Suspense>

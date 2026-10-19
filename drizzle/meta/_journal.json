@@ -15,6 +15,13 @@
       "when": 1792420972131,
       "tag": "0001_watchlist",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792443403032,
+      "tag": "0002_alerts",
+      "breakpoints": true
     }
   ]
 }

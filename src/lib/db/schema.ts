@@ -131,3 +131,47 @@ export const watchlist = pgTable(
   },
   (t) => [uniqueIndex("watchlist_user_platform_player_idx").on(t.userId, t.platform, t.playerExternalId)],
 );
+
+/**
+ * Browser push subscriptions (one per device). Keys are the browser's public
+ * values for encrypting messages to it; nothing here is a secret of ours.
+ */
+export const pushSubscription = pgTable(
+  "push_subscription",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("push_subscription_endpoint_idx").on(t.endpoint)],
+);
+
+/** Which alert types a user wants. Missing row = defaults (all on). */
+export const alertSettings = pgTable("alert_settings", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  tradeOffers: boolean("trade_offers").notNull().default(true),
+  results: boolean("results").notNull().default(true),
+  lineup: boolean("lineup").notNull().default(true),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+/** Alerts already sent, so each one goes out once. */
+export const alertSent = pgTable(
+  "alert_sent",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    sentAt: timestamp("sent_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("alert_sent_user_key_idx").on(t.userId, t.key)],
+);

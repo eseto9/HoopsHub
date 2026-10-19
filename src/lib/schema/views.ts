@@ -37,6 +37,8 @@ export interface DashboardData {
 
 /** Something in a league that needs the user's attention or just happened to them. */
 export interface DashboardAlert {
+  /** The activity it comes from. */
+  id: string;
   kind: "trade_offer" | "offer_waiting" | "claim_pending" | "claim_won" | "trade_done";
   text: string;
   date: string;

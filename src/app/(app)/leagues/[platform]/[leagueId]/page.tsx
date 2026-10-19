@@ -7,6 +7,8 @@ import { ChevronRight } from "@/components/icons";
 import { Group, Row } from "@/components/list";
 import { PlatformIcon, platformLabel } from "@/components/platform-badge";
 import { PlayerRow } from "@/components/player-row";
+import { RosterEditor } from "@/components/roster-editor";
+import { getAdapter } from "@/lib/adapters/registry";
 import { Segmented } from "@/components/segmented";
 import { TeamAvatar } from "@/components/team-avatar";
 import { PLATFORMS, type Platform, type Team } from "@/lib/schema";
@@ -98,6 +100,18 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
       const starters = slots.filter((s) => s.slot !== "BN" && s.slot !== "IR");
       const bench = slots.filter((s) => s.slot === "BN" || s.slot === "IR");
       if (preDraft && slots.every((s) => !s.player)) return <Empty text="Rosters fill in after the draft." />;
+      if (team.isMine && resolved.viaAccount && getAdapter(resolved.league.platform).capabilities.setLineup) {
+        return (
+          <RosterEditor
+            slots={slots}
+            platform={resolved.league.platform}
+            leagueId={resolved.league.externalId}
+            platformName={platformLabel(resolved.league.platform)}
+            showFantasyPoints={points}
+            title={team.name}
+          />
+        );
+      }
       return (
         <div className="flex flex-col gap-8">
           <Group header={`${team.name}${team.isMine ? "" : ` · ${team.ownerName}`} · Starters`}>

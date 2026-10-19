@@ -52,9 +52,10 @@ export interface AdapterCapabilities {
   trades: boolean;
 }
 
-/** Write-side inputs (Phase 5). Shapes will be finalized against real platform data. */
+/** Move one player between slot labels ("BN", "UTIL"...). A swap is two changes. */
 export interface LineupChange {
   playerId: string;
+  fromSlot: string;
   toSlot: string;
 }
 export interface TradeProposal {
@@ -78,7 +79,7 @@ export interface PlatformAdapter {
   getFreeAgents(conn: AdapterConnection, leagueId: string, query?: FreeAgentQuery): Promise<Player[]>;
 
   // Phase 5 write operations. Optional; presence must match `capabilities`.
-  setLineup?(conn: AdapterConnection, leagueId: string, teamId: string, changes: LineupChange[]): Promise<void>;
+  setLineup?(conn: AdapterConnection, leagueId: string, teamId: string, changes: LineupChange[], period?: number): Promise<void>;
   addDrop?(conn: AdapterConnection, leagueId: string, addPlayerId: string | null, dropPlayerId: string | null): Promise<void>;
   proposeTrade?(conn: AdapterConnection, leagueId: string, proposal: TradeProposal): Promise<void>;
   respondToTrade?(conn: AdapterConnection, leagueId: string, tradeId: string, accept: boolean): Promise<void>;

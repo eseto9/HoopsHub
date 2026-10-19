@@ -147,6 +147,7 @@ export interface EspnPlayer {
 export interface EspnPlayerPoolEntry {
   id: number;
   onTeamId: number;
+  lineupLocked?: boolean;
   status?: string; // "FREEAGENT" | "WAIVERS" | ...
   player: EspnPlayer;
 }

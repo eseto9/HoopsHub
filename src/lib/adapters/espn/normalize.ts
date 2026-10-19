@@ -193,6 +193,7 @@ export function normalizePlayer(p: EspnPlayer, proTeams: ProTeamMap): Player {
     positions,
     injuryStatus: mapInjury(p.injuryStatus),
     headshotUrl: headshotUrl(p.id),
+    eligibleSlots: p.eligibleSlots.flatMap((id) => (LINEUP_SLOTS[id] ? [LINEUP_SLOTS[id]] : [])),
     stats: normalizePlayerStats(p),
   };
 }
@@ -222,7 +223,7 @@ export function normalizeRoster(
     const size = Math.max(counts[slotId], filled.length);
     for (let i = 0; i < size; i++) {
       const e = filled[i];
-      slots.push({ teamId, slot: label, player: e ? normalizePlayer(e.playerPoolEntry.player, proTeams) : null });
+      slots.push({ teamId, slot: label, player: e ? normalizePlayer(e.playerPoolEntry.player, proTeams) : null, locked: e?.playerPoolEntry.lineupLocked || undefined });
     }
   }
   for (const [slotId, rest] of bySlot) {

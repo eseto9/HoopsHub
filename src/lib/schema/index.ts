@@ -98,6 +98,8 @@ export interface Player {
   positions: string[];
   injuryStatus?: InjuryStatus;
   headshotUrl?: string;
+  /** Lineup slots this player may occupy, e.g. ["PG","G","UTIL","BN","IR"]. */
+  eligibleSlots?: string[];
   stats?: PlayerStats;
 }
 
@@ -128,6 +130,8 @@ export interface RosterSlot {
   /** Slot label: "PG", "UTIL", "BN", "IR", ... */
   slot: string;
   player: Player | null;
+  /** Player can't be moved right now (e.g. their game has started). */
+  locked?: boolean;
 }
 
 export interface MatchupSide {

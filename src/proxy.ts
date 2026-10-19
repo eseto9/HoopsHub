@@ -15,7 +15,9 @@ export function proxy(request: NextRequest) {
     url.searchParams.set("next", pathname + search);
     return NextResponse.redirect(url);
   }
-  if (hasSession && (isAuthPage || pathname === "/")) {
+  // Only "/" forwards signed-in users. Never redirect away from the sign-in pages
+  // on cookie presence alone: an expired session's cookie would loop forever.
+  if (hasSession && pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
   return NextResponse.next();

@@ -1,8 +1,10 @@
 import "server-only";
 import { NotFoundError, PlatformError } from "@/lib/errors";
 import type { League, Player } from "@/lib/schema";
-import type { AdapterConnection, ConnectResult, FreeAgentQuery, PlatformAdapter, RosterResult } from "../types";
-import { cacheScope, cached, cookiesOf, espnFetch, ESPN_READS, fanEndpoint, leagueEndpoint, type EspnCookies } from "./client";
+import type { AdapterConnection, ConnectResult, FreeAgentQuery, LineupChange, PlatformAdapter, RosterResult } from "../types";
+import { invalidate } from "@/lib/cache";
+import { cacheScope, cached, cookiesOf, espnFetch, espnPost, ESPN_READS, fanEndpoint, leagueEndpoint, type EspnCookies } from "./client";
+import { buildLineupTransaction, transactionsUrl, type EspnTransactionResponse } from "./writes";
 import { LINEUP_SLOTS } from "./constants";
 import {
   leagueIdsFromFanProfile,
@@ -72,7 +74,7 @@ function context(conn: AdapterConnection, leagueId: string): LeagueContext {
 
 export const espnAdapter: PlatformAdapter = {
   platform: "espn",
-  capabilities: { freeAgents: true, setLineup: false, addDrop: false, trades: false },
+  capabilities: { freeAgents: true, setLineup: true, addDrop: false, trades: false },
 
   /** Validates pasted espn_s2 / SWID cookies by loading the ESPN fan profile. */
   async connect(_userId, input): Promise<ConnectResult> {
@@ -180,5 +182,31 @@ export const espnAdapter: PlatformAdapter = {
       entries = entries.filter((e) => e.player.fullName.toLowerCase().includes(q));
     }
     return entries.slice(0, query.limit ?? 50).map((e) => normalizePlayer(e.player, proTeams));
+  },
+
+  /** Lineup moves, using the request format captured from espn.com (fixtures/espn/writes). */
+  async setLineup(conn, leagueId, teamId, changes: LineupChange[], period?: number) {
+    const cookies = cookiesOf(conn);
+    if (!cookies) throw new PlatformError("espn", 403, "Connect your ESPN account to edit lineups");
+    // Fresh settings: the scoring period (day) and ownership must be current.
+    invalidate(`espn:${cacheScope(conn)}:settings:`);
+    const settings = await getSettings(conn, leagueId);
+    const mine = normalizeTeams(settings, context(conn, leagueId)).find((t) => t.isMine);
+    if (!mine || mine.externalId !== teamId) throw new PlatformError("espn", 403, "You can only edit your own team");
+
+    const body = buildLineupTransaction({
+      teamId: Number(teamId),
+      memberId: cookies.swid,
+      scoringPeriodId: period ?? settings.scoringPeriodId,
+      changes,
+    });
+    const res = await espnPost<EspnTransactionResponse>(transactionsUrl(settings.seasonId, leagueId), body, {
+      cookies,
+      connectionId: conn.id,
+    });
+    invalidate(`espn:${cacheScope(conn)}:`);
+    if (res.status && res.status !== "EXECUTED") {
+      throw new PlatformError("espn", 409, `ESPN didn't apply the move (status: ${res.status})`);
+    }
   },
 };

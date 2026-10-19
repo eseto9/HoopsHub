@@ -1,0 +1,103 @@
+{
+  "_note": "Captured from espn.com in the browser on 2026-10-19 (lineup swap Khaman Maluach BN<->Walker Kessler UTIL, then swapped back). memberId redacted. Request headers not recorded.",
+  "request": {
+    "method": "POST",
+    "url": "https://lm-api-writes.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/1151450222/transactions/?platformVersion=449ae61ae2f56ca57937889af8d9916057709312",
+    "contentType": "application/json",
+    "body": {
+      "isLeagueManager": false,
+      "teamId": 12,
+      "type": "ROSTER",
+      "memberId": "{REDACTED-SWID}",
+      "scoringPeriodId": 1,
+      "executionType": "EXECUTE",
+      "items": [
+        {
+          "playerId": 5203685,
+          "type": "LINEUP",
+          "fromLineupSlotId": 12,
+          "toLineupSlotId": 11
+        },
+        {
+          "playerId": 4433136,
+          "type": "LINEUP",
+          "fromLineupSlotId": 11,
+          "toLineupSlotId": 12
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "bidAmount": 0,
+      "executionType": "EXECUTE",
+      "id": "5ecdec35-2701-471b-8490-97cb561b2ee5",
+      "isActingAsTeamOwner": false,
+      "isLeagueManager": false,
+      "isPending": false,
+      "items": [
+        {
+          "fromLineupSlotId": 12,
+          "fromTeamId": 0,
+          "isKeeper": false,
+          "overallPickNumber": 0,
+          "playerId": 5203685,
+          "toLineupSlotId": 11,
+          "toTeamId": 0,
+          "type": "LINEUP"
+        },
+        {
+          "fromLineupSlotId": 11,
+          "fromTeamId": 0,
+          "isKeeper": false,
+          "overallPickNumber": 0,
+          "playerId": 4433136,
+          "toLineupSlotId": 12,
+          "toTeamId": 0,
+          "type": "LINEUP"
+        }
+      ],
+      "memberId": "{REDACTED-SWID}",
+      "proposedDate": 1792391794823,
+      "rating": 0,
+      "scoringPeriodId": 1,
+      "skipTransactionCounters": false,
+      "status": "EXECUTED",
+      "subOrder": 0,
+      "teamId": 12,
+      "type": "ROSTER"
+    }
+  },
+  "revert": {
+    "request": {
+      "method": "POST",
+      "url": "https://lm-api-writes.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/1151450222/transactions/?platformVersion=449ae61ae2f56ca57937889af8d9916057709312",
+      "body": {
+        "isLeagueManager": false,
+        "teamId": 12,
+        "type": "ROSTER",
+        "memberId": "{REDACTED-SWID}",
+        "scoringPeriodId": 1,
+        "executionType": "EXECUTE",
+        "items": [
+          {
+            "playerId": 4433136,
+            "type": "LINEUP",
+            "fromLineupSlotId": 12,
+            "toLineupSlotId": 11
+          },
+          {
+            "playerId": 5203685,
+            "type": "LINEUP",
+            "fromLineupSlotId": 11,
+            "toLineupSlotId": 12
+          }
+        ]
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}

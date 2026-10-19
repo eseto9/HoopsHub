@@ -45,20 +45,33 @@ export function PlayerRow({
   slot,
   showFantasyPoints,
   href,
+  action,
+  dimmed,
 }: {
   player: Player | null;
   slot?: string;
   showFantasyPoints: boolean;
   href?: string;
+  /** Trailing control, e.g. a Move button. */
+  action?: React.ReactNode;
+  dimmed?: boolean;
 }) {
   if (!player) {
-    return <Row icon={slot ? <SlotTile slot={slot} /> : undefined} title={<span className="text-faint">Empty</span>} />;
+    return (
+      <Row
+        className={dimmed ? "opacity-40" : ""}
+        icon={slot ? <SlotTile slot={slot} /> : undefined}
+        title={<span className="text-faint">Empty</span>}
+        value={action}
+      />
+    );
   }
   const line = bestLine(player);
   const inj = player.injuryStatus ? INJURY[player.injuryStatus] : null;
   return (
     <Row
       href={href}
+      className={dimmed ? "opacity-40" : ""}
       icon={slot ? <SlotTile slot={slot} /> : undefined}
       title={
         <span className="flex items-center gap-1.5">
@@ -75,11 +88,16 @@ export function PlayerRow({
         </>
       }
       value={
-        showFantasyPoints && line?.fantasyPointsPerGame !== undefined ? (
-          <span className="flex flex-col items-end leading-tight">
-            <span className="text-[17px] font-semibold text-text tabular-nums">{fmt1.format(line.fantasyPointsPerGame)}</span>
-            <span className="text-[11px]">FP/G</span>
-          </span>
+        (showFantasyPoints && line?.fantasyPointsPerGame !== undefined) || action ? (
+          <>
+            {showFantasyPoints && line?.fantasyPointsPerGame !== undefined && (
+              <span className="flex flex-col items-end leading-tight">
+                <span className="text-[17px] font-semibold text-text tabular-nums">{fmt1.format(line.fantasyPointsPerGame)}</span>
+                <span className="text-[11px]">FP/G</span>
+              </span>
+            )}
+            {action}
+          </>
         ) : undefined
       }
     />

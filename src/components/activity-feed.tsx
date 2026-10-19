@@ -1,9 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
+import { cancelPendingAction } from "@/app/actions/moves";
 import type { ActivityMove, LeagueActivity, Team } from "@/lib/schema";
 import { Group, RowBlock } from "./list";
 import { PlayerAvatar } from "./player-avatar";
+import { Notice, Sheet, type NoticeState } from "./sheet";
 import { TeamAvatar } from "./team-avatar";
 
 type TeamInfo = Pick<Team, "id" | "name" | "avatarUrl" | "isMine">;
@@ -48,7 +51,17 @@ function MoveLine({ move, teamName }: { move: ActivityMove; teamName: (id: strin
   );
 }
 
-function ActivityItem({ a, team, teamName }: { a: LeagueActivity; team: (id: string) => TeamInfo | undefined; teamName: (id: string | null) => string }) {
+function ActivityItem({
+  a,
+  team,
+  teamName,
+  action,
+}: {
+  a: LeagueActivity;
+  team: (id: string) => TeamInfo | undefined;
+  teamName: (id: string | null) => string;
+  action?: React.ReactNode;
+}) {
   const t = team(a.teamId);
   const others = a.kind === "trade" ? a.teamIds.filter((id) => id !== a.teamId) : [];
   return (
@@ -66,6 +79,7 @@ function ActivityItem({ a, team, teamName }: { a: LeagueActivity; team: (id: str
             {a.status === "pending" ? " · Pending" : ""} · <time suppressHydrationWarning>{timeLabel(a.date)}</time>
           </p>
         </div>
+        {action}
       </div>
       <div className="flex flex-col gap-2.5 pl-1">
         {a.moves.map((m, i) => (
@@ -76,9 +90,62 @@ function ActivityItem({ a, team, teamName }: { a: LeagueActivity; team: (id: str
   );
 }
 
-export function ActivityFeed({ feed, pending, teams }: { feed: LeagueActivity[]; pending: LeagueActivity[]; teams: TeamInfo[] }) {
-  const [filter, setFilter] = useState<Filter>("all");
+export function ActivityFeed({
+  feed,
+  pending,
+  teams,
+  platform,
+  leagueId,
+  platformName,
+  leagueUrl,
+  canAct,
+}: {
+  feed: LeagueActivity[];
+  pending: LeagueActivity[];
+  teams: TeamInfo[];
+  platform: string;
+  leagueId: string;
+  platformName: string;
+  leagueUrl?: string;
+  /** Connected through the user's account, so their own pending moves can be cancelled. */
+  canAct: boolean;
+}) {
+  const router = useRouter();
   const byId = useMemo(() => new Map<string, TeamInfo>(teams.map((t) => [t.id, t])), [teams]);
+  const [filter, setFilter] = useState<Filter>("all");
+  const [cancelling, setCancelling] = useState<LeagueActivity | null>(null);
+  const [notice, setNotice] = useState<NoticeState>(null);
+  const [busy, start] = useTransition();
+
+  function cancel() {
+    if (!cancelling) return;
+    const transactionId = cancelling.id.slice(cancelling.id.indexOf(".") + 1);
+    start(async () => {
+      const res = await cancelPendingAction({ platform, leagueId, transactionId });
+      setCancelling(null);
+      setNotice(res.ok ? { kind: "ok", text: res.message } : { kind: "error", text: res.error, reconnect: res.reconnect });
+      if (res.ok) router.refresh();
+    });
+  }
+
+  const pendingAction = (a: LeagueActivity) => {
+    const mine = byId.get(a.teamId)?.isMine;
+    if (mine && canAct) {
+      return (
+        <button type="button" onClick={() => (setNotice(null), setCancelling(a))} className="shrink-0 text-[15px] text-danger">
+          Cancel
+        </button>
+      );
+    }
+    if (!mine && leagueUrl) {
+      return (
+        <a href={leagueUrl} target="_blank" rel="noreferrer" className="shrink-0 text-[13px] font-semibold text-accent">
+          Respond on {platformName} ↗
+        </a>
+      );
+    }
+    return undefined;
+  };
   const team = (id: string) => byId.get(id);
   const teamName = (id: string | null) => (id ? (byId.get(id)?.name ?? "another team") : "free agency");
 
@@ -102,10 +169,11 @@ export function ActivityFeed({ feed, pending, teams }: { feed: LeagueActivity[];
 
   return (
     <div className="flex flex-col gap-8">
+      <Notice notice={notice} />
       {pending.length > 0 && (
-        <Group header="Your pending moves" footer="Only you can see these. Claims process when waivers clear.">
+        <Group header="Your pending moves" footer="Only you can see these. Claims process when waivers clear; offers wait for the other manager.">
           {pending.map((a) => (
-            <ActivityItem key={a.id} a={a} team={team} teamName={teamName} />
+            <ActivityItem key={a.id} a={a} team={team} teamName={teamName} action={pendingAction(a)} />
           ))}
         </Group>
       )}
@@ -138,6 +206,22 @@ export function ActivityFeed({ feed, pending, teams }: { feed: LeagueActivity[];
             ))}
           </Group>
         ))
+      )}
+
+      {cancelling && (
+        <Sheet
+          title={cancelling.kind === "trade" ? "Cancel trade offer?" : "Cancel waiver claim?"}
+          confirmLabel={cancelling.kind === "trade" ? "Cancel Offer" : "Cancel Claim"}
+          pendingLabel={`Cancelling on ${platformName}…`}
+          pending={busy}
+          destructive
+          onConfirm={cancel}
+          onCancel={() => setCancelling(null)}
+        >
+          <p className="text-center text-[15px] text-muted">
+            {cancelling.moves.map((m) => `${m.action === "added" ? "Add" : m.action === "dropped" ? "Drop" : "Trade"} ${m.player?.name ?? "player"}`).join(" · ")}
+          </p>
+        </Sheet>
       )}
     </div>
   );

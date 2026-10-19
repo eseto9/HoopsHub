@@ -101,6 +101,10 @@ export interface Player {
   /** Lineup slots this player may occupy, e.g. ["PG","G","UTIL","BN","IR"]. */
   eligibleSlots?: string[];
   stats?: PlayerStats;
+  /** For unrostered players: instant pickup or waiver claim. */
+  availability?: "free_agent" | "waivers";
+  /** ISO time waivers clear, when on waivers. */
+  waiverClearsAt?: string;
 }
 
 /**

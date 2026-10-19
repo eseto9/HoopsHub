@@ -4,7 +4,7 @@ import type { League, Player } from "@/lib/schema";
 import type { AdapterConnection, ConnectResult, FreeAgentQuery, LineupChange, PlatformAdapter, RosterResult } from "../types";
 import { invalidate } from "@/lib/cache";
 import { cacheScope, cached, cookiesOf, espnFetch, espnPost, ESPN_READS, fanEndpoint, leagueEndpoint, type EspnCookies } from "./client";
-import { buildLineupTransaction, transactionsUrl, type EspnTransactionResponse } from "./writes";
+import { buildAddDrop, buildCancel, buildLineupTransaction, buildTradeProposal, transactionsUrl, type EspnTransactionResponse } from "./writes";
 import { LINEUP_SLOTS } from "./constants";
 import {
   leagueIdsFromFanProfile,
@@ -28,7 +28,7 @@ import type {
   EspnRosterResponse,
   EspnTransactionsResponse,
 } from "./raw-types";
-import { activityPlayerIds, normalizeActivity } from "./activity";
+import { activityPlayerIds, closedIds, normalizeActivity } from "./activity";
 
 const TTL = { game: 3600, proTeams: 86400, settings: 120, roster: 60, matchups: 45, freeAgents: 300, fan: 600, activity: 60, players: 600 };
 
@@ -77,9 +77,46 @@ function context(conn: AdapterConnection, leagueId: string): LeagueContext {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Write helpers. Every write re-reads league state fresh and re-checks it.
+// ---------------------------------------------------------------------------
+
+async function writeContext(conn: AdapterConnection, leagueId: string, teamId: string) {
+  const cookies = cookiesOf(conn);
+  if (!cookies) throw new PlatformError("espn", 403, "Connect your ESPN account to make moves");
+  invalidate(`espn:${cacheScope(conn)}:`);
+  const settings = await getSettings(conn, leagueId);
+  const mine = normalizeTeams(settings, context(conn, leagueId)).find((t) => t.isMine);
+  if (!mine || mine.externalId !== teamId) throw new PlatformError("espn", 403, "You can only make moves for your own team");
+  return { cookies, settings };
+}
+
+async function rosterPlayerIds(conn: AdapterConnection, season: number, leagueId: string, teamId: number): Promise<Set<number>> {
+  const raw = await cached(`espn:${cacheScope(conn)}:roster:${season}:${leagueId}`, TTL.roster, () =>
+    espnFetch<EspnRosterResponse>(leagueEndpoint(season, leagueId, ["mRoster"]), fetchOpts(conn)),
+  );
+  const team = raw.teams?.find((t) => t.id === teamId);
+  return new Set((team?.roster.entries ?? []).map((e) => e.playerId));
+}
+
+async function lookupPlayers(conn: AdapterConnection, settings: EspnLeagueSettingsResponse, leagueId: string, ids: number[]) {
+  const extra: Record<string, string> = settings.scoringPeriodId ? { scoringPeriodId: String(settings.scoringPeriodId) } : {};
+  const res = await espnFetch<EspnFreeAgentsResponse>(leagueEndpoint(settings.seasonId, leagueId, ["kona_player_info"], extra), {
+    ...fetchOpts(conn),
+    headers: { ...KONA_HEADERS, "X-Fantasy-Filter": JSON.stringify({ players: { filterIds: { value: ids } } }) },
+  });
+  return res.players;
+}
+
+async function postTransaction(conn: AdapterConnection, cookies: EspnCookies, season: number, leagueId: string, body: unknown) {
+  const res = await espnPost<EspnTransactionResponse>(transactionsUrl(season, leagueId), body, { cookies, connectionId: conn.id });
+  invalidate(`espn:${cacheScope(conn)}:`);
+  return res;
+}
+
 export const espnAdapter: PlatformAdapter = {
   platform: "espn",
-  capabilities: { freeAgents: true, setLineup: true, addDrop: false, trades: false },
+  capabilities: { freeAgents: true, setLineup: true, addDrop: true, trades: true },
 
   /** Validates pasted espn_s2 / SWID cookies by loading the ESPN fan profile. */
   async connect(_userId, input): Promise<ConnectResult> {
@@ -186,7 +223,11 @@ export const espnAdapter: PlatformAdapter = {
       const q = query.search.toLowerCase();
       entries = entries.filter((e) => e.player.fullName.toLowerCase().includes(q));
     }
-    return entries.slice(0, query.limit ?? 50).map((e) => normalizePlayer(e.player, proTeams));
+    return entries.slice(0, query.limit ?? 50).map((e) => ({
+      ...normalizePlayer(e.player, proTeams),
+      availability: e.status === "WAIVERS" ? ("waivers" as const) : ("free_agent" as const),
+      waiverClearsAt: e.waiverProcessDate ? new Date(e.waiverProcessDate).toISOString() : undefined,
+    }));
   },
 
   /** League activity from mTransactions2, with player names resolved by id. */
@@ -215,6 +256,87 @@ export const espnAdapter: PlatformAdapter = {
     const players = new Map(pool.players.map((e) => [e.player.id, normalizePlayer(e.player, proTeams)]));
     const mine = normalizeTeams(settings, context(conn, leagueId)).find((t) => t.isMine);
     return normalizeActivity(raw, leagueId, players, mine?.externalId);
+  },
+
+  /** Add a player (claim if on waivers, else instant pickup), optionally dropping one. */
+  async addDrop(conn, leagueId, teamId, opts) {
+    const { cookies, settings } = await writeContext(conn, leagueId, teamId);
+    const addId = Number(opts.addPlayerId);
+    const dropId = opts.dropPlayerId ? Number(opts.dropPlayerId) : undefined;
+
+    const entry = (await lookupPlayers(conn, settings, leagueId, [addId])).find((e) => e.player.id === addId);
+    if (!entry) throw new PlatformError("espn", 404, "Couldn't find that player on ESPN");
+    if (entry.onTeamId) throw new PlatformError("espn", 409, `${entry.player.fullName} is already on a team`);
+    if (dropId && !(await rosterPlayerIds(conn, settings.seasonId, leagueId, Number(teamId))).has(dropId)) {
+      throw new PlatformError("espn", 409, "The player you chose to drop isn't on your roster anymore");
+    }
+
+    const body = buildAddDrop({
+      type: entry.status === "WAIVERS" ? "WAIVER" : "FREEAGENT",
+      teamId: Number(teamId),
+      memberId: cookies.swid,
+      scoringPeriodId: settings.scoringPeriodId,
+      addPlayerId: addId,
+      dropPlayerId: dropId,
+    });
+    const res = await postTransaction(conn, cookies, settings.seasonId, leagueId, body);
+    if (res.status === "PENDING") return { status: "pending" };
+    if (res.status === "EXECUTED") return { status: "completed" };
+    throw new PlatformError("espn", 409, `ESPN didn't accept the move (status: ${res.status ?? "unknown"})`);
+  },
+
+  /** Offer a trade to another team. */
+  async proposeTrade(conn, leagueId, teamId, proposal) {
+    const { cookies, settings } = await writeContext(conn, leagueId, teamId);
+    const me = Number(teamId);
+    const other = Number(proposal.toTeamId);
+    if (!settings.teams.some((t) => t.id === other) || other === me) throw new PlatformError("espn", 400, "Pick another team in this league");
+    const send = proposal.sendPlayerIds.map(Number);
+    const receive = proposal.receivePlayerIds.map(Number);
+    if (!send.length || !receive.length) throw new PlatformError("espn", 400, "Pick at least one player on each side");
+
+    const [mine, theirs] = await Promise.all([
+      rosterPlayerIds(conn, settings.seasonId, leagueId, me),
+      rosterPlayerIds(conn, settings.seasonId, leagueId, other),
+    ]);
+    if (!send.every((p) => mine.has(p))) throw new PlatformError("espn", 409, "One of your players isn't on your roster anymore");
+    if (!receive.every((p) => theirs.has(p))) throw new PlatformError("espn", 409, "One of their players isn't on their roster anymore");
+
+    const days = Math.min(7, Math.max(1, proposal.expiresInDays ?? 2));
+    const body = buildTradeProposal({
+      teamId: me,
+      memberId: cookies.swid,
+      scoringPeriodId: settings.scoringPeriodId,
+      otherTeamId: other,
+      sendPlayerIds: send,
+      receivePlayerIds: receive,
+      expirationDate: new Date(Date.now() + days * 86_400_000).toISOString(),
+      comment: proposal.message?.slice(0, 500),
+    });
+    const res = await postTransaction(conn, cookies, settings.seasonId, leagueId, body);
+    if (res.status !== "PENDING") throw new PlatformError("espn", 409, `ESPN didn't accept the offer (status: ${res.status ?? "unknown"})`);
+    return { status: "pending" };
+  },
+
+  /** Cancel your own still-open waiver claim or trade offer. */
+  async cancelPending(conn, leagueId, teamId, transactionId) {
+    const { cookies, settings } = await writeContext(conn, leagueId, teamId);
+    const raw = await espnFetch<EspnTransactionsResponse>(leagueEndpoint(settings.seasonId, leagueId, ["mTransactions2"]), fetchOpts(conn));
+    const txns = raw.transactions ?? [];
+    const t = txns.find((x) => x.id === transactionId);
+    const cancellable =
+      t && t.teamId === Number(teamId) && t.status === "PENDING" && !closedIds(txns).has(t.id) && (t.type === "WAIVER" || t.type === "TRADE_PROPOSAL");
+    if (!cancellable) throw new PlatformError("espn", 409, "That move isn't open anymore");
+
+    const body = buildCancel({
+      type: t.type as "WAIVER" | "TRADE_PROPOSAL",
+      teamId: Number(teamId),
+      memberId: cookies.swid,
+      scoringPeriodId: settings.scoringPeriodId,
+      relatedTransactionId: t.id,
+    });
+    const res = await postTransaction(conn, cookies, settings.seasonId, leagueId, body);
+    if (res.status !== "CANCELED") throw new PlatformError("espn", 409, `ESPN didn't cancel it (status: ${res.status ?? "unknown"})`);
   },
 
   /** Lineup moves, using the request format captured from espn.com (fixtures/espn/writes). */

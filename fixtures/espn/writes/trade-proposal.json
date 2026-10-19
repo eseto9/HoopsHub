@@ -1,0 +1,78 @@
+{
+  "_note": "Captured from espn.com on 2026-10-19 with a throwaway account in a public practice league: team 8 offered Egor Demin (5175643) for Quentin Grimes (4397014) from team 1, expiring in 2 days. memberId redacted.",
+  "request": {
+    "method": "POST",
+    "url": "https://lm-api-writes.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/1732958907/transactions/",
+    "body": {
+      "isLeagueManager": false,
+      "teamId": 8,
+      "type": "TRADE_PROPOSAL",
+      "memberId": "{REDACTED-SWID}",
+      "scoringPeriodId": 1,
+      "executionType": "EXECUTE",
+      "items": [
+        {
+          "playerId": 4397014,
+          "type": "TRADE",
+          "fromTeamId": 1,
+          "toTeamId": 8
+        },
+        {
+          "playerId": 5175643,
+          "type": "TRADE",
+          "fromTeamId": 8,
+          "toTeamId": 1
+        }
+      ],
+      "expirationDate": "2026-10-21T14:09:03.447Z",
+      "comment": ""
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "bidAmount": 0,
+      "comment": "",
+      "executionType": "EXECUTE",
+      "expirationDate": 1792591743447,
+      "id": "2dd52ece-6a58-46e6-89bc-cd4505693629",
+      "isActingAsTeamOwner": false,
+      "isLeagueManager": false,
+      "isPending": true,
+      "items": [
+        {
+          "fromLineupSlotId": 12,
+          "fromTeamId": 1,
+          "isKeeper": false,
+          "overallPickNumber": 0,
+          "playerId": 4397014,
+          "toLineupSlotId": -1,
+          "toTeamId": 8,
+          "type": "TRADE"
+        },
+        {
+          "fromLineupSlotId": 12,
+          "fromTeamId": 8,
+          "isKeeper": false,
+          "overallPickNumber": 0,
+          "playerId": 5175643,
+          "toLineupSlotId": -1,
+          "toTeamId": 1,
+          "type": "TRADE"
+        }
+      ],
+      "memberId": "{REDACTED-SWID}",
+      "proposedDate": 1792418943655,
+      "rating": 0,
+      "scoringPeriodId": 1,
+      "skipTransactionCounters": false,
+      "status": "PENDING",
+      "subOrder": 0,
+      "teamActions": {
+        "8": "ACCEPTED"
+      },
+      "teamId": 8,
+      "type": "TRADE_PROPOSAL"
+    }
+  }
+}

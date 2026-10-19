@@ -1,0 +1,59 @@
+{
+  "_note": "Cancel of the offer in trade-proposal.json (Pending Moves -> Cancel Trade), sent 26s later. memberId redacted.",
+  "request": {
+    "method": "POST",
+    "url": "https://lm-api-writes.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/1732958907/transactions/",
+    "body": {
+      "isLeagueManager": false,
+      "teamId": 8,
+      "type": "TRADE_PROPOSAL",
+      "memberId": "{REDACTED-SWID}",
+      "scoringPeriodId": 1,
+      "executionType": "CANCEL",
+      "relatedTransactionId": "2dd52ece-6a58-46e6-89bc-cd4505693629"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "bidAmount": 0,
+      "executionType": "CANCEL",
+      "id": "7e046630-f6bb-405e-b52a-e4b5e2429bf0",
+      "isActingAsTeamOwner": false,
+      "isLeagueManager": false,
+      "isPending": false,
+      "items": [
+        {
+          "fromLineupSlotId": 12,
+          "fromTeamId": 1,
+          "isKeeper": false,
+          "overallPickNumber": 0,
+          "playerId": 4397014,
+          "toLineupSlotId": -1,
+          "toTeamId": 8,
+          "type": "TRADE"
+        },
+        {
+          "fromLineupSlotId": 12,
+          "fromTeamId": 8,
+          "isKeeper": false,
+          "overallPickNumber": 0,
+          "playerId": 5175643,
+          "toLineupSlotId": -1,
+          "toTeamId": 1,
+          "type": "TRADE"
+        }
+      ],
+      "memberId": "{REDACTED-SWID}",
+      "proposedDate": 1792418969761,
+      "rating": 0,
+      "relatedTransactionId": "2dd52ece-6a58-46e6-89bc-cd4505693629",
+      "scoringPeriodId": 1,
+      "skipTransactionCounters": false,
+      "status": "CANCELED",
+      "subOrder": 0,
+      "teamId": 8,
+      "type": "TRADE_PROPOSAL"
+    }
+  }
+}

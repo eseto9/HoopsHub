@@ -60,10 +60,16 @@ export interface LineupChange {
   toSlot: string;
 }
 export interface TradeProposal {
+  /** Other team, external id. */
   toTeamId: string;
   sendPlayerIds: string[];
   receivePlayerIds: string[];
   message?: string;
+  expiresInDays?: number;
+}
+
+export interface WriteResult {
+  status: "completed" | "pending";
 }
 
 export interface PlatformAdapter {
@@ -83,7 +89,8 @@ export interface PlatformAdapter {
 
   // Phase 5 write operations. Optional; presence must match `capabilities`.
   setLineup?(conn: AdapterConnection, leagueId: string, teamId: string, changes: LineupChange[], period?: number): Promise<void>;
-  addDrop?(conn: AdapterConnection, leagueId: string, addPlayerId: string | null, dropPlayerId: string | null): Promise<void>;
-  proposeTrade?(conn: AdapterConnection, leagueId: string, proposal: TradeProposal): Promise<void>;
-  respondToTrade?(conn: AdapterConnection, leagueId: string, tradeId: string, accept: boolean): Promise<void>;
+  addDrop?(conn: AdapterConnection, leagueId: string, teamId: string, opts: { addPlayerId: string; dropPlayerId?: string }): Promise<WriteResult>;
+  proposeTrade?(conn: AdapterConnection, leagueId: string, teamId: string, proposal: TradeProposal): Promise<WriteResult>;
+  /** Cancel one of your own pending claims or trade offers (external transaction id). */
+  cancelPending?(conn: AdapterConnection, leagueId: string, teamId: string, transactionId: string): Promise<void>;
 }

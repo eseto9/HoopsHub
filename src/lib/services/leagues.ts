@@ -161,7 +161,7 @@ export async function resolveLeague(userId: string, platform: Platform, external
   return null;
 }
 
-export type LeagueTab = "roster" | "matchup" | "players" | "activity" | "teams" | "standings";
+export type LeagueTab = "roster" | "matchup" | "players" | "activity" | "teams" | "standings" | "trade";
 
 /** Data for one tab of the league page. Only fetches what that tab shows. */
 export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opts: { teamId?: string; position?: string } = {}) {
@@ -184,8 +184,21 @@ export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opt
       const rosters = await Promise.all(sides.map((s) => adapter.getRoster(conn, id, byId.get(s.teamId)!.externalId)));
       return { tab, teams, matchup: mine ?? null, rosters, all: matchups } as const;
     }
-    case "players":
-      return { tab, teams, players: await adapter.getFreeAgents(conn, id, { position: opts.position, limit: 50 }) } as const;
+    case "players": {
+      // Your roster too (for the drop picker) when the league is connected through your account.
+      const canAdd = resolved.viaAccount && adapter.capabilities.addDrop && !!myTeam;
+      const [players, mine] = await Promise.all([
+        adapter.getFreeAgents(conn, id, { position: opts.position, limit: 50 }),
+        canAdd ? adapter.getRoster(conn, id, myTeam!.externalId) : Promise.resolve(null),
+      ]);
+      return { tab, teams, players, mySlots: mine?.slots ?? null } as const;
+    }
+    case "trade": {
+      const other = teams.find((t) => t.externalId === opts.teamId && !t.isMine);
+      if (!other || !myTeam || !resolved.viaAccount || !adapter.capabilities.trades) return { tab, teams, trade: null } as const;
+      const [mine, theirs] = await Promise.all([adapter.getRoster(conn, id, myTeam.externalId), adapter.getRoster(conn, id, other.externalId)]);
+      return { tab, teams, trade: { myTeam, other, mySlots: mine.slots, theirSlots: theirs.slots } } as const;
+    }
     case "standings":
       return { tab, teams, standings: await adapter.getStandings(conn, id) } as const;
     case "teams":

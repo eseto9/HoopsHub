@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ActivityFeed } from "@/components/activity-feed";
+import { FreeAgentList } from "@/components/free-agent-list";
+import { TradeBuilder } from "@/components/trade-builder";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { ChevronRight } from "@/components/icons";
 import { Group, Row } from "@/components/list";
@@ -64,7 +66,7 @@ async function LeagueView({ params, searchParams }: { params: Promise<{ platform
   if (!resolved) notFound();
 
   const { league } = resolved;
-  const tab = (TABS.some((t) => t.key === sp.tab) ? sp.tab : "roster") as LeagueTab;
+  const tab = (TABS.some((t) => t.key === sp.tab) || sp.tab === "trade" ? sp.tab : "roster") as LeagueTab;
   const base = `/leagues/${platform}/${leagueId}`;
   const points = league.format === "h2h-points" || league.format === "points";
 
@@ -114,8 +116,14 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
           />
         );
       }
+      const canTrade = !team.isMine && resolved.viaAccount && getAdapter(resolved.league.platform).capabilities.trades;
       return (
         <div className="flex flex-col gap-8">
+          {canTrade && (
+            <Link href={`${base}?tab=trade&team=${team.externalId}`} className="btn btn-primary w-full">
+              Propose a Trade to {team.name}
+            </Link>
+          )}
           <Group header={`${team.name}${team.isMine ? "" : ` · ${team.ownerName}`} · Starters`}>
             {starters.map((s, i) => (
               <PlayerRow key={i} player={s.player} slot={s.slot} showFantasyPoints={points} />
@@ -177,13 +185,14 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
             active={sp.pos ?? "All"}
             items={POSITIONS.map((p) => ({ key: p, label: p, href: `${base}?tab=players${p === "All" ? "" : `&pos=${p}`}` }))}
           />
-          <Group header="Top available free agents" footer="Sorted by how widely rostered they are across ESPN.">
-            {data.players.length === 0 ? (
-              <Row title={<span className="text-muted">No free agents found</span>} />
-            ) : (
-              data.players.map((p) => <PlayerRow key={p.id} player={p} showFantasyPoints={points} />)
-            )}
-          </Group>
+          <FreeAgentList
+            players={data.players}
+            mySlots={data.mySlots}
+            platform={resolved.league.platform}
+            leagueId={resolved.league.externalId}
+            platformName={platformLabel(resolved.league.platform)}
+            showFantasyPoints={points}
+          />
         </div>
       );
 
@@ -193,6 +202,25 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
           feed={data.activity.feed}
           pending={data.activity.pendingForTeam}
           teams={data.teams.map((t) => ({ id: t.id, name: t.name, avatarUrl: t.avatarUrl, isMine: t.isMine }))}
+          platform={resolved.league.platform}
+          leagueId={resolved.league.externalId}
+          platformName={platformLabel(resolved.league.platform)}
+          leagueUrl={resolved.league.url}
+          canAct={resolved.viaAccount}
+        />
+      );
+
+    case "trade":
+      if (!data.trade) return <Empty text="Trades need your connected account. Pick a team from Teams to start an offer." />;
+      return (
+        <TradeBuilder
+          platform={resolved.league.platform}
+          leagueId={resolved.league.externalId}
+          platformName={platformLabel(resolved.league.platform)}
+          myTeam={{ name: data.trade.myTeam.name }}
+          theirTeam={{ name: data.trade.other.name, externalId: data.trade.other.externalId, ownerName: data.trade.other.ownerName }}
+          mySlots={data.trade.mySlots}
+          theirSlots={data.trade.theirSlots}
         />
       );
 

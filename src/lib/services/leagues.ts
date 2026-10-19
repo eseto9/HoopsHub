@@ -2,10 +2,12 @@ import "server-only";
 import { getAdapter } from "@/lib/adapters/registry";
 import type { AdapterConnection } from "@/lib/adapters/types";
 import { PlatformError, ReconnectRequiredError } from "@/lib/errors";
-import type { League, Platform, RosterSlot, Team } from "@/lib/schema";
+import type { League, LeagueActivity, NewsItem, Platform, Player, PlayerListing, RosterSlot, Team } from "@/lib/schema";
 import type { DashboardData, DashboardLeague, DashboardProblem, MatchupSummary } from "@/lib/schema/views";
 import { watchedPlayerIds } from "./watchlist";
 import { activityAlerts } from "@/lib/alerts";
+import { exposure, nameKey } from "@/lib/hub";
+import { mapLimit, playerNews } from "@/lib/nba/news";
 import { getAdapterConnections, listConnections, listLeaguePreferences, markNeedsReconnect, markSynced } from "./connections";
 
 const PLATFORM_LABEL: Record<Platform, string> = { espn: "ESPN", yahoo: "Yahoo", sleeper: "Sleeper" };
@@ -266,18 +268,22 @@ export interface MyTeamSection {
   /** Points league: show fantasy point columns. */
   points: boolean;
   hasPlayerPages: boolean;
+  /** Lineup swaps can be made from Hoops Hub (ESPN, connected account). */
+  canEditLineup: boolean;
   error?: string;
 }
 
-/**
- * Every league where the user has a team, with their roster. One failing
- * league never hides the others.
- */
-export async function getMyTeams(userId: string): Promise<{ sections: MyTeamSection[]; problems: DashboardData["problems"] }> {
+interface LoadedTeam {
+  section: MyTeamSection;
+  /** Server-only: connection with credentials. Never returned to pages. */
+  resolved: ResolvedLeague | null;
+}
+
+async function loadMyTeams(userId: string): Promise<{ items: LoadedTeam[]; problems: DashboardData["problems"] }> {
   const { leagues, problems } = await getDashboard(userId);
   const withTeams = leagues.filter((l): l is DashboardLeague & { myTeam: Team } => !!l.myTeam);
-  const sections = await Promise.all(
-    withTeams.map(async (l): Promise<MyTeamSection> => {
+  const items = await Promise.all(
+    withTeams.map(async (l): Promise<LoadedTeam> => {
       const adapter = getAdapter(l.league.platform);
       const base = {
         league: l.league,
@@ -285,16 +291,113 @@ export async function getMyTeams(userId: string): Promise<{ sections: MyTeamSect
         matchup: l.matchup,
         points: l.league.format === "h2h-points" || l.league.format === "points",
         hasPlayerPages: !!adapter.getPlayerDetail,
+        canEditLineup: false,
       };
       try {
         const resolved = await resolveLeague(userId, l.league.platform, l.league.externalId);
-        if (!resolved) return { ...base, slots: [], error: "This league isn't available right now." };
+        if (!resolved) return { section: { ...base, slots: [], error: "This league isn't available right now." }, resolved: null };
         const roster = await adapter.getRoster(resolved.conn, l.league.externalId, l.myTeam.externalId);
-        return { ...base, slots: roster.slots };
+        const canEditLineup = resolved.viaAccount && adapter.capabilities.setLineup;
+        return { section: { ...base, canEditLineup, slots: roster.slots }, resolved };
       } catch (err) {
-        return { ...base, slots: [], error: friendlyError(err) };
+        return { section: { ...base, slots: [], error: friendlyError(err) }, resolved: null };
       }
     }),
   );
-  return { sections, problems };
+  return { items, problems };
+}
+
+/** Every league where the user has a team, with their roster. One failing league never hides the others. */
+export async function getMyTeams(userId: string): Promise<{ sections: MyTeamSection[]; problems: DashboardData["problems"] }> {
+  const { items, problems } = await loadMyTeams(userId);
+  return { sections: items.map((i) => i.section), problems };
+}
+
+/** Matchup Center: your lineup and your opponent's, per league. */
+export async function getMatchupCenter(userId: string) {
+  const { items } = await loadMyTeams(userId);
+  return Promise.all(
+    items.map(async ({ section, resolved }) => {
+      const opp = section.matchup?.opponent?.team;
+      if (!resolved || !opp) return { section, opponentSlots: null as RosterSlot[] | null };
+      try {
+        const r = await getAdapter(section.league.platform).getRoster(resolved.conn, section.league.externalId, opp.externalId);
+        return { section, opponentSlots: r.slots };
+      } catch {
+        return { section, opponentSlots: null };
+      }
+    }),
+  );
+}
+
+/** Waiver Radar: each league's player pool (free agents and waivers). */
+export async function getWaiverPools(userId: string) {
+  const { items } = await loadMyTeams(userId);
+  return Promise.all(
+    items.map(async ({ section, resolved }) => {
+      const adapter = getAdapter(section.league.platform);
+      if (!resolved || !adapter.getPlayerPool) return { section, pool: [] as PlayerListing[], error: resolved ? "Not available for this platform." : section.error };
+      try {
+        return { section, pool: await adapter.getPlayerPool(resolved.conn, section.league.externalId) };
+      } catch (err) {
+        return { section, pool: [] as PlayerListing[], error: friendlyError(err) };
+      }
+    }),
+  );
+}
+
+/** Combined activity: every league's feed plus its teams. */
+export async function getActivityFeeds(userId: string) {
+  const { items } = await loadMyTeams(userId);
+  return Promise.all(
+    items.map(async ({ section, resolved }) => {
+      const adapter = getAdapter(section.league.platform);
+      if (!resolved || !adapter.getActivity) return { section, teams: [] as Team[], feed: [] as LeagueActivity[] };
+      try {
+        const [teams, activity] = await Promise.all([
+          adapter.getTeams(resolved.conn, section.league.externalId),
+          adapter.getActivity(resolved.conn, section.league.externalId),
+        ]);
+        return { section, teams, feed: activity.feed };
+      } catch {
+        return { section, teams: [] as Team[], feed: [] as LeagueActivity[] };
+      }
+    }),
+  );
+}
+
+
+export interface MyNewsEntry {
+  player: Player;
+  leagues: { name: string; slot: string; platform: Platform }[];
+  news: NewsItem[];
+}
+
+/**
+ * News and injuries for players you roster. Injured players first, then the
+ * freshest news, capped to keep the page fast. Sleeper players borrow the
+ * ESPN id of the same player on one of your ESPN rosters, when there is one.
+ */
+export async function getMyNews(userId: string, cap = 24): Promise<{ entries: MyNewsEntry[]; injured: MyNewsEntry[] }> {
+  const { items } = await loadMyTeams(userId);
+  const rosters = items.map((i) => ({ league: i.section.league, slots: i.section.slots }));
+  const espnIdByName = new Map<string, string>();
+  for (const r of rosters) for (const s of r.slots) if (s.player && r.league.platform === "espn") espnIdByName.set(nameKey(s.player.name), s.player.externalId);
+  const entries: MyNewsEntry[] = exposure(rosters).map((e) => ({
+    player: e.player,
+    leagues: e.leagues.map((l) => ({ name: l.league.name, slot: l.slot, platform: l.league.platform })),
+    news: [],
+  }));
+  const injured = entries.filter((e) => e.player.injuryStatus);
+  const ranked = [...entries].sort(
+    (a, b) => Number(!!b.player.injuryStatus) - Number(!!a.player.injuryStatus) || (b.player.newsAt ?? "").localeCompare(a.player.newsAt ?? ""),
+  );
+  const withIds = ranked.flatMap((e) => {
+    const id = e.player.platform === "espn" ? e.player.externalId : espnIdByName.get(nameKey(e.player.name));
+    return id ? [{ e, id }] : [];
+  });
+  await mapLimit(withIds.slice(0, cap), 6, async ({ e, id }) => {
+    e.news = await playerNews(id);
+  });
+  return { entries: entries.filter((e) => e.news.length).sort((a, b) => (b.news[0]?.published ?? "").localeCompare(a.news[0]?.published ?? "")), injured };
 }

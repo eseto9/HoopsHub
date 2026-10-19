@@ -105,6 +105,10 @@ export interface Player {
   ownership?: { percentRostered: number; percentRosteredChange?: number; percentStarted?: number };
   /** NBA schedule context: games left this week (through Sunday, Eastern) and today's game. */
   schedule?: { gamesThisWeek: number; today: GameInfo | null };
+  /** ISO time of the platform's latest news on this player. */
+  newsAt?: string;
+  /** Short injury detail when the platform gives one, e.g. "Knee: Surgery". */
+  injuryNote?: string;
   /** For unrostered players: instant pickup or waiver claim. */
   availability?: "free_agent" | "waivers";
   /** ISO time waivers clear, when on waivers. */

@@ -13,6 +13,7 @@ import {
   type StatLine,
   type Team,
 } from "@/lib/schema";
+import { gamesThisWeek, gameToday, type ProSchedule } from "../espn/schedule";
 import type {
   SleeperDraftPick,
   SleeperLeague,
@@ -41,6 +42,20 @@ const playerKey = (playerId: string) => unifiedId("sleeper", playerId);
 export const headshotUrl = (playerId: string) => `https://sleepercdn.com/content/nba/players/${playerId}.jpg`;
 const avatarUrl = (avatar: string | null | undefined) => (avatar ? (avatar.startsWith("http") ? avatar : `https://sleepercdn.com/avatars/thumbs/${avatar}`) : undefined);
 const seasonLabel = (sleeperSeason: number) => `${sleeperSeason}-${String(sleeperSeason + 1).slice(2)}`;
+
+/** Sleeper team codes that differ from ESPN's (observed in both player lists). */
+const TEAM: Record<string, string> = { GSW: "GS", NOP: "NO", NYK: "NY", SAS: "SA", UTA: "UTAH", WAS: "WSH" };
+export const nbaTeam = (code: string | null) => (code ? (TEAM[code] ?? code) : null);
+
+/** Lineup slots a player can fill, from their positions (Sleeper's standard slot names). */
+export function eligibleSlots(positions: string[]): string[] {
+  const out = new Set(positions);
+  if (positions.some((p) => p === "PG" || p === "SG")) out.add("G");
+  if (positions.some((p) => p === "SF" || p === "PF")) out.add("F");
+  out.add("UTIL");
+  out.add("BN");
+  return [...out];
+}
 
 const INJURY: Record<string, InjuryStatus> = { Out: "OUT", DTD: "DTD", IR: "IR", Sus: "SUSP", GTD: "GTD", Questionable: "QUES" };
 
@@ -102,6 +117,8 @@ export function statLine(raw: Record<string, number> | undefined, label: string,
 export interface StatsContext {
   /** Sleeper season number of the current season, e.g. 2026. */
   season: number;
+  /** NBA schedule (from ESPN's public data), for games this week and today. */
+  nba?: { schedule: ProSchedule; abbrev: Record<number, string>; idByAbbrev: Map<string, number>; now: number };
   current?: SleeperStatMap;
   previous?: SleeperStatMap;
   projections?: SleeperStatMap;
@@ -116,14 +133,24 @@ export function normalizePlayer(p: SleeperPlayer, ctx?: StatsContext): Player {
     projected: statLine(ctx.projections?.[id], `${seasonLabel(ctx.season)} proj.`, ctx.scoring, true),
   };
   const positions = p.fantasy_positions?.length ? p.fantasy_positions : p.position ? [p.position] : [];
+  const team = nbaTeam(p.team);
+  const teamId = team && ctx?.nba ? ctx.nba.idByAbbrev.get(team) : undefined;
+  const note = [p.injury_body_part, p.injury_notes].filter(Boolean).join(": ");
   return {
     id: playerKey(id),
     platform: "sleeper",
     externalId: id,
     name: p.full_name,
-    nbaTeam: p.team ?? null,
+    nbaTeam: team,
     positions,
+    eligibleSlots: eligibleSlots(positions),
     injuryStatus: p.injury_status ? INJURY[p.injury_status] ?? "OTHER" : undefined,
+    injuryNote: p.injury_status && note ? note : undefined,
+    newsAt: p.news_updated ? new Date(p.news_updated).toISOString() : undefined,
+    schedule:
+      teamId !== undefined && ctx?.nba
+        ? { gamesThisWeek: gamesThisWeek(ctx.nba.schedule, teamId, ctx.nba.now), today: gameToday(ctx.nba.schedule, teamId, ctx.nba.now, ctx.nba.abbrev) }
+        : undefined,
     headshotUrl: headshotUrl(id),
     stats: stats && (stats.current || stats.previous || stats.projected) ? stats : undefined,
   };

@@ -179,6 +179,8 @@ export interface EspnPlayer {
   injuryStatus?: string; // observed: ACTIVE, DAY_TO_DAY, OUT
   active?: boolean;
   ownership?: { percentOwned: number; percentStarted: number; percentChange?: number; averageDraftPosition: number };
+  /** Epoch ms of ESPN's latest news on the player (observed in mRoster). */
+  lastNewsDate?: number;
 }
 
 export interface EspnPlayerPoolEntry {

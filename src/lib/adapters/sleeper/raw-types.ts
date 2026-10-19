@@ -118,6 +118,9 @@ export interface SleeperPlayer {
   injury_status: string | null; // observed: Out, DTD, IR, or empty
   active: boolean;
   search_rank: number | null;
+  news_updated?: number | null;
+  injury_body_part?: string | null;
+  injury_notes?: string | null;
 }
 
 /**
@@ -143,3 +146,4 @@ export interface SleeperTrending {
   player_id: string;
   count: number;
 }
+// Note: /players/nba also lists one "DEF" entry per NBA team (player_id = team code, no full_name).

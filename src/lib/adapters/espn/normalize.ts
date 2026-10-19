@@ -208,6 +208,7 @@ export function normalizePlayer(p: EspnPlayer, proTeams: ProTeamMap, sched?: Sch
     headshotUrl: headshotUrl(p.id),
     eligibleSlots: p.eligibleSlots.flatMap((id) => (LINEUP_SLOTS[id] ? [LINEUP_SLOTS[id]] : [])),
     stats: normalizePlayerStats(p),
+    newsAt: p.lastNewsDate ? new Date(p.lastNewsDate).toISOString() : undefined,
     ownership: p.ownership
       ? { percentRostered: p.ownership.percentOwned, percentRosteredChange: p.ownership.percentChange, percentStarted: p.ownership.percentStarted }
       : undefined,

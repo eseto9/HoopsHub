@@ -2,6 +2,7 @@ import "server-only";
 import { cached } from "@/lib/cache";
 import { NotFoundError, PlatformError } from "@/lib/errors";
 import { acquire } from "@/lib/rate-limit";
+import { nbaSchedule } from "@/lib/nba/schedule-source";
 import { unifiedId, type PlayerListing } from "@/lib/schema";
 import type { AdapterConnection, ConnectResult, PlatformAdapter } from "../types";
 import {
@@ -57,12 +58,14 @@ const statMap = (path: string) => cached(`sleeper:stats:${path}`, TTL.stats, () 
 
 async function statsContext(l: SleeperLeague): Promise<StatsContext> {
   const season = Number(l.season);
-  const [current, previous, projections] = await Promise.all([
+  const [current, previous, projections, nba] = await Promise.all([
     statMap(`/stats/nba/regular/${season}`),
     statMap(`/stats/nba/regular/${season - 1}`),
     statMap(`/projections/nba/regular/${season}`),
+    // Schedule is a nice-to-have; Sleeper pages still work without it.
+    nbaSchedule().catch(() => undefined),
   ]);
-  return { season, current, previous, projections, scoring: l.scoring_settings };
+  return { season, current, previous, projections, scoring: l.scoring_settings, nba: nba && { ...nba, now: Date.now() } };
 }
 
 const userId = (conn: AdapterConnection) => conn.externalUserId || undefined;
@@ -125,7 +128,7 @@ export const sleeperAdapter: PlatformAdapter = {
     const taken = new Set(r.flatMap((x) => x.players ?? []));
     const ctx = await statsContext(l);
     return Object.values(p)
-      .filter((x) => x.active && x.team && !taken.has(x.player_id))
+      .filter((x) => x.active && x.team && x.full_name && !taken.has(x.player_id))
       .sort((a, b) => (a.search_rank ?? 9999) - (b.search_rank ?? 9999))
       .slice(0, query.limit ?? 50)
       .map((x) => normalizePlayer(x, ctx));
@@ -138,18 +141,21 @@ export const sleeperAdapter: PlatformAdapter = {
     const owner = new Map<string, number>();
     for (const x of r) for (const id of x.players ?? []) owner.set(id, x.roster_id);
     const free = Object.values(p)
-      .filter((x) => x.active && x.team && !owner.has(x.player_id))
+      .filter((x) => x.active && x.team && x.full_name && !owner.has(x.player_id))
       .sort((a, b) => (a.search_rank ?? 9999) - (b.search_rank ?? 9999))
       .slice(0, 300);
     const rostered = [...owner.keys()].map((id) => p[id]).filter((x): x is SleeperPlayer => !!x);
-    return [...rostered, ...free].map((x) => ({
-      player: normalizePlayer(x, ctx),
-      status: owner.has(x.player_id) ? ("rostered" as const) : ("free_agent" as const),
-      fantasyTeamId: owner.has(x.player_id) ? unifiedId("sleeper", `${leagueId}.${owner.get(x.player_id)}`) : null,
-      // Sleeper has no ownership % or NBA schedule here.
-      gamesThisWeek: 0,
-      today: null,
-    }));
+    return [...rostered, ...free].map((x) => {
+      const player = normalizePlayer(x, ctx);
+      return {
+        player,
+        status: owner.has(x.player_id) ? ("rostered" as const) : ("free_agent" as const),
+        fantasyTeamId: owner.has(x.player_id) ? unifiedId("sleeper", `${leagueId}.${owner.get(x.player_id)}`) : null,
+        // Sleeper has no ownership %; the schedule comes from ESPN's public data.
+        gamesThisWeek: player.schedule?.gamesThisWeek ?? 0,
+        today: player.schedule?.today ?? null,
+      };
+    });
   },
 
   /** Transactions are per week; this season's weeks so far. */

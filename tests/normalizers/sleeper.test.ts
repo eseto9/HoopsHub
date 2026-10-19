@@ -147,3 +147,20 @@ describe("Sleeper activity and league tab", () => {
     expect(o.draft[0].player?.name).toBe("Victor Wembanyama");
   });
 });
+
+describe("Sleeper players with the NBA schedule", () => {
+  // ESPN's public schedule (fixtures/espn/pro-teams-2027.json) gives Sleeper players games and opponents.
+  const pro = load<import("@/lib/adapters/espn/raw-types").EspnProTeamsResponse>("../espn/pro-teams-2027.json");
+  it("maps Sleeper team codes to ESPN's and fills in this week's games", async () => {
+    const { normalizeProSchedule } = await import("@/lib/adapters/espn/schedule");
+    const { normalizeProTeams } = await import("@/lib/adapters/espn/normalize");
+    const abbrev = normalizeProTeams(pro);
+    const nba = { schedule: normalizeProSchedule(pro), abbrev, idByAbbrev: new Map(Object.entries(abbrev).map(([id, a]) => [a, Number(id)])), now: Date.parse("2026-10-20T16:00:00Z") };
+    const wemby = normalizePlayer(players["2577"], { ...stats, nba });
+    expect(wemby.nbaTeam).toBe("SA"); // Sleeper says SAS
+    expect(wemby.schedule!.gamesThisWeek).toBeGreaterThan(0);
+    expect(wemby.eligibleSlots).toEqual(expect.arrayContaining(["C", "UTIL", "BN"]));
+    const codes = new Set(Object.values(players).map((p) => normalizePlayer(p).nbaTeam).filter(Boolean));
+    expect([...codes].filter((c) => !Object.values(abbrev).includes(c!))).toEqual([]);
+  });
+});

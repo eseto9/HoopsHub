@@ -91,9 +91,16 @@ export function normalizePlayerCard(
       return { opponent: proTeams[home ? g.awayProTeamId : g.homeProTeamId] ?? "?", home, date: new Date(g.date).toISOString() };
     });
 
-  const items: NewsItem[] = (news?.news.feed ?? [])
+  const items = normalizeNews(news);
+
+  return { listing, splits, gameLog, outlook: entry.player.seasonOutlook || undefined, news: items, upcoming };
+}
+
+/** Readable, non-premium items from ESPN's fantasy news feed. */
+export function normalizeNews(news: EspnNewsResponse | null, limit = 10): NewsItem[] {
+  return (news?.news.feed ?? [])
     .filter((n) => !n.premium && (n.story || n.description))
-    .slice(0, 10)
+    .slice(0, limit)
     .map((n) => ({
       id: String(n.id),
       headline: n.headline,
@@ -102,6 +109,4 @@ export function normalizePlayerCard(
       source: n.type === "Rotowire" ? "RotoWire" : "ESPN",
       url: n.links?.web?.href,
     }));
-
-  return { listing, splits, gameLog, outlook: entry.player.seasonOutlook || undefined, news: items, upcoming };
 }

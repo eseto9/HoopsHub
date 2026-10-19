@@ -14,20 +14,24 @@ export type StatMode = "avg" | "tot";
 export type SortState = { key: string; dir: 1 | -1 };
 
 export const STAT_COLS: { key: string; label: string; rate?: boolean }[] = [
-  { key: "min", label: "MIN" },
-  { key: "fgm", label: "FGM" },
-  { key: "fga", label: "FGA" },
-  { key: "fg_pct", label: "FG%", rate: true },
-  { key: "ftm", label: "FTM" },
-  { key: "fta", label: "FTA" },
-  { key: "ft_pct", label: "FT%", rate: true },
-  { key: "3pm", label: "3PM" },
+  { key: "pts", label: "PTS" },
   { key: "reb", label: "REB" },
   { key: "ast", label: "AST" },
   { key: "stl", label: "STL" },
   { key: "blk", label: "BLK" },
   { key: "to", label: "TO" },
-  { key: "pts", label: "PTS" },
+  { key: "fg_pct", label: "FG%", rate: true },
+  { key: "ft_pct", label: "FT%", rate: true },
+  { key: "min", label: "MIN" },
+];
+
+/** Shown after GMS so no stat disappears; still sortable. */
+const EXTRA_COLS: { key: string; label: string }[] = [
+  { key: "3pm", label: "3PM" },
+  { key: "fgm", label: "FGM" },
+  { key: "fga", label: "FGA" },
+  { key: "ftm", label: "FTM" },
+  { key: "fta", label: "FTA" },
 ];
 
 const INJURY_LABEL: Partial<Record<InjuryStatus, string>> = { OUT: "O", IR: "IR", SUSP: "SSPD", DTD: "DTD", GTD: "GTD", QUES: "Q", OTHER: "INJ" };
@@ -113,22 +117,21 @@ export function StatsTable({
           <tr className="text-[11px] font-semibold text-muted uppercase">
             <Th {...th} k="name" sticky align="left">{firstColumn}</Th>
             <Th {...th}>Opp</Th>
-            <Th {...th} k="gms">Gms</Th>
+            {points && <Th {...th} k="fpavg">AVG</Th>}
+            {STAT_COLS.map((c) => (
+              <Th {...th} key={c.key} k={c.key}>{c.label}</Th>
+            ))}
             {showOwnership && (
               <>
                 <Th {...th} k="ros">%Ros</Th>
                 <Th {...th} k="chg">+/−</Th>
               </>
             )}
-            {STAT_COLS.map((c) => (
+            <Th {...th} k="gms">Gms</Th>
+            {EXTRA_COLS.map((c) => (
               <Th {...th} key={c.key} k={c.key}>{c.label}</Th>
             ))}
-            {points && (
-              <>
-                <Th {...th} k="fptot">FPTS</Th>
-                <Th {...th} k="fpavg">AVG</Th>
-              </>
-            )}
+            {points && <Th {...th} k="fptot">FPTS</Th>}
           </tr>
         </thead>
         <tbody>
@@ -182,7 +185,7 @@ function Row({ r, source, mode, points, showOwnership }: { r: StatsTableRow; sou
   const line = statLineOf(p, source);
   const inj = p?.injuryStatus ? INJURY_LABEL[p.injuryStatus] : undefined;
   const chg = p?.ownership?.percentRosteredChange;
-  const cells = STAT_COLS.length + 2 + (showOwnership ? 2 : 0) + (points ? 2 : 0);
+  const cells = STAT_COLS.length + EXTRA_COLS.length + 2 + (showOwnership ? 2 : 0) + (points ? 2 : 0);
   const bg = r.highlighted ? "bg-accent-soft" : "bg-surface";
   return (
     <tr className={`[&>td]:border-t-[0.5px] [&>td]:border-separator first:[&>td]:border-t-0 ${r.dimmed ? "opacity-40" : ""}`}>
@@ -209,7 +212,10 @@ function Row({ r, source, mode, points, showOwnership }: { r: StatsTableRow; sou
       {p ? (
         <>
           <Td muted>{p.schedule?.today ? `${p.schedule.today.home ? "" : "@"}${p.schedule.today.opponent}` : "–"}</Td>
-          <Td>{p.schedule?.gamesThisWeek ?? "–"}</Td>
+          {points && <Td strong>{line?.fantasyPointsPerGame !== undefined ? f1.format(line.fantasyPointsPerGame) : "–"}</Td>}
+          {STAT_COLS.map((c) => (
+            <StatTd key={c.key} p={p} k={c.key} rateCol={c.rate} source={source} mode={mode} />
+          ))}
           {showOwnership && (
             <>
               <Td>{p.ownership ? f1.format(p.ownership.percentRostered) : "–"}</Td>
@@ -218,22 +224,22 @@ function Row({ r, source, mode, points, showOwnership }: { r: StatsTableRow; sou
               </Td>
             </>
           )}
-          {STAT_COLS.map((c) => {
-            const v = columnValue(p, c.key, source, mode) as number | undefined;
-            return <Td key={c.key}>{v === undefined ? "–" : c.rate ? rate(v) : mode === "avg" ? f1.format(v) : f0.format(v)}</Td>;
-          })}
-          {points && (
-            <>
-              <Td>{line?.fantasyPointsTotal !== undefined ? f0.format(line.fantasyPointsTotal) : "–"}</Td>
-              <Td strong>{line?.fantasyPointsPerGame !== undefined ? f1.format(line.fantasyPointsPerGame) : "–"}</Td>
-            </>
-          )}
+          <Td>{p.schedule?.gamesThisWeek ?? "–"}</Td>
+          {EXTRA_COLS.map((c) => (
+            <StatTd key={c.key} p={p} k={c.key} source={source} mode={mode} />
+          ))}
+          {points && <Td>{line?.fantasyPointsTotal !== undefined ? f0.format(line.fantasyPointsTotal) : "–"}</Td>}
         </>
       ) : (
         <td colSpan={cells} className="bg-surface" />
       )}
     </tr>
   );
+}
+
+function StatTd({ p, k, rateCol, source, mode }: { p: Player; k: string; rateCol?: boolean; source: StatSource; mode: StatMode }) {
+  const v = columnValue(p, k, source, mode) as number | undefined;
+  return <Td>{v === undefined ? "–" : rateCol ? rate(v) : mode === "avg" ? f1.format(v) : f0.format(v)}</Td>;
 }
 
 function Td({ children, muted, strong, className = "" }: { children: React.ReactNode; muted?: boolean; strong?: boolean; className?: string }) {

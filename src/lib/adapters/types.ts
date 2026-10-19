@@ -5,6 +5,7 @@ import type {
   Platform,
   Player,
   PlayerListing,
+  LeagueOverview,
   RosterSlot,
   StandingsRow,
   Team,
@@ -89,6 +90,8 @@ export interface PlatformAdapter {
   getActivity?(conn: AdapterConnection, leagueId: string): Promise<{ feed: LeagueActivity[]; pendingForTeam: LeagueActivity[] }>;
   /** Available and rostered players with ownership and this week's NBA schedule. */
   getPlayerPool?(conn: AdapterConnection, leagueId: string): Promise<PlayerListing[]>;
+  /** Waiver order, rules, draft results and season schedule. */
+  getLeagueOverview?(conn: AdapterConnection, leagueId: string): Promise<LeagueOverview>;
 
   // Phase 5 write operations. Optional; presence must match `capabilities`.
   setLineup?(conn: AdapterConnection, leagueId: string, teamId: string, changes: LineupChange[], period?: number): Promise<void>;

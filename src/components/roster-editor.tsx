@@ -7,8 +7,7 @@ import { moveLineupAction } from "@/app/actions/lineup";
 import { safeAction } from "@/lib/safe-action";
 import { planMove, validTargets } from "@/lib/lineup";
 import type { RosterSlot } from "@/lib/schema";
-import { Group } from "./list";
-import { PlayerRow } from "./player-row";
+import { StatControls, StatsTable, availableSources, type StatMode, type StatSource } from "./stats-table";
 
 type Pending = { from: number; to: number } | null;
 type Notice = { kind: "ok" | "error"; text: string; reconnect?: boolean } | null;
@@ -25,6 +24,7 @@ export function RosterEditor({
   platformName,
   showFantasyPoints,
   title,
+  editable = true,
 }: {
   slots: RosterSlot[];
   platform: string;
@@ -32,12 +32,17 @@ export function RosterEditor({
   platformName: string;
   showFantasyPoints: boolean;
   title: string;
+  /** False for other teams and public leagues: same table, no Move buttons. */
+  editable?: boolean;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<number | null>(null);
   const [confirm, setConfirm] = useState<Pending>(null);
   const [notice, setNotice] = useState<Notice>(null);
   const [isPending, startTransition] = useTransition();
+  const players = useMemo(() => slots.map((x) => x.player), [slots]);
+  const [source, setSource] = useState<StatSource>(availableSources(players)[0] ?? "projected");
+  const [mode, setMode] = useState<StatMode>("avg");
 
   const targets = useMemo(() => new Set(selected === null ? [] : validTargets(slots, selected)), [slots, selected]);
   const indexed = slots.map((s, i) => ({ s, i }));
@@ -46,6 +51,7 @@ export function RosterEditor({
 
   function actionFor(i: number) {
     const s = slots[i];
+    if (!editable) return undefined;
     if (selected === null) {
       if (!s.player) return undefined;
       if (s.locked) return <span className="text-[13px] text-faint">Locked</span>;
@@ -56,17 +62,15 @@ export function RosterEditor({
     return undefined;
   }
 
-  function renderRows(rows: typeof indexed) {
-    return rows.map(({ s, i }) => (
-      <PlayerRow
-        key={i}
-        player={s.player}
-        slot={s.slot}
-        showFantasyPoints={showFantasyPoints}
-        action={actionFor(i)}
-        dimmed={selected !== null && i !== selected && !targets.has(i)}
-      />
-    ));
+  function tableRows(rows: typeof indexed) {
+    return rows.map(({ s, i }) => ({
+      key: String(i),
+      player: s.player,
+      lead: <SlotTile slot={s.slot} />,
+      trailing: actionFor(i),
+      dimmed: selected !== null && i !== selected && !targets.has(i),
+      highlighted: selected === i,
+    }));
   }
 
   function submit() {
@@ -109,11 +113,16 @@ export function RosterEditor({
           Tap <b className="text-accent">Here</b> to move {slots[selected].player?.name}. Changes apply on {platformName} for today.
         </p>
       )}
-      <Group header={`${title} · Starters`}>{renderRows(starters)}</Group>
+      <StatControls players={players} source={source} onSource={setSource} mode={mode} onMode={setMode} />
+      <section className="flex flex-col gap-1.5">
+        <h2 className="group-header">{title} · Starters</h2>
+        <StatsTable rows={tableRows(starters)} source={source} mode={mode} points={showFantasyPoints} firstColumn="Slot · Player" />
+      </section>
       {bench.length > 0 && (
-        <Group header="Bench & IR" footer={showFantasyPoints ? "FP/G = fantasy points per game in this league's scoring." : undefined}>
-          {renderRows(bench)}
-        </Group>
+        <section className="flex flex-col gap-1.5">
+          <h2 className="group-header">Bench & IR</h2>
+          <StatsTable rows={tableRows(bench)} source={source} mode={mode} points={showFantasyPoints} firstColumn="Slot · Player" />
+        </section>
       )}
 
       {confirm && (
@@ -130,6 +139,11 @@ export function RosterEditor({
   );
 }
 
+function SlotTile({ slot }: { slot: string }) {
+  const tone = slot === "IR" ? "bg-danger-soft text-danger" : slot === "BN" ? "bg-fill text-muted" : "bg-accent-soft text-accent";
+  return <span className={`flex h-6 w-9 shrink-0 items-center justify-center rounded-[6px] text-[10px] font-bold ${tone}`}>{slot}</span>;
+}
+
 function MoveButton({ label, onClick, tone = "tinted" }: { label: string; onClick: () => void; tone?: "tinted" | "filled" | "plain" }) {
   const cls =
     tone === "filled"
@@ -138,7 +152,7 @@ function MoveButton({ label, onClick, tone = "tinted" }: { label: string; onClic
         ? "text-accent"
         : "bg-accent-soft text-accent";
   return (
-    <button type="button" onClick={onClick} className={`rounded-full px-3 py-1 text-[13px] font-semibold ${cls}`}>
+    <button type="button" onClick={onClick} className={`shrink-0 rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${cls}`}>
       {label}
     </button>
   );

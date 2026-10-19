@@ -162,10 +162,10 @@ export async function resolveLeague(userId: string, platform: Platform, external
   return null;
 }
 
-export type LeagueTab = "roster" | "matchup" | "players" | "activity" | "teams" | "standings" | "trade";
+export type LeagueTab = "roster" | "matchup" | "players" | "activity" | "league" | "teams" | "standings" | "trade";
 
 /** Data for one tab of the league page. Only fetches what that tab shows. */
-export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opts: { teamId?: string; position?: string } = {}) {
+export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opts: { teamId?: string; position?: string; period?: number } = {}) {
   const { conn, league } = resolved;
   const adapter = getAdapter(league.platform);
   const id = league.externalId;
@@ -179,7 +179,7 @@ export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opt
       return { tab, teams, roster: teamExt ? await adapter.getRoster(conn, id, teamExt) : null } as const;
     }
     case "matchup": {
-      const matchups = await adapter.getMatchups(conn, id);
+      const matchups = await adapter.getMatchups(conn, id, opts.period);
       const mine = myTeam ? matchups.find((m) => m.home.teamId === myTeam.id || m.away?.teamId === myTeam.id) : undefined;
       const sides = mine ? [mine.home, mine.away].filter((s): s is NonNullable<typeof s> => !!s) : [];
       const rosters = await Promise.all(sides.map((s) => adapter.getRoster(conn, id, byId.get(s.teamId)!.externalId)));
@@ -209,6 +209,8 @@ export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opt
       return { tab, teams, standings: await adapter.getStandings(conn, id) } as const;
     case "teams":
       return { tab, teams } as const;
+    case "league":
+      return { tab, teams, overview: adapter.getLeagueOverview ? await adapter.getLeagueOverview(conn, id) : null } as const;
     case "activity": {
       const activity = adapter.getActivity ? await adapter.getActivity(conn, id) : { feed: [], pendingForTeam: [] };
       return { tab, teams, activity } as const;

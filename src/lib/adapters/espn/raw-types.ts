@@ -59,6 +59,9 @@ export interface EspnTeam {
   playoffSeed: number;
   points: number;
   record: { overall: EspnRecordLine; home: EspnRecordLine; away: EspnRecordLine; division: EspnRecordLine };
+  /** 1 = first waiver claim (observed in mTeam). */
+  waiverRank?: number;
+  transactionCounter?: { acquisitions: number; drops: number; trades: number; moveToIR: number; moveToActive: number };
 }
 
 export interface EspnMember {
@@ -97,10 +100,37 @@ export interface EspnSettings {
     scoringType: string; // observed: "H2H_POINTS"
     scoringItems: EspnScoringItem[];
   };
-  rosterSettings: { lineupSlotCounts: Record<string, number> };
+  rosterSettings: {
+    lineupSlotCounts: Record<string, number>;
+    isBenchUnlimited?: boolean;
+    moveLimit?: number; // -1 = none
+    lineupLocktimeType?: string; // observed: INDIVIDUAL_GAME
+  };
   scheduleSettings: {
     matchupPeriodCount: number;
     matchupPeriods: Record<string, number[]>; // matchup period -> scoring periods (days)
+    playoffTeamCount?: number;
+    playoffSeedingRule?: string; // observed: TOTAL_POINTS_SCORED
+    playoffMatchupPeriodLength?: number;
+  };
+  /** Observed in mSettings; all fields seen in fixtures/espn/.../settings.json. */
+  acquisitionSettings?: {
+    acquisitionType: string; // observed: WAIVERS_TRADITIONAL
+    acquisitionLimit: number; // -1 = none
+    matchupAcquisitionLimit?: number;
+    waiverHours: number;
+    waiverProcessDays: string[]; // observed: ["SUNDAY"]
+    waiverProcessHour: number;
+    isUsingAcquisitionBudget: boolean;
+    acquisitionBudget: number;
+  };
+  tradeSettings?: { deadlineDate: number; vetoVotesRequired: number; revisionHours: number; max: number };
+  draftSettings?: {
+    type: string; // observed: SNAKE
+    date: number;
+    timePerSelection: number; // seconds
+    pickOrder: number[]; // team ids in first-round order
+    keeperCount: number;
   };
 }
 
@@ -200,6 +230,9 @@ export interface EspnTransactionItem {
   toTeamId: number;
   fromLineupSlotId?: number;
   toLineupSlotId?: number;
+  /** DRAFT items. */
+  overallPickNumber?: number;
+  isKeeper?: boolean;
 }
 
 /**
@@ -225,4 +258,24 @@ export interface EspnTransaction {
 
 export interface EspnTransactionsResponse {
   transactions?: EspnTransaction[];
+}
+
+/**
+ * Communication feed (lm-api-communication .../communication/?view=kona_league_communication).
+ * Message meanings verified against espn.com Recent Activity: 164 team renamed
+ * (from/to names, targetId team), 162 abbreviation changed, 252 trade
+ * availability changed (targetId team, for = player), 119 draft completed,
+ * 188 lineup move. Transactions also appear here but come from mTransactions2.
+ */
+export interface EspnCommunicationMessage {
+  messageTypeId: number;
+  date: number;
+  from?: number | string;
+  to?: number | string;
+  targetId?: number;
+  for?: number;
+}
+
+export interface EspnCommunicationResponse {
+  topics?: { id: string; type: string; date: number; targetId?: number; messages: EspnCommunicationMessage[] }[];
 }

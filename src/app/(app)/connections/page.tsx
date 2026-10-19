@@ -113,7 +113,7 @@ async function Espn() {
 
 export default function ConnectionsPage() {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
       <h1 className="large-title px-1">Connections</h1>
 
       <Suspense fallback={<div className="list-group h-[92px] animate-pulse" />}>

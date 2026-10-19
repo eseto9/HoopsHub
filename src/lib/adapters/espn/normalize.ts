@@ -35,6 +35,7 @@ import type {
   EspnStatEntry,
   EspnTeam,
 } from "./raw-types";
+import { gamesThisWeek, gameToday, type ProSchedule } from "./schedule";
 
 /** proTeamId -> NBA abbreviation. 0 (free agent) is omitted. */
 export type ProTeamMap = Record<number, string>;
@@ -184,7 +185,13 @@ export function normalizePlayerStats(p: EspnPlayer): PlayerStats | undefined {
   return stats.current || stats.previous || stats.projected ? stats : undefined;
 }
 
-export function normalizePlayer(p: EspnPlayer, proTeams: ProTeamMap): Player {
+/** Optional NBA schedule context, so players carry games-this-week and today's opponent. */
+export interface ScheduleContext {
+  schedule: ProSchedule;
+  now: number;
+}
+
+export function normalizePlayer(p: EspnPlayer, proTeams: ProTeamMap, sched?: ScheduleContext): Player {
   const positions = BASE_POSITION_SLOTS.filter((s) => p.eligibleSlots.includes(s)).map((s) => LINEUP_SLOTS[s]);
   if (positions.length === 0) {
     const pos = defaultPosition(p.defaultPositionId);
@@ -201,6 +208,15 @@ export function normalizePlayer(p: EspnPlayer, proTeams: ProTeamMap): Player {
     headshotUrl: headshotUrl(p.id),
     eligibleSlots: p.eligibleSlots.flatMap((id) => (LINEUP_SLOTS[id] ? [LINEUP_SLOTS[id]] : [])),
     stats: normalizePlayerStats(p),
+    ownership: p.ownership
+      ? { percentRostered: p.ownership.percentOwned, percentRosteredChange: p.ownership.percentChange, percentStarted: p.ownership.percentStarted }
+      : undefined,
+    schedule: sched
+      ? {
+          gamesThisWeek: gamesThisWeek(sched.schedule, p.proTeamId, sched.now),
+          today: gameToday(sched.schedule, p.proTeamId, sched.now, proTeams),
+        }
+      : undefined,
   };
 }
 
@@ -213,6 +229,7 @@ export function normalizeRoster(
   roster: EspnRosterResponse,
   teamExternalId: string,
   proTeams: ProTeamMap,
+  sched?: ScheduleContext,
 ): RosterSlot[] {
   const teamId = teamKey(settings.id, Number(teamExternalId));
   const entries = roster.teams?.find((t) => String(t.id) === teamExternalId)?.roster.entries ?? [];
@@ -229,12 +246,12 @@ export function normalizeRoster(
     const size = Math.max(counts[slotId], filled.length);
     for (let i = 0; i < size; i++) {
       const e = filled[i];
-      slots.push({ teamId, slot: label, player: e ? normalizePlayer(e.playerPoolEntry.player, proTeams) : null, locked: e?.playerPoolEntry.lineupLocked || undefined });
+      slots.push({ teamId, slot: label, player: e ? normalizePlayer(e.playerPoolEntry.player, proTeams, sched) : null, locked: e?.playerPoolEntry.lineupLocked || undefined });
     }
   }
   for (const [slotId, rest] of bySlot) {
     for (const e of rest) {
-      slots.push({ teamId, slot: LINEUP_SLOTS[slotId] ?? `SLOT_${slotId}`, player: normalizePlayer(e.playerPoolEntry.player, proTeams) });
+      slots.push({ teamId, slot: LINEUP_SLOTS[slotId] ?? `SLOT_${slotId}`, player: normalizePlayer(e.playerPoolEntry.player, proTeams, sched) });
     }
   }
   return slots;
@@ -254,11 +271,15 @@ function side(leagueId: number, s: EspnMatchupSide, status: MatchupStatus): Matc
   };
 }
 
-/** Matchups for one matchup period (defaults to the league's current one). */
-export function normalizeMatchups(raw: EspnMatchupsResponse, leagueId: number, period?: number): Matchup[] {
+/**
+ * Matchups for one matchup period (defaults to the league's current one).
+ * latestScoringPeriod is already 1 the day before opening night, so callers
+ * pass whether the NBA season has actually tipped off.
+ */
+export function normalizeMatchups(raw: EspnMatchupsResponse, leagueId: number, period?: number, seasonStarted = true): Matchup[] {
   const current = raw.status.currentMatchupPeriod;
   const target = period ?? current;
-  const active = raw.status.isActive && raw.status.latestScoringPeriod > 0;
+  const active = raw.status.isActive && raw.status.latestScoringPeriod > 0 && seasonStarted;
   return raw.schedule
     .filter((m) => m.matchupPeriodId === target)
     .map((m) => {

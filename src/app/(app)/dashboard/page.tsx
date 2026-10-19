@@ -49,7 +49,7 @@ async function Leagues() {
       )}
 
       {leagues.length > 0 ? (
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {leagues.map((l) => (
             <LeagueCard key={l.league.id} data={l} />
           ))}

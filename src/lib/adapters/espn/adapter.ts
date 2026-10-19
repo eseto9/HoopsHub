@@ -3,7 +3,7 @@ import { NotFoundError, PlatformError } from "@/lib/errors";
 import type { League, Player } from "@/lib/schema";
 import type { AdapterConnection, ConnectResult, FreeAgentQuery, LineupChange, PlatformAdapter, RosterResult } from "../types";
 import { invalidate } from "@/lib/cache";
-import { cacheScope, cached, cookiesOf, espnFetch, espnPost, ESPN_READS, fanEndpoint, leagueEndpoint, type EspnCookies } from "./client";
+import { cacheScope, cached, communicationEndpoint, cookiesOf, espnFetch, espnPost, ESPN_READS, fanEndpoint, leagueEndpoint, type EspnCookies } from "./client";
 import { buildAddDrop, buildCancel, buildLineupTransaction, buildTradeProposal, transactionsUrl, type EspnTransactionResponse } from "./writes";
 import { LINEUP_SLOTS } from "./constants";
 import {
@@ -19,6 +19,7 @@ import {
   type ProTeamMap,
 } from "./normalize";
 import type {
+  EspnCommunicationResponse,
   EspnFanProfile,
   EspnFreeAgentsResponse,
   EspnGame,
@@ -28,7 +29,8 @@ import type {
   EspnRosterResponse,
   EspnTransactionsResponse,
 } from "./raw-types";
-import { activityPlayerIds, closedIds, normalizeActivity } from "./activity";
+import { activityPlayerIds, closedIds, communicationPlayerIds, normalizeActivity, normalizeCommunication } from "./activity";
+import { draftPlayerIds, normalizeOverview } from "./overview";
 import { normalizePlayerPool } from "./pool";
 import { normalizeProSchedule } from "./schedule";
 
@@ -36,6 +38,25 @@ const TTL = { game: 3600, proTeams: 86400, settings: 120, roster: 60, matchups: 
 
 /** Headers espn.com sends with filtered player lookups (captured). */
 const KONA_HEADERS = { "X-Fantasy-Platform": "espn-fantasy-web", "X-Fantasy-Source": "kona" };
+
+/**
+ * League message feed filter, as espn.com's Recent Activity page sends it
+ * (captured). The excluded ids are ones espn.com itself hides.
+ */
+function communicationFilter(now: number) {
+  return {
+    topics: {
+      filterDateRange: { value: now - 90 * 86_400_000, additionalValue: now },
+      filterExcludeMessageTypeIds: { value: [106, 202, 232, 184, 183, 229, 228, 227, 230, 231, 286] },
+      filterType: { value: ["ACTIVITY_SETTINGS", "ACTIVITY_STATUS"] },
+      limit: 100,
+      limitPerMessageSet: { value: 25 },
+      offset: 0,
+      sortMessageDate: { sortPriority: 1, sortAsc: false },
+      sortFor: { sortPriority: 2, sortAsc: false },
+    },
+  };
+}
 
 const SWID_RE = /^\{?[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}?$/i;
 
@@ -72,6 +93,33 @@ async function getSettings(conn: AdapterConnection, leagueId: string): Promise<E
   return cached(`espn:${cacheScope(conn)}:settings:${season}:${leagueId}`, TTL.settings, () =>
     espnFetch(leagueEndpoint(season, leagueId, ["mSettings", "mStatus", "mTeam"]), fetchOpts(conn)),
   );
+}
+
+async function getMatchupsRaw(conn: AdapterConnection, season: number, leagueId: string) {
+  return cached(`espn:${cacheScope(conn)}:matchups:${season}:${leagueId}`, TTL.matchups, () =>
+    espnFetch<EspnMatchupsResponse>(leagueEndpoint(season, leagueId, ["mMatchup", "mMatchupScore"]), fetchOpts(conn)),
+  );
+}
+
+async function getTransactionsRaw(conn: AdapterConnection, season: number, leagueId: string) {
+  return cached(`espn:${cacheScope(conn)}:activity:${season}:${leagueId}`, TTL.activity, () =>
+    espnFetch<EspnTransactionsResponse>(leagueEndpoint(season, leagueId, ["mTransactions2"]), fetchOpts(conn)),
+  );
+}
+
+/** Players by id (filterIds without a limit: ESPN rejects a limit that has no sort). */
+async function playersById(conn: AdapterConnection, settings: EspnLeagueSettingsResponse, leagueId: string, ids: number[]) {
+  const season = settings.seasonId;
+  const sorted = [...new Set(ids)].sort((a, b) => a - b);
+  if (!sorted.length) return [];
+  const extra: Record<string, string> = settings.scoringPeriodId ? { scoringPeriodId: String(settings.scoringPeriodId) } : {};
+  const pool = await cached(`espn:${cacheScope(conn)}:players:${season}:${leagueId}:${sorted.join(",")}`, TTL.players, () =>
+    espnFetch<EspnFreeAgentsResponse>(leagueEndpoint(season, leagueId, ["kona_player_info"], extra), {
+      ...fetchOpts(conn),
+      headers: { ...KONA_HEADERS, "X-Fantasy-Filter": JSON.stringify({ players: { filterIds: { value: sorted } } }) },
+    }),
+  );
+  return pool.players;
 }
 
 function context(conn: AdapterConnection, leagueId: string): LeagueContext {
@@ -184,15 +232,15 @@ export const espnAdapter: PlatformAdapter = {
       ),
       getProTeams(settings.seasonId),
     ]);
-    return { team, slots: normalizeRoster(settings, roster, teamId, proTeams) };
+    const proRaw = await getProTeamsRaw(settings.seasonId);
+    return { team, slots: normalizeRoster(settings, roster, teamId, proTeams, { schedule: normalizeProSchedule(proRaw), now: Date.now() }) };
   },
 
   async getMatchups(conn, leagueId, period) {
     const season = await getSeason();
-    const raw = await cached(`espn:${cacheScope(conn)}:matchups:${season}:${leagueId}`, TTL.matchups, () =>
-      espnFetch<EspnMatchupsResponse>(leagueEndpoint(season, leagueId, ["mMatchup", "mMatchupScore"]), fetchOpts(conn)),
-    );
-    return normalizeMatchups(raw, Number(leagueId), period);
+    const [raw, pro] = await Promise.all([getMatchupsRaw(conn, season, leagueId), getProTeamsRaw(season)]);
+    const firstTip = Math.min(...pro.settings.proTeams.flatMap((t) => Object.values(t.proGamesByScoringPeriod ?? {}).flat().map((g) => g.date)));
+    return normalizeMatchups(raw, Number(leagueId), period, Date.now() >= firstTip);
   },
 
   async getStandings(conn, leagueId) {
@@ -265,27 +313,42 @@ export const espnAdapter: PlatformAdapter = {
     const settings = await getSettings(conn, leagueId);
     const season = settings.seasonId;
     const scope = cacheScope(conn);
-    const raw = await cached(`espn:${scope}:activity:${season}:${leagueId}`, TTL.activity, () =>
-      espnFetch<EspnTransactionsResponse>(leagueEndpoint(season, leagueId, ["mTransactions2"]), fetchOpts(conn)),
-    );
-
-    const ids = activityPlayerIds(raw).sort((a, b) => a - b);
-    const extra: Record<string, string> = settings.scoringPeriodId ? { scoringPeriodId: String(settings.scoringPeriodId) } : {};
-    const [proTeams, pool] = await Promise.all([
-      getProTeams(season),
-      ids.length
-        ? cached(`espn:${scope}:players:${season}:${leagueId}:${ids.join(",")}`, TTL.players, () =>
-            // filterIds without a limit: ESPN rejects a limit that has no sort.
-            espnFetch<EspnFreeAgentsResponse>(leagueEndpoint(season, leagueId, ["kona_player_info"], extra), {
-              ...fetchOpts(conn),
-              headers: { ...KONA_HEADERS, "X-Fantasy-Filter": JSON.stringify({ players: { filterIds: { value: ids } } }) },
-            }),
-          )
-        : Promise.resolve({ players: [] } as EspnFreeAgentsResponse),
+    const [raw, comm] = await Promise.all([
+      getTransactionsRaw(conn, season, leagueId),
+      // League messages are extra detail; the feed still works without them.
+      cached(`espn:${scope}:communication:${season}:${leagueId}`, TTL.activity, () =>
+        espnFetch<EspnCommunicationResponse>(communicationEndpoint(season, leagueId), {
+          ...fetchOpts(conn),
+          headers: { ...KONA_HEADERS, "X-Fantasy-Filter": JSON.stringify(communicationFilter(Date.now())) },
+        }),
+      ).catch((): EspnCommunicationResponse => ({ topics: [] })),
     ]);
-    const players = new Map(pool.players.map((e) => [e.player.id, normalizePlayer(e.player, proTeams)]));
-    const mine = normalizeTeams(settings, context(conn, leagueId)).find((t) => t.isMine);
-    return normalizeActivity(raw, leagueId, players, mine?.externalId);
+
+    const [proTeams, entries] = await Promise.all([
+      getProTeams(season),
+      playersById(conn, settings, leagueId, [...activityPlayerIds(raw), ...communicationPlayerIds(comm)]),
+    ]);
+    const players = new Map(entries.map((e) => [e.player.id, normalizePlayer(e.player, proTeams)]));
+    const teams = normalizeTeams(settings, context(conn, leagueId));
+    const mine = teams.find((t) => t.isMine);
+    const result = normalizeActivity(raw, leagueId, players, mine?.externalId);
+    const teamName = (id: number) => teams.find((t) => t.externalId === String(id))?.name ?? `Team ${id}`;
+    const messages = normalizeCommunication(comm, leagueId, players, teamName);
+    return { ...result, feed: [...result.feed, ...messages].sort((a, b) => b.date.localeCompare(a.date)) };
+  },
+
+  async getLeagueOverview(conn, leagueId) {
+    const settings = await getSettings(conn, leagueId);
+    const season = settings.seasonId;
+    const [matchups, txns, proRaw] = await Promise.all([
+      getMatchupsRaw(conn, season, leagueId),
+      getTransactionsRaw(conn, season, leagueId),
+      getProTeamsRaw(season),
+    ]);
+    const proTeams = normalizeProTeams(proRaw);
+    const entries = await playersById(conn, settings, leagueId, draftPlayerIds(txns));
+    const players = new Map(entries.map((e) => [e.player.id, normalizePlayer(e.player, proTeams)]));
+    return normalizeOverview(settings, matchups, txns, proRaw, players, Date.now());
   },
 
   /** Add a player (claim if on waivers, else instant pickup), optionally dropping one. */

@@ -3,13 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ActivityFeed } from "@/components/activity-feed";
+import { LeagueOverviewView } from "@/components/league-overview";
+import { MatchupView } from "@/components/matchup-view";
 import { PlayersExplorer } from "@/components/players-explorer";
 import { TradeBuilder } from "@/components/trade-builder";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { ChevronRight } from "@/components/icons";
 import { Group, Row } from "@/components/list";
 import { PlatformIcon, platformLabel } from "@/components/platform-badge";
-import { PlayerRow } from "@/components/player-row";
 import { RosterEditor } from "@/components/roster-editor";
 import { getAdapter } from "@/lib/adapters/registry";
 import { Segmented } from "@/components/segmented";
@@ -25,13 +26,14 @@ const TABS: { key: LeagueTab; label: string }[] = [
   { key: "matchup", label: "Matchup" },
   { key: "players", label: "Players" },
   { key: "activity", label: "Activity" },
+  { key: "league", label: "League" },
   { key: "standings", label: "Standings" },
   { key: "teams", label: "Teams" },
 ];
 
 const fmt1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
-type Search = { tab?: string; team?: string; pos?: string };
+type Search = { tab?: string; team?: string; pos?: string; week?: string };
 
 export default function LeaguePage({ params, searchParams }: PageProps<"/leagues/[platform]/[leagueId]">) {
   return (
@@ -81,7 +83,7 @@ async function LeagueView({ params, searchParams }: { params: Promise<{ platform
 
       <Segmented active={tab} items={TABS.map((t) => ({ key: t.key, label: t.label, href: `${base}?tab=${t.key}` }))} />
 
-      <Suspense key={`${tab}-${sp.team ?? ""}-${sp.pos ?? ""}`} fallback={<div className="list-group h-80 animate-pulse" />}>
+      <Suspense key={`${tab}-${sp.team ?? ""}-${sp.pos ?? ""}-${sp.week ?? ""}`} fallback={<div className="list-group h-80 animate-pulse" />}>
         <TabContent resolved={resolved} tab={tab} sp={sp} base={base} points={points} />
       </Suspense>
 
@@ -93,15 +95,14 @@ async function LeagueView({ params, searchParams }: { params: Promise<{ platform
 }
 
 async function TabContent({ resolved, tab, sp, base, points }: { resolved: ResolvedLeague; tab: LeagueTab; sp: Search; base: string; points: boolean }) {
-  const data = await getLeagueTab(resolved, tab, { teamId: sp.team, position: sp.pos && sp.pos !== "All" ? sp.pos : undefined });
+  const week = sp.week && /^d{1,2}$/.test(sp.week) ? Number(sp.week) : undefined;
+  const data = await getLeagueTab(resolved, tab, { teamId: sp.team, position: sp.pos && sp.pos !== "All" ? sp.pos : undefined, period: week });
   const preDraft = resolved.league.status === "pre_draft" || resolved.league.status === "drafting";
 
   switch (data.tab) {
     case "roster": {
       if (!data.roster) return <Empty text="Pick your team in Connections to see your roster here." />;
       const { team, slots } = data.roster;
-      const starters = slots.filter((s) => s.slot !== "BN" && s.slot !== "IR");
-      const bench = slots.filter((s) => s.slot === "BN" || s.slot === "IR");
       if (preDraft && slots.every((s) => !s.player)) return <Empty text="Rosters fill in after the draft." />;
       if (team.isMine && resolved.viaAccount && getAdapter(resolved.league.platform).capabilities.setLineup) {
         return (
@@ -117,36 +118,77 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
       }
       const canTrade = !team.isMine && resolved.viaAccount && getAdapter(resolved.league.platform).capabilities.trades;
       return (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {canTrade && (
-            <Link href={`${base}?tab=trade&team=${team.externalId}`} className="btn btn-primary w-full">
+            <Link href={`${base}?tab=trade&team=${team.externalId}`} className="btn btn-primary w-full sm:w-auto sm:self-start">
               Propose a Trade to {team.name}
             </Link>
           )}
-          <Group header={`${team.name}${team.isMine ? "" : ` · ${team.ownerName}`} · Starters`}>
-            {starters.map((s, i) => (
-              <PlayerRow key={i} player={s.player} slot={s.slot} showFantasyPoints={points} />
-            ))}
-          </Group>
-          {bench.length > 0 && (
-            <Group header="Bench & IR" footer={points ? "FP/G = fantasy points per game in this league's scoring." : undefined}>
-              {bench.map((s, i) => (
-                <PlayerRow key={i} player={s.player} slot={s.slot} showFantasyPoints={points} />
-              ))}
-            </Group>
-          )}
+          <RosterEditor
+            slots={slots}
+            platform={resolved.league.platform}
+            leagueId={resolved.league.externalId}
+            platformName={platformLabel(resolved.league.platform)}
+            showFantasyPoints={points}
+            title={team.isMine ? team.name : `${team.name} · ${team.ownerName}`}
+            editable={false}
+          />
         </div>
       );
     }
 
     case "matchup": {
       if (preDraft) return <Empty text="Matchups start after the draft." />;
-      if (!data.matchup) return <Empty text="No matchup for your team this week." />;
-      const m = data.matchup;
       const team = (id: string) => data.teams.find((t) => t.id === id);
+      const period = data.matchup?.period ?? data.all[0]?.period ?? week ?? 1;
+      const weekNav = (
+        <div className="flex items-center justify-between gap-2">
+          {period > 1 ? (
+            <Link href={`${base}?tab=matchup&week=${period - 1}`} scroll={false} className="text-[15px] text-accent">
+              ‹ Week {period - 1}
+            </Link>
+          ) : (
+            <span />
+          )}
+          <span className="text-[15px] font-semibold">Week {period}</span>
+          <Link href={`${base}?tab=matchup&week=${period + 1}`} scroll={false} className="text-[15px] text-accent">
+            Week {period + 1} ›
+          </Link>
+        </div>
+      );
+      const scoreboard = data.all.length > 1 && (
+        <Group header="Scoreboard">
+          {data.all.map((g) => {
+            const h = team(g.home.teamId);
+            const a = g.away ? team(g.away.teamId) : undefined;
+            const isMine = h?.isMine || a?.isMine;
+            return (
+              <div key={g.id} className={`row-block ${isMine ? "bg-accent-soft" : ""}`}>
+                <div className="row-body gap-3 text-[15px] tabular-nums">
+                  <span className={`min-w-0 flex-1 truncate ${h?.isMine ? "font-semibold" : ""}`}>{h?.name}</span>
+                  <span className="w-14 text-right">{g.home.score === undefined ? "–" : fmt1.format(g.home.score)}</span>
+                  <span className="text-faint">–</span>
+                  <span className="w-14">{g.away?.score === undefined ? "–" : fmt1.format(g.away.score)}</span>
+                  <span className={`min-w-0 flex-1 truncate text-right ${a?.isMine ? "font-semibold" : ""}`}>{a?.name ?? "Bye"}</span>
+                </div>
+              </div>
+            );
+          })}
+        </Group>
+      );
+      if (!data.matchup)
+        return (
+          <div className="flex flex-col gap-6">
+            {weekNav}
+            <Empty text="No matchup for your team this week." />
+            {scoreboard}
+          </div>
+        );
+      const m = data.matchup;
       const sides = [m.home, m.away].filter((s): s is NonNullable<typeof s> => !!s);
       return (
         <div className="flex flex-col gap-8">
+          {weekNav}
           <div className="flex flex-col gap-2">
             <Group header={`Week ${m.period} · ${m.status === "live" ? "Live" : m.status === "final" ? "Final" : "Upcoming"}`}>
               {sides.map((s) => {
@@ -164,18 +206,29 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
             </Group>
             {m.status === "live" && <AutoRefresh seconds={60} />}
           </div>
-          {data.rosters.map(({ team: t, slots }) => (
-            <Group key={t.id} header={t.name}>
-              {slots
-                .filter((s) => s.slot !== "BN" && s.slot !== "IR")
-                .map((s, i) => (
-                  <PlayerRow key={i} player={s.player} slot={s.slot} showFantasyPoints={points} />
-                ))}
-            </Group>
-          ))}
+          <MatchupView
+            points={points}
+            sides={data.rosters.map(({ team: t, slots }) => ({
+              team: { id: t.id, name: t.name, isMine: t.isMine },
+              score: sides.find((x) => x.teamId === t.id)?.score,
+              slots,
+            }))}
+          />
+          {scoreboard}
         </div>
       );
     }
+
+    case "league":
+      if (!data.overview) return <Empty text="League details aren't available for this platform yet." />;
+      return (
+        <LeagueOverviewView
+          overview={data.overview}
+          teams={data.teams.map((t) => ({ id: t.id, externalId: t.externalId, name: t.name, avatarUrl: t.avatarUrl, isMine: t.isMine }))}
+          base={base}
+          points={points}
+        />
+      );
 
     case "players":
       return (

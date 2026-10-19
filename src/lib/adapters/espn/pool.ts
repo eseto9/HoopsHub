@@ -18,7 +18,7 @@ export function normalizePlayerPool(
     const rostered = e.status === "ONTEAM" || e.onTeamId > 0;
     const o = e.player.ownership;
     return {
-      player: normalizePlayer(e.player, proTeams),
+      player: normalizePlayer(e.player, proTeams, { schedule, now }),
       status: rostered ? "rostered" : e.status === "WAIVERS" ? "waivers" : "free_agent",
       fantasyTeamId: rostered && e.onTeamId > 0 ? unifiedId("espn", `${leagueId}.${e.onTeamId}`) : null,
       waiverClearsAt: e.waiverProcessDate ? new Date(e.waiverProcessDate).toISOString() : undefined,

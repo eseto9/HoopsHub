@@ -101,6 +101,10 @@ export interface Player {
   /** Lineup slots this player may occupy, e.g. ["PG","G","UTIL","BN","IR"]. */
   eligibleSlots?: string[];
   stats?: PlayerStats;
+  /** Platform-wide ownership: % of leagues rostering/starting the player. */
+  ownership?: { percentRostered: number; percentRosteredChange?: number; percentStarted?: number };
+  /** NBA schedule context: games left this week (through Sunday, Eastern) and today's game. */
+  schedule?: { gamesThisWeek: number; today: GameInfo | null };
   /** For unrostered players: instant pickup or waiver claim. */
   availability?: "free_agent" | "waivers";
   /** ISO time waivers clear, when on waivers. */
@@ -181,10 +185,13 @@ export interface StandingsRow {
 // League activity (Recent Activity page)
 // ---------------------------------------------------------------------------
 
-export type ActivityKind = "free_agent" | "waiver" | "trade";
+export type ActivityKind = "free_agent" | "waiver" | "trade" | "lineup" | "league";
 
 export interface ActivityMove {
-  action: "added" | "dropped" | "traded";
+  action: "added" | "dropped" | "traded" | "moved";
+  /** Lineup moves: slot labels. */
+  fromSlot?: string;
+  toSlot?: string;
   playerId: UnifiedId;
   /** Resolved player, when the platform could look it up. */
   player: Player | null;
@@ -199,11 +206,13 @@ export interface LeagueActivity {
   status: "completed" | "pending";
   /** ISO timestamp the move happened (processed time for waivers). */
   date: string;
-  /** Team that made the move (proposer for trades). */
-  teamId: UnifiedId;
+  /** Team that made the move (proposer for trades); null for league-wide messages. */
+  teamId: UnifiedId | null;
   /** Every team involved, including teamId. */
   teamIds: UnifiedId[];
   moves: ActivityMove[];
+  /** League messages (renames, settings, draft): readable lines. */
+  lines?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -233,4 +242,51 @@ export interface PlayerListing {
   gamesThisWeek: number;
   /** NBA game today, if any. */
   today: GameInfo | null;
+}
+
+// ---------------------------------------------------------------------------
+// League overview (League tab)
+// ---------------------------------------------------------------------------
+
+export interface WaiverOrderRow {
+  teamId: UnifiedId;
+  /** 1 = first claim. */
+  rank: number;
+  acquisitions: number;
+  drops: number;
+  trades: number;
+  moveToIR: number;
+}
+
+export interface DraftPick {
+  overall: number;
+  round: number;
+  /** Pick within the round. */
+  pick: number;
+  teamId: UnifiedId;
+  player: Player | null;
+  playerId: UnifiedId;
+  keeper?: boolean;
+}
+
+export interface ScheduleWeek {
+  period: number;
+  /** "Week 3", "Playoffs Round 1". */
+  label: string;
+  playoff: boolean;
+  /** First and last day (YYYY-MM-DD, US Eastern) when known. */
+  start?: string;
+  end?: string;
+  games: { home: UnifiedId; away: UnifiedId | null; homeScore?: number; awayScore?: number; winner?: "home" | "away" | "tie" }[];
+}
+
+export interface LeagueOverview {
+  waiverOrder: WaiverOrderRow[];
+  /** Readable rules, grouped ("Scoring", "Roster", "Waivers", "Trades", "Draft", "Playoffs"). */
+  rules: { title: string; rows: { label: string; value: string }[] }[];
+  /** Points per stat (points leagues) or counted categories. */
+  scoring: { label: string; points?: number }[];
+  draft: DraftPick[];
+  schedule: ScheduleWeek[];
+  currentPeriod: number;
 }

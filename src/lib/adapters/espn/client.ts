@@ -95,6 +95,13 @@ export function leagueEndpoint(season: number, leagueId: string, views: string[]
   return `${ESPN_READS}/seasons/${season}/segments/0/leagues/${leagueId}?${params}`;
 }
 
+const ESPN_COMMUNICATION = "https://lm-api-communication.fantasy.espn.com/apis/v3/games/fba";
+
+/** League message feed (renames, settings, draft) on its own host. */
+export function communicationEndpoint(season: number, leagueId: string) {
+  return `${ESPN_COMMUNICATION}/seasons/${season}/segments/0/leagues/${leagueId}/communication/?view=kona_league_communication`;
+}
+
 export function fanEndpoint(swid: string) {
   return `${FAN_API}/${encodeURIComponent(swid)}?displayEvents=true&featureFlags=challengeEntries&platform=web`;
 }

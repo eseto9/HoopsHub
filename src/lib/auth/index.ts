@@ -31,5 +31,8 @@ export function getAuth() {
 
 /** Current session in a Server Component / Route Handler, or null. */
 export async function getSession() {
-  return getAuth().api.getSession({ headers: await headers() });
+  // Read the request first: during prerendering this suspends before anything
+  // touches the database, so builds don't need DATABASE_URL.
+  const requestHeaders = await headers();
+  return getAuth().api.getSession({ headers: requestHeaders });
 }

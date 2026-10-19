@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { markFresh } from "@/lib/cache";
 import { PLATFORMS, type Platform } from "@/lib/schema";
 import { movePlayer, type MoveResult } from "@/lib/services/lineup";
 import { requireUser } from "@/lib/session";
@@ -26,6 +27,7 @@ export async function moveLineupAction(input: {
     targetPlayerId: input.targetPlayerId === null ? null : String(input.targetPlayerId),
   });
   if (result.ok) {
+    await markFresh();
     revalidatePath(`/leagues/${input.platform}/${input.leagueId}`);
     revalidatePath("/dashboard");
   }

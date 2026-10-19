@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { markFresh } from "@/lib/cache";
 import { redirect } from "next/navigation";
 import { PlatformError } from "@/lib/errors";
 import { addPublicLeague, connectPlatform, deleteConnection, removePublicLeague } from "@/lib/services/connections";
@@ -31,6 +32,7 @@ export async function connectEspnAction(_prev: FormState, formData: FormData): P
     }
     return { error: "Couldn't reach ESPN. Try again in a minute." };
   }
+  await markFresh();
   revalidatePath("/dashboard");
   redirect("/dashboard");
 }

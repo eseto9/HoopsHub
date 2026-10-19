@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { markFresh } from "@/lib/cache";
 import { PLATFORMS, type Platform } from "@/lib/schema";
 import { addDropPlayer, cancelPendingMove, proposeTrade, type MoveOutcome } from "@/lib/services/moves";
 import { requireUser } from "@/lib/session";
@@ -12,7 +13,8 @@ function valid(platform: string, leagueId: string): platform is Platform {
   return PLATFORMS.includes(platform as Platform) && ID.test(leagueId);
 }
 
-function refresh(platform: string, leagueId: string) {
+async function refresh(platform: string, leagueId: string) {
+  await markFresh();
   revalidatePath(`/leagues/${platform}/${leagueId}`);
   revalidatePath("/dashboard");
 }
@@ -35,7 +37,7 @@ export async function addDropAction(input: {
     dropPlayerId: input.dropPlayerId,
     dropName: input.dropName ? String(input.dropName).slice(0, 80) : undefined,
   });
-  if (res.ok) refresh(input.platform, input.leagueId);
+  if (res.ok) await refresh(input.platform, input.leagueId);
   return res;
 }
 
@@ -58,7 +60,7 @@ export async function proposeTradeAction(input: {
     receivePlayerIds: input.receivePlayerIds,
     message: input.message ? String(input.message).slice(0, 500) : undefined,
   });
-  if (res.ok) refresh(input.platform, input.leagueId);
+  if (res.ok) await refresh(input.platform, input.leagueId);
   return res;
 }
 
@@ -66,6 +68,6 @@ export async function cancelPendingAction(input: { platform: string; leagueId: s
   const user = await requireUser();
   if (!valid(input.platform, input.leagueId) || !TXN.test(input.transactionId)) return { ok: false, error: "Invalid request." };
   const res = await cancelPendingMove(user.id, input.platform, input.leagueId, input.transactionId);
-  if (res.ok) refresh(input.platform, input.leagueId);
+  if (res.ok) await refresh(input.platform, input.leagueId);
   return res;
 }

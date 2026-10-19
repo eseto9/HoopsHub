@@ -114,7 +114,25 @@ export interface EspnLeagueSettingsResponse {
   members: EspnMember[];
 }
 
+/**
+ * One stat span. Observed ids are `${statSourceId}${statSplitTypeId}${seasonId}`:
+ * source 0 = actual, 1 = projected; split 0 = full season (1-3 are present but
+ * empty pre-season; presumably last 7/15/30 days).
+ */
+export interface EspnStatEntry {
+  id: string;
+  seasonId: number;
+  scoringPeriodId: number;
+  statSourceId: number;
+  statSplitTypeId: number;
+  appliedTotal?: number;
+  appliedAverage?: number;
+  stats?: Record<string, number>;
+  averageStats?: Record<string, number>;
+}
+
 export interface EspnPlayer {
+  stats?: EspnStatEntry[];
   id: number;
   fullName: string;
   proTeamId: number;

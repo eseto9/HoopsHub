@@ -7,7 +7,9 @@ import {
   type MatchupStatus,
   type Player,
   type RosterSlot,
+  type PlayerStats,
   type ScoringSettings,
+  type StatLine,
   type StandingsRow,
   type Team,
 } from "@/lib/schema";
@@ -30,6 +32,7 @@ import type {
   EspnProTeamsResponse,
   EspnRosterResponse,
   EspnScheduleItem,
+  EspnStatEntry,
   EspnTeam,
 } from "./raw-types";
 
@@ -142,6 +145,39 @@ export function normalizeTeams(raw: EspnLeagueSettingsResponse, ctx: LeagueConte
   }));
 }
 
+/** Stat keys shown in the UI. ESPN returns ~45; keep the common ones to stay lean. */
+const STAT_KEYS = [0, 6, 3, 2, 1, 17, 11, 19, 20, 28, 13, 14, 15, 16, 4];
+
+function seasonLabel(seasonId: number) {
+  return `${seasonId - 1}-${String(seasonId).slice(2)}`;
+}
+
+function statLine(e: EspnStatEntry | undefined, label: string): StatLine | undefined {
+  const gp = e?.stats?.["42"] ?? 0;
+  if (!e || !e.averageStats || gp <= 0) return undefined;
+  const perGame: Record<string, number> = {};
+  for (const id of STAT_KEYS) {
+    const v = e.averageStats[String(id)];
+    if (typeof v === "number") perGame[statInfo(id).key] = v;
+  }
+  return { label, gamesPlayed: gp, fantasyPointsPerGame: e.appliedAverage, perGame };
+}
+
+/** Season actual / previous season / projection from ESPN's stat spans. */
+export function normalizePlayerStats(p: EspnPlayer): PlayerStats | undefined {
+  const entries = p.stats ?? [];
+  if (entries.length === 0) return undefined;
+  const season = Math.max(...entries.map((e) => e.seasonId));
+  const find = (source: number, seasonId: number) =>
+    entries.find((e) => e.statSourceId === source && e.statSplitTypeId === 0 && e.seasonId === seasonId && e.scoringPeriodId === 0);
+  const stats: PlayerStats = {
+    current: statLine(find(0, season), seasonLabel(season)),
+    previous: statLine(find(0, season - 1), seasonLabel(season - 1)),
+    projected: statLine(find(1, season), `${seasonLabel(season)} proj.`),
+  };
+  return stats.current || stats.previous || stats.projected ? stats : undefined;
+}
+
 export function normalizePlayer(p: EspnPlayer, proTeams: ProTeamMap): Player {
   const positions = BASE_POSITION_SLOTS.filter((s) => p.eligibleSlots.includes(s)).map((s) => LINEUP_SLOTS[s]);
   if (positions.length === 0) {
@@ -157,6 +193,7 @@ export function normalizePlayer(p: EspnPlayer, proTeams: ProTeamMap): Player {
     positions,
     injuryStatus: mapInjury(p.injuryStatus),
     headshotUrl: headshotUrl(p.id),
+    stats: normalizePlayerStats(p),
   };
 }
 

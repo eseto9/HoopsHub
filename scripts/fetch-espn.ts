@@ -25,6 +25,8 @@
  *   fixtures/espn/league-<id>/standings.json      mStandings
  *   fixtures/espn/league-<id>/scoreboard.json     mScoreboard (current period)
  *   fixtures/espn/league-<id>/free-agents.json    kona_player_info (top 50 FA/waivers)
+ *   fixtures/espn/league-<id>/live/*.json         roster + box scores for the current day
+ *   fixtures/espn/nba-scoreboard.json             today's real NBA games (public)
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -166,9 +168,27 @@ async function main() {
         `league-${id}/free-agents.json`,
         await get(leagueUrl(season, id, ["kona_player_info"], periodParam), { "X-Fantasy-Filter": JSON.stringify(filter) }),
       );
+
+      // Game-day data for live stats: rosters and box scores scoped to the current
+      // scoring period (day). Most useful when run while/after games are played.
+      if (period) {
+        await save(`league-${id}/live/roster-period-${period}.json`, await get(leagueUrl(season, id, ["mRoster"], periodParam)));
+        await save(
+          `league-${id}/live/boxscore-period-${period}.json`,
+          await get(leagueUrl(season, id, ["mBoxscore", "mMatchupScore", "mScoreboard"], periodParam)),
+        );
+      }
     } catch (e) {
       console.log(`  ${(e as Error).message}`);
     }
+  }
+
+  // Real NBA games today (public ESPN scoreboard): game clock, status, scores.
+  console.log("Fetching today's NBA scoreboard...");
+  try {
+    await save("nba-scoreboard.json", await get("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"));
+  } catch (e) {
+    console.log(`  NBA scoreboard: ${(e as Error).message}`);
   }
 
   console.log(`\nDone. Fixtures in fixtures/espn/. Cookies were ${cookieHeader ? "used and redacted" : "not used"}.`);

@@ -131,6 +131,18 @@ describe("ESPN roster", () => {
     expect(players.some((p) => p.injuryStatus === "DTD")).toBe(true);
   });
 
+  it("normalizes player stat lines (last season, projection; none yet this season)", () => {
+    const slots = normalizeRoster(s, roster, "1", proTeams);
+    const stats = slots.find((x) => x.player?.name === "Jalen Johnson")?.player?.stats;
+    expect(stats?.current).toBeUndefined(); // season hasn't started in the fixture
+    expect(stats?.previous).toMatchObject({ label: "2025-26", gamesPlayed: 72 });
+    expect(stats?.previous?.perGame.pts).toBeCloseTo(22.51, 1);
+    expect(stats?.previous?.perGame.fg_pct).toBeCloseTo(0.489, 2);
+    expect(stats?.previous?.fantasyPointsPerGame).toBeCloseTo(52.3, 0);
+    expect(stats?.projected).toMatchObject({ label: "2026-27 proj.", gamesPlayed: 72 });
+    expect(stats?.projected?.perGame.pts).toBeCloseTo(22.99, 1);
+  });
+
   it("returns all-empty slots for a pre-draft league", () => {
     const slots = normalizeRoster(settings(PRE), load<EspnRosterResponse>(`league-${PRE}/roster.json`), "2", proTeams);
     expect(slots).toHaveLength(14);

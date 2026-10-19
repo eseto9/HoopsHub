@@ -52,8 +52,7 @@ export function LeagueCard({ data }: { data: DashboardLeague }) {
         title={league.name}
         titleClassName="font-semibold"
         subtitle={`${teamCount} teams · ${LEAGUE_STATUS[league.status]}`}
-        href={league.url}
-        external
+        href={`/leagues/${league.platform}/${league.externalId}`}
       />
 
       {myTeam ? (

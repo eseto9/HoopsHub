@@ -98,6 +98,29 @@ export interface Player {
   positions: string[];
   injuryStatus?: InjuryStatus;
   headshotUrl?: string;
+  stats?: PlayerStats;
+}
+
+/**
+ * Per-game averages for one span. Stat keys are normalized ("pts", "reb",
+ * "fg_pct"...); percentages are fractions (0.489 = 48.9%).
+ */
+export interface StatLine {
+  /** Human label, e.g. "2026-27", "2025-26", "2026-27 proj." */
+  label: string;
+  gamesPlayed: number;
+  /** In this league's scoring (points leagues). */
+  fantasyPointsPerGame?: number;
+  perGame: Record<string, number>;
+}
+
+export interface PlayerStats {
+  /** This season's actual stats, once games have been played. */
+  current?: StatLine;
+  /** Last season's actual stats. */
+  previous?: StatLine;
+  /** Platform projection for this season. */
+  projected?: StatLine;
 }
 
 export interface RosterSlot {

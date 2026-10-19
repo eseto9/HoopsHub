@@ -26,7 +26,7 @@ import type {
   EspnRosterResponse,
 } from "./raw-types";
 
-const TTL = { game: 3600, proTeams: 86400, settings: 300, roster: 120, matchups: 60, freeAgents: 300, fan: 600 };
+const TTL = { game: 3600, proTeams: 86400, settings: 120, roster: 60, matchups: 45, freeAgents: 300, fan: 600 };
 
 const SWID_RE = /^\{?[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}?$/i;
 

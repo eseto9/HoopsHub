@@ -127,6 +127,72 @@ export async function getDashboard(userId: string): Promise<DashboardData> {
   return { connections: await listConnections(userId), leagues, problems };
 }
 
+export interface ResolvedLeague {
+  conn: AdapterConnection;
+  league: League;
+  /** True when loaded through the user's own account (writes possible later). */
+  viaAccount: boolean;
+}
+
+/**
+ * Find how this user can open a league: through a connected account first,
+ * then as a public league they added. Returns null if neither works.
+ */
+export async function resolveLeague(userId: string, platform: Platform, externalLeagueId: string): Promise<ResolvedLeague | null> {
+  const [conns, prefs] = await Promise.all([getAdapterConnections(userId), listLeaguePreferences(userId)]);
+  const adapter = getAdapter(platform);
+  const pref = prefs.find((p) => p.platform === platform && p.externalLeagueId === externalLeagueId);
+  const picks = pref?.myTeamExternalId ? { [externalLeagueId]: pref.myTeamExternalId } : {};
+
+  for (const c of conns.filter((c) => c.platform === platform && c.status === "active")) {
+    const conn = { ...c, myTeamByLeague: picks };
+    try {
+      return { conn, league: await adapter.getLeague(conn, externalLeagueId), viaAccount: true };
+    } catch (err) {
+      if (err instanceof ReconnectRequiredError) await markNeedsReconnect(c.id);
+      else if (!(err instanceof PlatformError)) throw err;
+    }
+  }
+
+  if (pref && !pref.connectionId) {
+    const conn: AdapterConnection = { id: `public:${platform}`, userId, platform, externalUserId: "", credentials: null, myTeamByLeague: picks };
+    return { conn, league: await adapter.getLeague(conn, externalLeagueId), viaAccount: false };
+  }
+  return null;
+}
+
+export type LeagueTab = "roster" | "matchup" | "players" | "teams" | "standings";
+
+/** Data for one tab of the league page. Only fetches what that tab shows. */
+export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opts: { teamId?: string; position?: string } = {}) {
+  const { conn, league } = resolved;
+  const adapter = getAdapter(league.platform);
+  const id = league.externalId;
+  const teams = await adapter.getTeams(conn, id);
+  const byId = new Map<string, Team>(teams.map((t) => [t.id, t]));
+  const myTeam = teams.find((t) => t.isMine);
+
+  switch (tab) {
+    case "roster": {
+      const teamExt = opts.teamId ?? myTeam?.externalId;
+      return { tab, teams, roster: teamExt ? await adapter.getRoster(conn, id, teamExt) : null } as const;
+    }
+    case "matchup": {
+      const matchups = await adapter.getMatchups(conn, id);
+      const mine = myTeam ? matchups.find((m) => m.home.teamId === myTeam.id || m.away?.teamId === myTeam.id) : undefined;
+      const sides = mine ? [mine.home, mine.away].filter((s): s is NonNullable<typeof s> => !!s) : [];
+      const rosters = await Promise.all(sides.map((s) => adapter.getRoster(conn, id, byId.get(s.teamId)!.externalId)));
+      return { tab, teams, matchup: mine ?? null, rosters, all: matchups } as const;
+    }
+    case "players":
+      return { tab, teams, players: await adapter.getFreeAgents(conn, id, { position: opts.position, limit: 50 }) } as const;
+    case "standings":
+      return { tab, teams, standings: await adapter.getStandings(conn, id) } as const;
+    case "teams":
+      return { tab, teams } as const;
+  }
+}
+
 /** Look up a public league by id (no credentials) so the user can pick their team. */
 export async function lookupPublicLeague(platform: Platform, externalLeagueId: string) {
   const conn: AdapterConnection = { id: `public:${platform}`, userId: "", platform, externalUserId: "", credentials: null };

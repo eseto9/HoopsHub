@@ -79,7 +79,16 @@ export const espnAdapter: PlatformAdapter = {
     const cookies = parseEspnCookies(input);
     if (!cookies) throw new PlatformError("espn", 400, "Those don't look like valid espn_s2 and SWID values");
 
-    const fan = await espnFetch<EspnFanProfile>(fanEndpoint(cookies.swid), { cookies });
+    let fan: EspnFanProfile;
+    try {
+      fan = await espnFetch<EspnFanProfile>(fanEndpoint(cookies.swid), { cookies });
+    } catch (err) {
+      // ESPN answers an unknown/invalid SWID with 404 rather than 401.
+      if (err instanceof PlatformError && (err.status === 401 || err.status === 403 || err.status === 404)) {
+        throw new PlatformError("espn", 401, "ESPN rejected these cookies");
+      }
+      throw err;
+    }
     const season = await getSeason();
     let displayName = "ESPN account";
     const [firstLeague] = leagueIdsFromFanProfile(fan, season);

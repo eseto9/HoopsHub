@@ -1,5 +1,6 @@
 import type {
   League,
+  LeagueActivity,
   Matchup,
   Platform,
   Player,
@@ -77,6 +78,8 @@ export interface PlatformAdapter {
   getMatchups(conn: AdapterConnection, leagueId: string, period?: number): Promise<Matchup[]>;
   getStandings(conn: AdapterConnection, leagueId: string): Promise<StandingsRow[]>;
   getFreeAgents(conn: AdapterConnection, leagueId: string, query?: FreeAgentQuery): Promise<Player[]>;
+  /** Completed league moves (newest first) plus the user's own open claims/offers. */
+  getActivity?(conn: AdapterConnection, leagueId: string): Promise<{ feed: LeagueActivity[]; pendingForTeam: LeagueActivity[] }>;
 
   // Phase 5 write operations. Optional; presence must match `capabilities`.
   setLineup?(conn: AdapterConnection, leagueId: string, teamId: string, changes: LineupChange[], period?: number): Promise<void>;

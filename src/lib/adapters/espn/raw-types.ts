@@ -189,3 +189,37 @@ export interface EspnMatchupsResponse {
 export interface EspnFreeAgentsResponse {
   players: EspnPlayerPoolEntry[];
 }
+
+export interface EspnTransactionItem {
+  type: string; // observed: ADD, DROP, TRADE, LINEUP, DRAFT
+  playerId: number;
+  fromTeamId: number; // 0 = none (free agency)
+  toTeamId: number;
+  fromLineupSlotId?: number;
+  toLineupSlotId?: number;
+}
+
+/**
+ * league?view=mTransactions2. Observed types: FREEAGENT, WAIVER, TRADE_PROPOSAL,
+ * TRADE_DECLINE, ROSTER, FUTURE_ROSTER, DRAFT. Observed statuses: EXECUTED,
+ * PENDING, CANCELED. A pending item is closed by a later transaction whose
+ * relatedTransactionId points at it (CANCEL, TRADE_DECLINE, or a waiver PROCESS),
+ * while the original keeps status PENDING.
+ */
+export interface EspnTransaction {
+  id: string;
+  type: string;
+  status: string;
+  executionType?: string; // EXECUTE | PROCESS | CANCEL
+  teamId: number;
+  proposedDate: number;
+  processDate?: number;
+  relatedTransactionId?: string;
+  scoringPeriodId: number;
+  items?: EspnTransactionItem[];
+  teamActions?: Record<string, string>;
+}
+
+export interface EspnTransactionsResponse {
+  transactions?: EspnTransaction[];
+}

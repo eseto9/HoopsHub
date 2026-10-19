@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ActivityFeed } from "@/components/activity-feed";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { ChevronRight } from "@/components/icons";
 import { Group, Row } from "@/components/list";
@@ -21,6 +22,7 @@ const TABS: { key: LeagueTab; label: string }[] = [
   { key: "roster", label: "Roster" },
   { key: "matchup", label: "Matchup" },
   { key: "players", label: "Players" },
+  { key: "activity", label: "Activity" },
   { key: "standings", label: "Standings" },
   { key: "teams", label: "Teams" },
 ];
@@ -183,6 +185,15 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
             )}
           </Group>
         </div>
+      );
+
+    case "activity":
+      return (
+        <ActivityFeed
+          feed={data.activity.feed}
+          pending={data.activity.pendingForTeam}
+          teams={data.teams.map((t) => ({ id: t.id, name: t.name, avatarUrl: t.avatarUrl, isMine: t.isMine }))}
+        />
       );
 
     case "standings": {

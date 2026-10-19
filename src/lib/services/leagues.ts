@@ -161,7 +161,7 @@ export async function resolveLeague(userId: string, platform: Platform, external
   return null;
 }
 
-export type LeagueTab = "roster" | "matchup" | "players" | "teams" | "standings";
+export type LeagueTab = "roster" | "matchup" | "players" | "activity" | "teams" | "standings";
 
 /** Data for one tab of the league page. Only fetches what that tab shows. */
 export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opts: { teamId?: string; position?: string } = {}) {
@@ -190,6 +190,10 @@ export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opt
       return { tab, teams, standings: await adapter.getStandings(conn, id) } as const;
     case "teams":
       return { tab, teams } as const;
+    case "activity": {
+      const activity = adapter.getActivity ? await adapter.getActivity(conn, id) : { feed: [], pendingForTeam: [] };
+      return { tab, teams, activity } as const;
+    }
   }
 }
 

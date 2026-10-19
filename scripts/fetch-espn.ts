@@ -169,6 +169,22 @@ async function main() {
         await get(leagueUrl(season, id, ["kona_player_info"], periodParam), { "X-Fantasy-Filter": JSON.stringify(filter) }),
       );
 
+      // League activity: every transaction this season (adds, drops, waivers,
+      // trades, lineup moves, draft), plus the players they mention by id.
+      const txns = (await get(leagueUrl(season, id, ["mTransactions2"]))) as { transactions?: { items?: { playerId: number }[] }[] };
+      await save(`league-${id}/transactions.json`, txns);
+      const playerIds = [...new Set((txns.transactions ?? []).flatMap((t) => (t.items ?? []).map((i) => i.playerId)))].filter((p) => p > 0);
+      if (playerIds.length) {
+        await save(
+          `league-${id}/transaction-players.json`,
+          await get(leagueUrl(season, id, ["kona_player_info"], periodParam), {
+            "X-Fantasy-Filter": JSON.stringify({ players: { filterIds: { value: playerIds } } }),
+            "X-Fantasy-Platform": "espn-fantasy-web",
+            "X-Fantasy-Source": "kona",
+          }),
+        );
+      }
+
       // Game-day data for live stats: rosters and box scores scoped to the current
       // scoring period (day). Most useful when run while/after games are played.
       if (period) {

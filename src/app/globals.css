@@ -102,150 +102,156 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Large title, like "Settings" */
-.large-title {
-  font-size: 34px;
-  line-height: 41px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-/* ---- Inset grouped list ------------------------------------------------ */
-.list-group {
-  overflow: hidden;
-  border-radius: 22px;
-  background: var(--surface);
-}
-
-/* Small caps-style header/footer around a group */
-.group-header {
-  padding: 0 20px 7px;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-}
-.group-footer {
-  padding: 7px 20px 0;
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--muted);
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding-left: 16px;
-  min-height: 52px;
-  color: inherit;
-  text-align: left;
-  width: 100%;
-}
-/* Hairline separator, inset to start after the icon like iOS */
-.row-body {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  align-items: center;
-  gap: 10px;
-  align-self: stretch;
-  padding: 11px 16px 11px 0;
-}
-.row + .row > .row-body,
-.row + .row-block > .row-body,
-.row-block + .row > .row-body,
-.row-block + .row-block > .row-body {
-  border-top: 0.5px solid var(--separator);
-}
-.row-block {
-  display: flex;
-  padding-left: 16px;
-}
-a.row:active,
-button.row:active {
-  background: var(--fill);
-}
-@media (hover: hover) {
-  a.row:hover,
-  button.row:hover {
-    background: color-mix(in srgb, var(--fill) 45%, transparent);
+/*
+ * Component classes live in the components layer so Tailwind utilities on the
+ * same element (e.g. items-stretch, text-[14px]) can override them.
+ */
+@layer components {
+  /* Large title, like "Settings" */
+  .large-title {
+    font-size: 34px;
+    line-height: 41px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
   }
-}
 
-/* Rounded-square icon tile, like Settings icons */
-.icon-tile {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-  border-radius: 7px;
-  color: #fff;
-}
+  /* ---- Inset grouped list ------------------------------------------------ */
+  .list-group {
+    overflow: hidden;
+    border-radius: 22px;
+    background: var(--surface);
+  }
 
-.badge {
-  display: inline-flex;
-  min-width: 22px;
-  height: 22px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  padding: 0 7px;
-  background: var(--danger);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-}
+  /* Small caps-style header/footer around a group */
+  .group-header {
+    padding: 0 20px 7px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  .group-footer {
+    padding: 7px 20px 0;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--muted);
+  }
 
-/* ---- Controls ---------------------------------------------------------- */
-.input {
-  width: 100%;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  font-size: 17px;
-  color: var(--text);
-  outline: none;
-}
-.input::placeholder {
-  color: var(--faint);
-}
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-left: 16px;
+    min-height: 52px;
+    color: inherit;
+    text-align: left;
+    width: 100%;
+  }
+  /* Hairline separator, inset to start after the icon like iOS */
+  .row-body {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    padding: 11px 16px 11px 0;
+  }
+  .row + .row > .row-body,
+  .row + .row-block > .row-body,
+  .row-block + .row > .row-body,
+  .row-block + .row-block > .row-body {
+    border-top: 0.5px solid var(--separator);
+  }
+  .row-block {
+    display: flex;
+    padding-left: 16px;
+  }
+  a.row:active,
+  button.row:active {
+    background: var(--fill);
+  }
+  @media (hover: hover) {
+    a.row:hover,
+    button.row:hover {
+      background: color-mix(in srgb, var(--fill) 45%, transparent);
+    }
+  }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  border-radius: 14px;
-  padding: 0 20px;
-  min-height: 50px;
-  font-size: 17px;
-  font-weight: 600;
-  transition: opacity 120ms, background-color 120ms;
-}
-.btn:active:not(:disabled) {
-  opacity: 0.7;
-}
-.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-.btn-primary {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-.btn-secondary {
-  background: var(--fill);
-  color: var(--accent);
-}
-.btn-plain {
-  min-height: 0;
-  padding: 0;
-  border-radius: 0;
-  color: var(--accent);
-  font-weight: 400;
+  /* Rounded-square icon tile, like Settings icons */
+  .icon-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    color: #fff;
+  }
+
+  .badge {
+    display: inline-flex;
+    min-width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0 7px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* ---- Controls ---------------------------------------------------------- */
+  .input {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-size: 17px;
+    color: var(--text);
+    outline: none;
+  }
+  .input::placeholder {
+    color: var(--faint);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border-radius: 14px;
+    padding: 0 20px;
+    min-height: 50px;
+    font-size: 17px;
+    font-weight: 600;
+    transition: opacity 120ms, background-color 120ms;
+  }
+  .btn:active:not(:disabled) {
+    opacity: 0.7;
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .btn-secondary {
+    background: var(--fill);
+    color: var(--accent);
+  }
+  .btn-plain {
+    min-height: 0;
+    padding: 0;
+    border-radius: 0;
+    color: var(--accent);
+    font-weight: 400;
+  }
 }
 
 :focus-visible {

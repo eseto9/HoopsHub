@@ -26,9 +26,14 @@ import type {
   EspnMatchupsResponse,
   EspnProTeamsResponse,
   EspnRosterResponse,
+  EspnTransactionsResponse,
 } from "./raw-types";
+import { activityPlayerIds, normalizeActivity } from "./activity";
 
-const TTL = { game: 3600, proTeams: 86400, settings: 120, roster: 60, matchups: 45, freeAgents: 300, fan: 600 };
+const TTL = { game: 3600, proTeams: 86400, settings: 120, roster: 60, matchups: 45, freeAgents: 300, fan: 600, activity: 60, players: 600 };
+
+/** Headers espn.com sends with filtered player lookups (captured). */
+const KONA_HEADERS = { "X-Fantasy-Platform": "espn-fantasy-web", "X-Fantasy-Source": "kona" };
 
 const SWID_RE = /^\{?[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}?$/i;
 
@@ -182,6 +187,34 @@ export const espnAdapter: PlatformAdapter = {
       entries = entries.filter((e) => e.player.fullName.toLowerCase().includes(q));
     }
     return entries.slice(0, query.limit ?? 50).map((e) => normalizePlayer(e.player, proTeams));
+  },
+
+  /** League activity from mTransactions2, with player names resolved by id. */
+  async getActivity(conn, leagueId) {
+    const settings = await getSettings(conn, leagueId);
+    const season = settings.seasonId;
+    const scope = cacheScope(conn);
+    const raw = await cached(`espn:${scope}:activity:${season}:${leagueId}`, TTL.activity, () =>
+      espnFetch<EspnTransactionsResponse>(leagueEndpoint(season, leagueId, ["mTransactions2"]), fetchOpts(conn)),
+    );
+
+    const ids = activityPlayerIds(raw).sort((a, b) => a - b);
+    const extra: Record<string, string> = settings.scoringPeriodId ? { scoringPeriodId: String(settings.scoringPeriodId) } : {};
+    const [proTeams, pool] = await Promise.all([
+      getProTeams(season),
+      ids.length
+        ? cached(`espn:${scope}:players:${season}:${leagueId}:${ids.join(",")}`, TTL.players, () =>
+            // filterIds without a limit: ESPN rejects a limit that has no sort.
+            espnFetch<EspnFreeAgentsResponse>(leagueEndpoint(season, leagueId, ["kona_player_info"], extra), {
+              ...fetchOpts(conn),
+              headers: { ...KONA_HEADERS, "X-Fantasy-Filter": JSON.stringify({ players: { filterIds: { value: ids } } }) },
+            }),
+          )
+        : Promise.resolve({ players: [] } as EspnFreeAgentsResponse),
+    ]);
+    const players = new Map(pool.players.map((e) => [e.player.id, normalizePlayer(e.player, proTeams)]));
+    const mine = normalizeTeams(settings, context(conn, leagueId)).find((t) => t.isMine);
+    return normalizeActivity(raw, leagueId, players, mine?.externalId);
   },
 
   /** Lineup moves, using the request format captured from espn.com (fixtures/espn/writes). */

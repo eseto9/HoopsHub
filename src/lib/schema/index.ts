@@ -169,3 +169,32 @@ export interface StandingsRow {
   /** Roto leagues: stat key -> rank in that category. */
   categoryRanks?: Record<string, number>;
 }
+
+// ---------------------------------------------------------------------------
+// League activity (Recent Activity page)
+// ---------------------------------------------------------------------------
+
+export type ActivityKind = "free_agent" | "waiver" | "trade";
+
+export interface ActivityMove {
+  action: "added" | "dropped" | "traded";
+  playerId: UnifiedId;
+  /** Resolved player, when the platform could look it up. */
+  player: Player | null;
+  fromTeamId: UnifiedId | null; // null = free agency / waivers
+  toTeamId: UnifiedId | null; // null = dropped to free agency
+}
+
+export interface LeagueActivity {
+  id: UnifiedId;
+  leagueId: UnifiedId;
+  kind: ActivityKind;
+  status: "completed" | "pending";
+  /** ISO timestamp the move happened (processed time for waivers). */
+  date: string;
+  /** Team that made the move (proposer for trades). */
+  teamId: UnifiedId;
+  /** Every team involved, including teamId. */
+  teamIds: UnifiedId[];
+  moves: ActivityMove[];
+}

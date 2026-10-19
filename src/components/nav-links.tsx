@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Basketball, LinkIcon } from "./icons";
+import { Basketball, LinkIcon, Person } from "./icons";
 
 const TABS = [
   { href: "/dashboard", label: "Leagues", Icon: Basketball, match: ["/dashboard", "/leagues"] },
+  { href: "/my-teams", label: "My Teams", Icon: Person, match: ["/my-teams"] },
   { href: "/connections", label: "Connections", Icon: LinkIcon, match: ["/connections"] },
 ];
 

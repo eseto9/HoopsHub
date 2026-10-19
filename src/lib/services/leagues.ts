@@ -2,7 +2,7 @@ import "server-only";
 import { getAdapter } from "@/lib/adapters/registry";
 import type { AdapterConnection } from "@/lib/adapters/types";
 import { PlatformError, ReconnectRequiredError } from "@/lib/errors";
-import type { League, Platform, Team } from "@/lib/schema";
+import type { League, Platform, RosterSlot, Team } from "@/lib/schema";
 import type { DashboardData, DashboardLeague, DashboardProblem, MatchupSummary } from "@/lib/schema/views";
 import { watchedPlayerIds } from "./watchlist";
 import { activityAlerts } from "@/lib/alerts";
@@ -256,4 +256,45 @@ export async function getPlayerPage(resolved: ResolvedLeague, playerId: string) 
   const owner = detail.listing.fantasyTeamId ? (teams.find((t) => t.id === detail.listing.fantasyTeamId) ?? null) : null;
   const canTrade = resolved.viaAccount && adapter.capabilities.trades && !!myTeam && !!owner && !owner.isMine;
   return { detail, teams, owner, mySlots: mine?.slots ?? null, watched: watched.includes(playerId), canTrade };
+}
+
+export interface MyTeamSection {
+  league: League;
+  myTeam: Team;
+  matchup?: MatchupSummary;
+  slots: RosterSlot[];
+  /** Points league: show fantasy point columns. */
+  points: boolean;
+  hasPlayerPages: boolean;
+  error?: string;
+}
+
+/**
+ * Every league where the user has a team, with their roster. One failing
+ * league never hides the others.
+ */
+export async function getMyTeams(userId: string): Promise<{ sections: MyTeamSection[]; problems: DashboardData["problems"] }> {
+  const { leagues, problems } = await getDashboard(userId);
+  const withTeams = leagues.filter((l): l is DashboardLeague & { myTeam: Team } => !!l.myTeam);
+  const sections = await Promise.all(
+    withTeams.map(async (l): Promise<MyTeamSection> => {
+      const adapter = getAdapter(l.league.platform);
+      const base = {
+        league: l.league,
+        myTeam: l.myTeam,
+        matchup: l.matchup,
+        points: l.league.format === "h2h-points" || l.league.format === "points",
+        hasPlayerPages: !!adapter.getPlayerDetail,
+      };
+      try {
+        const resolved = await resolveLeague(userId, l.league.platform, l.league.externalId);
+        if (!resolved) return { ...base, slots: [], error: "This league isn't available right now." };
+        const roster = await adapter.getRoster(resolved.conn, l.league.externalId, l.myTeam.externalId);
+        return { ...base, slots: roster.slots };
+      } catch (err) {
+        return { ...base, slots: [], error: friendlyError(err) };
+      }
+    }),
+  );
+  return { sections, problems };
 }

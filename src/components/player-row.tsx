@@ -1,5 +1,6 @@
 import type { InjuryStatus, Player, StatLine } from "@/lib/schema";
 import { Row } from "./list";
+import { PlayerAvatar } from "./player-avatar";
 
 const fmt1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
 const pct = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1, style: "percent" });
@@ -34,7 +35,7 @@ export function statSummary(line: StatLine | undefined): string | null {
 function SlotTile({ slot }: { slot: string }) {
   const tone = slot === "IR" ? "bg-danger-soft text-danger" : slot === "BN" ? "bg-fill text-muted" : "bg-accent-soft text-accent";
   return (
-    <span className={`flex h-[30px] w-[38px] shrink-0 items-center justify-center rounded-[7px] text-[11px] font-bold ${tone}`}>
+    <span className={`flex h-[30px] w-[34px] shrink-0 items-center justify-center rounded-[7px] text-[10px] font-bold ${tone}`}>
       {slot}
     </span>
   );
@@ -67,12 +68,18 @@ export function PlayerRow({
     );
   }
   const line = bestLine(player);
+  const fp = showFantasyPoints ? line?.fantasyPointsPerGame : undefined;
   const inj = player.injuryStatus ? INJURY[player.injuryStatus] : null;
   return (
     <Row
       href={href}
       className={dimmed ? "opacity-40" : ""}
-      icon={slot ? <SlotTile slot={slot} /> : undefined}
+      icon={
+        <span className="flex shrink-0 items-center gap-2.5">
+          {slot && <SlotTile slot={slot} />}
+          <PlayerAvatar src={player.headshotUrl} name={player.name} />
+        </span>
+      }
       title={
         <span className="flex items-center gap-1.5">
           <span className="truncate">{player.name}</span>
@@ -83,22 +90,20 @@ export function PlayerRow({
         <>
           <span className="block truncate">
             {player.nbaTeam ?? "FA"} · {player.positions.join(", ")}
+            {/* With a trailing action there's no room for the big FP/G figure; show it inline. */}
+            {action && fp !== undefined && <b className="font-semibold text-text"> · {fmt1.format(fp)} FP/G</b>}
           </span>
           {line && <span className="block truncate text-[13px] text-faint">{statSummary(line)}</span>}
         </>
       }
       value={
-        (showFantasyPoints && line?.fantasyPointsPerGame !== undefined) || action ? (
-          <>
-            {showFantasyPoints && line?.fantasyPointsPerGame !== undefined && (
-              <span className="flex flex-col items-end leading-tight">
-                <span className="text-[17px] font-semibold text-text tabular-nums">{fmt1.format(line.fantasyPointsPerGame)}</span>
-                <span className="text-[11px]">FP/G</span>
-              </span>
-            )}
-            {action}
-          </>
-        ) : undefined
+        action ??
+        (fp !== undefined ? (
+          <span className="flex flex-col items-end leading-tight">
+            <span className="text-[17px] font-semibold text-text tabular-nums">{fmt1.format(fp)}</span>
+            <span className="text-[11px]">FP/G</span>
+          </span>
+        ) : undefined)
       }
     />
   );

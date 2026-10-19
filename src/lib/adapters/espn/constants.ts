@@ -126,7 +126,10 @@ export function leagueUrl(leagueId: string | number, season: string | number) {
   return `https://fantasy.espn.com/basketball/league?leagueId=${leagueId}&seasonId=${season}`;
 }
 
-/** ESPN CDN headshot pattern; the UI must tolerate a missing image. */
+/**
+ * ESPN CDN headshot via ESPN's resizer (~8 KB vs ~200 KB full size; both
+ * verified to load). The UI must still tolerate a missing image.
+ */
 export function headshotUrl(playerId: number) {
-  return `https://a.espncdn.com/i/headshots/nba/players/full/${playerId}.png`;
+  return `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/${playerId}.png&w=96&h=70&cb=1`;
 }

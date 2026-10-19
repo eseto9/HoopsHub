@@ -61,7 +61,7 @@ export function RosterEditor({
         key={i}
         player={s.player}
         slot={s.slot}
-        showFantasyPoints={showFantasyPoints && selected === null}
+        showFantasyPoints={showFantasyPoints}
         action={actionFor(i)}
         dimmed={selected !== null && i !== selected && !targets.has(i)}
       />

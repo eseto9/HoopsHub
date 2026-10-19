@@ -175,6 +175,13 @@ export interface StandingsRow {
   ties: number;
   pointsFor?: number;
   pointsAgainst?: number;
+  /** Win percentage, 0-1. */
+  winPct?: number;
+  gamesBack?: number;
+  /** "W3", "L1"; undefined before any games. */
+  streak?: string;
+  /** Holds a playoff spot if the season ended today. */
+  inPlayoffs?: boolean;
   /** Roto leagues. */
   rotoPoints?: number;
   /** Roto leagues: stat key -> rank in that category. */
@@ -287,6 +294,44 @@ export interface LeagueOverview {
   /** Points per stat (points leagues) or counted categories. */
   scoring: { label: string; points?: number }[];
   draft: DraftPick[];
+  /** Players their managers have put on the trade block. */
+  tradeBlock: { teamId: UnifiedId; playerId: UnifiedId; player: Player | null }[];
   schedule: ScheduleWeek[];
   currentPeriod: number;
+}
+
+// ---------------------------------------------------------------------------
+// Player page
+// ---------------------------------------------------------------------------
+
+export interface GameLogEntry {
+  gameId: string;
+  /** YYYY-MM-DD, US Eastern. */
+  date: string;
+  opponent: string;
+  home: boolean;
+  /** Same keys as StatLine.perGame (pts, reb, fg_pct...). */
+  stats: Record<string, number>;
+  fantasyPoints?: number;
+}
+
+export interface NewsItem {
+  id: string;
+  headline: string;
+  body?: string;
+  published: string;
+  source: string;
+  url?: string;
+}
+
+export interface PlayerDetail {
+  listing: PlayerListing;
+  /** "Last 7 days", "Last 15 days", "Last 30 days", then season lines; only those with games. */
+  splits: StatLine[];
+  /** Most recent first. */
+  gameLog: GameLogEntry[];
+  outlook?: string;
+  news: NewsItem[];
+  /** Next NBA games. */
+  upcoming: GameInfo[];
 }

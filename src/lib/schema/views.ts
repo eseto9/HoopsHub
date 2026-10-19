@@ -18,6 +18,7 @@ export interface DashboardLeague {
   myTeam?: Team;
   standing?: StandingsRow;
   matchup?: MatchupSummary;
+  alerts?: DashboardAlert[];
 }
 
 export interface DashboardProblem {
@@ -32,4 +33,13 @@ export interface DashboardData {
   connections: Connection[];
   leagues: DashboardLeague[];
   problems: DashboardProblem[];
+}
+
+/** Something in a league that needs the user's attention or just happened to them. */
+export interface DashboardAlert {
+  kind: "trade_offer" | "offer_waiting" | "claim_pending" | "claim_won" | "trade_done";
+  text: string;
+  date: string;
+  /** Trade offers to you need a decision. */
+  urgent: boolean;
 }

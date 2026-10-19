@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { draftPlayerIds, normalizeOverview } from "@/lib/adapters/espn/overview";
+import { draftPlayerIds, normalizeOverview, tradeBlockPlayerIds } from "@/lib/adapters/espn/overview";
 import type { EspnLeagueSettingsResponse, EspnMatchupsResponse, EspnProTeamsResponse, EspnTransactionsResponse } from "@/lib/adapters/espn/raw-types";
 
 const dir = path.join(__dirname, "..", "..", "fixtures", "espn");
@@ -40,6 +40,15 @@ describe("ESPN league overview", () => {
     expect(o.schedule.filter((w) => w.playoff).map((w) => w.label)).toEqual(["Playoffs Round 1", "Playoffs Round 2", "Playoffs Round 3"]);
     // Pre-season: no scores yet.
     expect(regular[0].games.every((g) => g.homeScore === undefined)).toBe(true);
+  });
+
+  it("lists trade-block players (shape observed in another league's mTeam)", () => {
+    expect(o.tradeBlock).toEqual([]); // nobody in this league uses it yet
+    const withBlock = structuredClone(settings);
+    withBlock.teams[0].tradeBlock = { players: { "6440": "ON_THE_BLOCK" } };
+    const ob = normalizeOverview(withBlock, load<EspnMatchupsResponse>(`league-${LEAGUE}/matchups.json`), txns, load<EspnProTeamsResponse>("pro-teams-2027.json"), new Map(), 0);
+    expect(ob.tradeBlock).toEqual([{ teamId: `espn:${LEAGUE}.${withBlock.teams[0].id}`, playerId: "espn:6440", player: null }]);
+    expect(tradeBlockPlayerIds(withBlock)).toEqual([6440]);
   });
 
   it("describes the rules and points per stat", () => {

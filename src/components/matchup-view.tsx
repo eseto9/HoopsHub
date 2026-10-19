@@ -19,9 +19,11 @@ const subscribeWide = (cb: () => void) => {
 export function MatchupView({
   sides,
   points,
+  playerBase,
 }: {
   sides: { team: Pick<Team, "id" | "name" | "isMine">; score?: number; slots: RosterSlot[] }[];
   points: boolean;
+  playerBase?: string;
 }) {
   const players = useMemo(() => sides.flatMap((s) => s.slots.map((x) => x.player)), [sides]);
   const [source, setSource] = useState<StatSource>(availableSources(players)[0] ?? "projected");
@@ -85,6 +87,7 @@ export function MatchupView({
                 firstColumn="Slot · Player"
                 showOwnership={false}
                 compact={wide}
+                playerBase={playerBase}
               />
             </section>
           );

@@ -5,6 +5,7 @@ import { PlatformError, ReconnectRequiredError } from "@/lib/errors";
 import type { League, Platform, Team } from "@/lib/schema";
 import type { DashboardData, DashboardLeague, DashboardProblem, MatchupSummary } from "@/lib/schema/views";
 import { watchedPlayerIds } from "./watchlist";
+import { activityAlerts } from "@/lib/alerts";
 import { getAdapterConnections, listConnections, listLeaguePreferences, markNeedsReconnect, markSynced } from "./connections";
 
 const PLATFORM_LABEL: Record<Platform, string> = { espn: "ESPN", yahoo: "Yahoo", sleeper: "Sleeper" };
@@ -23,6 +24,16 @@ async function summarize(conn: AdapterConnection, league: League): Promise<Dashb
   ]);
   const byId = new Map<string, Team>(teams.map((t) => [t.id, t]));
   const myTeam = league.myTeamId ? byId.get(league.myTeamId) : undefined;
+
+  // Alerts need the user's own account (pending moves are private); a failure here never hides the league.
+  let alerts: DashboardLeague["alerts"];
+  if (myTeam && conn.credentials && adapter.getActivity) {
+    try {
+      alerts = activityAlerts(await adapter.getActivity(conn, league.externalId), myTeam.id, teams, Date.now());
+    } catch {
+      alerts = undefined;
+    }
+  }
 
   let matchup: MatchupSummary | undefined;
   if (myTeam) {
@@ -44,6 +55,7 @@ async function summarize(conn: AdapterConnection, league: League): Promise<Dashb
     league,
     teamCount: teams.length,
     myTeam,
+    alerts,
     standing: myTeam ? standings.find((s) => s.teamId === myTeam.id) : undefined,
     matchup,
   };
@@ -224,4 +236,24 @@ export async function lookupPublicLeague(platform: Platform, externalLeagueId: s
   const adapter = getAdapter(platform);
   const [league, teams] = await Promise.all([adapter.getLeague(conn, externalLeagueId), adapter.getTeams(conn, externalLeagueId)]);
   return { league, teams };
+}
+
+/** Player page: details plus what the viewer can do with the player. */
+export async function getPlayerPage(resolved: ResolvedLeague, playerId: string) {
+  const { conn, league } = resolved;
+  const adapter = getAdapter(league.platform);
+  if (!adapter.getPlayerDetail) return null;
+  const id = league.externalId;
+  const [detail, teams, watched] = await Promise.all([
+    adapter.getPlayerDetail(conn, id, playerId),
+    adapter.getTeams(conn, id),
+    watchedPlayerIds(conn.userId, league.platform),
+  ]);
+  if (!detail) return null;
+  const myTeam = teams.find((t) => t.isMine);
+  const canAdd = resolved.viaAccount && adapter.capabilities.addDrop && !!myTeam && detail.listing.status !== "rostered";
+  const mine = canAdd ? await adapter.getRoster(conn, id, myTeam!.externalId) : null;
+  const owner = detail.listing.fantasyTeamId ? (teams.find((t) => t.id === detail.listing.fantasyTeamId) ?? null) : null;
+  const canTrade = resolved.viaAccount && adapter.capabilities.trades && !!myTeam && !!owner && !owner.isMine;
+  return { detail, teams, owner, mySlots: mine?.slots ?? null, watched: watched.includes(playerId), canTrade };
 }

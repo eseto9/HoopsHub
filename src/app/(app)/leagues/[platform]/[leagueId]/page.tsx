@@ -113,6 +113,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
             platformName={platformLabel(resolved.league.platform)}
             showFantasyPoints={points}
             title={team.name}
+            playerBase={`${base}/player`}
           />
         );
       }
@@ -132,6 +133,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
             showFantasyPoints={points}
             title={team.isMine ? team.name : `${team.name} · ${team.ownerName}`}
             editable={false}
+            playerBase={`${base}/player`}
           />
         </div>
       );
@@ -208,6 +210,7 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
           </div>
           <MatchupView
             points={points}
+            playerBase={`${base}/player`}
             sides={data.rosters.map(({ team: t, slots }) => ({
               team: { id: t.id, name: t.name, isMine: t.isMine },
               score: sides.find((x) => x.teamId === t.id)?.score,
@@ -275,31 +278,67 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
 
     case "standings": {
       const team = (id: string) => data.teams.find((t) => t.id === id);
+      const cutoff = data.standings.findIndex((r) => r.inPlayoffs === false);
       return (
-        <Group footer={preDraft ? "Order reflects ESPN's pre-season seeding." : undefined}>
-          {data.standings.map((r) => {
-            const t = team(r.teamId);
-            return (
-              <Row
-                key={r.teamId}
-                icon={
-                  <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[7px] bg-fill text-[13px] font-bold text-muted">
-                    {r.rank}
-                  </span>
-                }
-                title={<span className={t?.isMine ? "font-semibold" : ""}>{t?.name}</span>}
-                subtitle={points && r.pointsFor !== undefined ? `${fmt1.format(r.pointsFor)} PF · ${fmt1.format(r.pointsAgainst ?? 0)} PA` : t?.ownerName}
-                value={
-                  <span className="text-[15px] tabular-nums">
-                    {r.wins}-{r.losses}
-                    {r.ties ? `-${r.ties}` : ""}
-                  </span>
-                }
-                href={t ? `${base}?tab=roster&team=${t.externalId}` : undefined}
-              />
-            );
-          })}
-        </Group>
+        <section className="flex flex-col gap-1.5">
+          <div className="list-group overflow-x-auto">
+            <table className="w-full border-separate border-spacing-0 text-[14px] tabular-nums">
+              <thead>
+                <tr className="text-[11px] font-semibold text-muted uppercase [&>th]:border-b-[0.5px] [&>th]:border-separator [&>th]:px-2.5 [&>th]:py-2 [&>th]:text-right">
+                  <th className="sticky left-0 z-[2] bg-surface !pl-4 !text-left shadow-[1px_0_0_var(--separator)]">Team</th>
+                  <th>W-L-T</th>
+                  <th>PCT</th>
+                  <th>GB</th>
+                  {points && (
+                    <>
+                      <th>PF</th>
+                      <th>PA</th>
+                    </>
+                  )}
+                  <th className="!pr-4">Strk</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.standings.map((r, i) => {
+                  const t = team(r.teamId);
+                  const line = i === cutoff && cutoff > 0 ? "[&>td]:border-t-2 [&>td]:border-t-accent/50" : "[&>td]:border-t-[0.5px] [&>td]:border-separator";
+                  return (
+                    <tr key={r.teamId} className={`${line} first:[&>td]:border-t-0 ${t?.isMine ? "[&>td]:bg-accent-soft" : ""}`}>
+                      <td className="sticky left-0 z-[1] bg-surface py-2 pr-2 pl-4 shadow-[1px_0_0_var(--separator)]">
+                        <Link href={t ? `${base}?tab=roster&team=${t.externalId}` : base} className="flex w-[190px] items-center gap-2.5 sm:w-[260px]">
+                          <span className="w-5 shrink-0 text-right text-[13px] font-semibold text-muted">{r.rank}</span>
+                          <TeamAvatar src={t?.avatarUrl} name={t?.name ?? "?"} />
+                          <span className="min-w-0">
+                            <span className={`block truncate ${t?.isMine ? "font-semibold" : ""}`}>{t?.name}</span>
+                            <span className="block truncate text-[12px] text-muted">{t?.isMine ? "You" : t?.ownerName}</span>
+                          </span>
+                        </Link>
+                      </td>
+                      <td className="px-2.5 py-2 text-right">
+                        {r.wins}-{r.losses}-{r.ties}
+                      </td>
+                      <td className="px-2.5 py-2 text-right">{r.winPct !== undefined ? r.winPct.toFixed(3).replace(/^0/, "") : "–"}</td>
+                      <td className="px-2.5 py-2 text-right">{r.gamesBack ? fmt1.format(r.gamesBack) : "–"}</td>
+                      {points && (
+                        <>
+                          <td className="px-2.5 py-2 text-right">{r.pointsFor !== undefined ? fmt1.format(r.pointsFor) : "–"}</td>
+                          <td className="px-2.5 py-2 text-right">{r.pointsAgainst !== undefined ? fmt1.format(r.pointsAgainst) : "–"}</td>
+                        </>
+                      )}
+                      <td className={`py-2 pr-4 pl-2.5 text-right ${r.streak?.startsWith("W") ? "text-success" : r.streak?.startsWith("L") ? "text-danger" : ""}`}>
+                        {r.streak ?? "–"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="group-footer">
+            {cutoff > 0 ? "Teams above the blue line hold playoff spots. " : ""}
+            {preDraft || data.standings.every((r) => r.wins + r.losses + r.ties === 0) ? "Order reflects ESPN's pre-season seeding." : ""}
+          </p>
+        </section>
       );
     }
 

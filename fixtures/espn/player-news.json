@@ -1,0 +1,63 @@
+{
+  "_note": "Trimmed sample of site.api.espn.com fantasy news (text shortened).",
+  "news": {
+    "status": "success",
+    "resultsCount": 18,
+    "feed": [
+      {
+        "id": 53507546,
+        "type": "Rotowire",
+        "headline": "The Mavericks exercised the third-year team option on Flagg's contract for the 2027-28 season, Brett Siegel of ClutchPoints.com reports.",
+        "story": "Flagg is coming off an impressive rookie campaign with Dallas, averaging 21.0 points, 6.7 rebounds, 4.5 assists, 1.2 steals and 0.9 blocks across 33.5 minutes p",
+        "description": "The Mavericks exercised the third-year team option on Flagg's contract for the 2027-28 season, Brett Siegel of ClutchPoi",
+        "published": "2026-10-17T20:51:47Z",
+        "lastModified": "2026-10-17T20:51:47Z",
+        "premium": false,
+        "playerId": 5041939,
+        "links": {}
+      },
+      {
+        "id": 53492046,
+        "type": "Rotowire",
+        "headline": "Flagg notched 26 points (8-20 FG, 2-6 3Pt, 8-9 FT), 12 rebounds, four assists, two steals, one block and two turnovers over 30 minutes in Friday's 135-111 preseason loss to the Hawks.",
+        "story": "Flagg closed out the preseason strong, recording his first double-double to go with a full stat line. Last season's Rookie of the Year has looked great througho",
+        "description": "Flagg notched 26 points (8-20 FG, 2-6 3Pt, 8-9 FT), 12 rebounds, four assists, two steals, one block and two turnovers o",
+        "published": "2026-10-17T04:32:04Z",
+        "lastModified": "2026-10-17T04:32:04Z",
+        "premium": false,
+        "playerId": 5041939,
+        "links": {}
+      },
+      {
+        "id": 50199342,
+        "type": "Media",
+        "headline": "Atlanta Hawks vs. Dallas Mavericks: Game Highlights",
+        "description": "Atlanta Hawks vs. Dallas Mavericks: Game Highlights",
+        "published": "2026-10-17T02:56:34Z",
+        "lastModified": "2026-10-17T02:56:34Z",
+        "premium": false,
+        "playerId": 5041939,
+        "links": {
+          "web": {
+            "href": "https://www.espn.com/video/clip/_/id/50199342/game-highlights"
+          }
+        }
+      },
+      {
+        "id": 50199239,
+        "type": "Media",
+        "headline": "Cooper Flagg gets the basket plus the foul",
+        "description": "Cooper Flagg somehow gets the and-1 to fall",
+        "published": "2026-10-17T02:10:28Z",
+        "lastModified": "2026-10-17T02:10:28Z",
+        "premium": false,
+        "playerId": 5041939,
+        "links": {
+          "web": {
+            "href": "https://www.espn.com/video/clip/_/id/50199239/cooper-flagg-gets-basket-plus-foul"
+          }
+        }
+      }
+    ]
+  }
+}

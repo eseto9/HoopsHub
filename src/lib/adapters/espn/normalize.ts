@@ -147,7 +147,7 @@ export function normalizeTeams(raw: EspnLeagueSettingsResponse, ctx: LeagueConte
 }
 
 /** Stat keys shown in the UI. ESPN returns ~45; keep the common ones to stay lean. */
-const STAT_KEYS = [0, 6, 3, 2, 1, 17, 11, 19, 20, 40, 13, 14, 15, 16, 4];
+export const STAT_KEYS = [0, 6, 3, 2, 1, 17, 11, 19, 20, 40, 13, 14, 15, 16, 4];
 /** Percentages are rates, not sums: never total them. */
 const RATE_KEYS = new Set([19, 20]);
 
@@ -155,7 +155,7 @@ function seasonLabel(seasonId: number) {
   return `${seasonId - 1}-${String(seasonId).slice(2)}`;
 }
 
-function statLine(e: EspnStatEntry | undefined, label: string): StatLine | undefined {
+export function statLine(e: EspnStatEntry | undefined, label: string): StatLine | undefined {
   const gp = e?.stats?.["42"] ?? 0;
   if (!e || !e.averageStats || gp <= 0) return undefined;
   const perGame: Record<string, number> = {};
@@ -315,5 +315,13 @@ export function normalizeStandings(raw: EspnLeagueSettingsResponse): StandingsRo
     ties: t.record.overall.ties,
     pointsFor: t.record.overall.pointsFor,
     pointsAgainst: t.record.overall.pointsAgainst,
+    winPct: t.record.overall.percentage,
+    gamesBack: t.record.overall.gamesBack,
+    // streakType observed: "NONE" pre-season; WIN/LOSS/TIE per espn-api.
+    streak:
+      t.record.overall.streakLength > 0 && t.record.overall.streakType !== "NONE"
+        ? `${t.record.overall.streakType.charAt(0)}${t.record.overall.streakLength}`
+        : undefined,
+    inPlayoffs: raw.settings.scheduleSettings.playoffTeamCount ? i < raw.settings.scheduleSettings.playoffTeamCount : undefined,
   }));
 }

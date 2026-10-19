@@ -187,7 +187,7 @@ export function PlayersExplorer({
         {filtered.length} player{filtered.length === 1 ? "" : "s"} · tap a column to sort
       </p>
 
-      <StatsTable rows={rows} source={source} mode={mode} points={points} sort={sort} onSort={toggleSort} />
+      <StatsTable rows={rows} source={source} mode={mode} points={points} sort={sort} onSort={toggleSort} playerBase={`${base}/player`} />
       {filtered.length === 0 && <p className="px-5 py-6 text-center text-[15px] text-muted">No players match these filters.</p>}
 
       {filtered.length > shown && (

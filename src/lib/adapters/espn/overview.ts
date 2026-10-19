@@ -205,7 +205,18 @@ export function normalizeOverview(
     });
   }
 
-  return { waiverOrder, rules, scoring, draft, schedule, currentPeriod: settings.status.currentMatchupPeriod };
+  const tradeBlock = settings.teams.flatMap((t) =>
+    Object.entries(t.tradeBlock?.players ?? {})
+      .filter(([, v]) => v === "ON_THE_BLOCK")
+      .map(([id]) => ({ teamId: teamKey(leagueId, t.id), playerId: unifiedId("espn", id), player: players.get(Number(id)) ?? null })),
+  );
+
+  return { waiverOrder, rules, scoring, draft, tradeBlock, schedule, currentPeriod: settings.status.currentMatchupPeriod };
+}
+
+/** Trade-block player ids, for the player lookup. */
+export function tradeBlockPlayerIds(settings: EspnLeagueSettingsResponse): number[] {
+  return settings.teams.flatMap((t) => Object.keys(t.tradeBlock?.players ?? {}).map(Number)).filter((id) => id > 0);
 }
 
 /** Drafted player ids, for the player lookup. */

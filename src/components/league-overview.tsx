@@ -95,7 +95,30 @@ export function LeagueOverviewView({ overview, teams, base, points }: { overview
         </section>
       </div>
 
-      {overview.draft.length > 0 && <DraftBoard picks={overview.draft} teams={teams} />}
+      {overview.tradeBlock.length > 0 && (
+        <Group header="Trade Block" footer="Players their managers are shopping. Tap a team to see its roster or start an offer.">
+          {overview.tradeBlock.map((b) => {
+            const t = byId.get(b.teamId);
+            const id = b.playerId.split(":")[1];
+            return (
+              <div key={b.playerId} className="row-block">
+                <div className="row-body gap-3">
+                  <PlayerAvatar src={b.player?.headshotUrl} name={b.player?.name ?? "?"} />
+                  <Link href={`${base}/player/${id}`} className="min-w-0 flex-1">
+                    <span className="block truncate text-[15px] font-medium">{b.player?.name ?? `Player ${id}`}</span>
+                    <span className="block truncate text-[13px] text-muted">{b.player ? `${b.player.nbaTeam ?? "FA"} · ${b.player.positions.join(", ")}` : ""}</span>
+                  </Link>
+                  <Link href={t ? `${base}?tab=roster&team=${t.externalId}` : base} className={`shrink-0 text-[14px] ${t?.isMine ? "font-semibold" : "text-accent"}`}>
+                    {t?.isMine ? "Your team" : (t?.name ?? "Unknown")}
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </Group>
+      )}
+
+      {overview.draft.length > 0 && <DraftBoard picks={overview.draft} teams={teams} playerBase={`${base}/player`} />}
 
       <section className="flex flex-col gap-1.5">
         <h2 className="group-header">League Settings</h2>
@@ -145,7 +168,7 @@ function GameSide({ name, score, won, mine }: { name: string; score?: number; wo
 }
 
 /** Rounds down, teams across in first-round order — like a draft board. */
-function DraftBoard({ picks, teams }: { picks: DraftPick[]; teams: TeamInfo[] }) {
+function DraftBoard({ picks, teams, playerBase }: { picks: DraftPick[]; teams: TeamInfo[]; playerBase: string }) {
   const byId = new Map<string, TeamInfo>(teams.map((t) => [t.id, t]));
   const order = picks.filter((p) => p.round === 1).map((p) => p.teamId);
   const rounds = Math.max(...picks.map((p) => p.round));
@@ -181,7 +204,9 @@ function DraftBoard({ picks, teams }: { picks: DraftPick[]; teams: TeamInfo[] })
                         <div className="flex items-center gap-1.5">
                           <PlayerAvatar src={p.player?.headshotUrl} name={p.player?.name ?? "?"} size="sm" />
                           <div className="min-w-0">
-                            <div className="line-clamp-2 leading-tight font-medium">{p.player?.name ?? `#${p.playerId.split(":")[1]}`}</div>
+                            <Link href={`${playerBase}/${p.playerId.split(":")[1]}`} className="line-clamp-2 leading-tight font-medium hover:text-accent">
+                              {p.player?.name ?? `#${p.playerId.split(":")[1]}`}
+                            </Link>
                             <div className="text-[10px] text-muted tabular-nums">
                               {p.overall} · {p.player ? `${p.player.nbaTeam ?? "FA"} ${p.player.positions[0] ?? ""}` : ""}
                               {p.keeper ? " · K" : ""}

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { InjuryStatus, Player, PlayerStats, StatLine } from "@/lib/schema";
 import { PlayerAvatar } from "./player-avatar";
 
@@ -99,6 +100,7 @@ export function StatsTable({
   firstColumn = "Player",
   showOwnership = true,
   compact = false,
+  playerBase,
 }: {
   rows: StatsTableRow[];
   source: StatSource;
@@ -111,6 +113,8 @@ export function StatsTable({
   showOwnership?: boolean;
   /** Half-width layout (matchup side by side): tighter cells, no trailing extra columns. */
   compact?: boolean;
+  /** Player page base URL; names link to `${playerBase}/<playerId>`. */
+  playerBase?: string;
 }) {
   const th = { sort, onSort };
   return (
@@ -142,7 +146,7 @@ export function StatsTable({
         </thead>
         <tbody>
           {rows.map((r) => (
-            <Row key={r.key} r={r} source={source} mode={mode} points={points} showOwnership={showOwnership} compact={compact} />
+            <Row key={r.key} r={r} source={source} mode={mode} points={points} showOwnership={showOwnership} compact={compact} playerBase={playerBase} />
           ))}
         </tbody>
       </table>
@@ -193,6 +197,7 @@ function Row({
   points,
   showOwnership,
   compact,
+  playerBase,
 }: {
   r: StatsTableRow;
   source: StatSource;
@@ -200,6 +205,7 @@ function Row({
   points: boolean;
   showOwnership: boolean;
   compact: boolean;
+  playerBase?: string;
 }) {
   const p = r.player;
   const line = statLineOf(p, source);
@@ -217,7 +223,13 @@ function Row({
               <PlayerAvatar src={p.headshotUrl} name={p.name} size="sm" />
               <div className="min-w-0 flex-1">
                 <div className={`text-[14px] leading-tight font-medium ${compact ? "truncate" : "line-clamp-2"}`} title={compact ? p.name : undefined}>
-                  {p.name}
+                  {playerBase ? (
+                    <Link href={`${playerBase}/${p.externalId}`} className="hover:text-accent hover:underline">
+                      {p.name}
+                    </Link>
+                  ) : (
+                    p.name
+                  )}
                   {inj && <span className="ml-1 text-[10px] font-bold text-danger">{inj}</span>}
                 </div>
                 <div className="truncate text-[11px] text-muted">{r.meta ?? `${p.nbaTeam ?? "FA"} · ${p.positions.join(", ")}`}</div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { cancelPendingAction } from "@/app/actions/moves";
@@ -45,7 +46,7 @@ function dayLabel(iso: string) {
 }
 const timeLabel = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
-function MoveLine({ move, teamName }: { move: ActivityMove; teamName: (id: string | null) => string }) {
+function MoveLine({ move, teamName, playerBase }: { move: ActivityMove; teamName: (id: string | null) => string; playerBase: string }) {
   const p = move.player;
   const badge =
     move.action === "added"
@@ -62,7 +63,9 @@ function MoveLine({ move, teamName }: { move: ActivityMove; teamName: (id: strin
       </span>
       <PlayerAvatar src={p?.headshotUrl} name={p?.name ?? "?"} size={move.action === "moved" ? "sm" : "md"} />
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[15px]">{p?.name ?? `Player ${move.playerId.split(":")[1]}`}</span>
+        <Link href={`${playerBase}/${move.playerId.split(":")[1]}`} className="block truncate text-[15px] hover:text-accent">
+          {p?.name ?? `Player ${move.playerId.split(":")[1]}`}
+        </Link>
         <span className="block truncate text-[13px] text-muted">
           {p ? `${p.nbaTeam ?? "FA"} · ${p.positions.join(", ")}` : ""}
           {move.action === "traded" && ` · to ${teamName(move.toTeamId)}`}
@@ -83,11 +86,13 @@ function ActivityItem({
   team,
   teamName,
   action,
+  playerBase,
 }: {
   a: LeagueActivity;
   team: (id: string | null) => TeamInfo | undefined;
   teamName: (id: string | null) => string;
   action?: React.ReactNode;
+  playerBase: string;
 }) {
   const t = team(a.teamId);
   const others = a.kind === "trade" ? a.teamIds.filter((id) => id !== a.teamId) : [];
@@ -117,7 +122,7 @@ function ActivityItem({
       {a.moves.length > 0 && (
         <div className="flex flex-col gap-2.5 pl-1">
           {a.moves.map((m, i) => (
-            <MoveLine key={i} move={m} teamName={teamName} />
+            <MoveLine key={i} move={m} teamName={teamName} playerBase={playerBase} />
           ))}
         </div>
       )}
@@ -183,13 +188,18 @@ export function ActivityFeed({
     if (!mine && leagueUrl) {
       return (
         <a href={leagueUrl} target="_blank" rel="noreferrer" className="shrink-0 text-[13px] font-semibold text-accent">
-          Respond on {platformName} ↗
+          Review on {platformName} ↗
         </a>
       );
     }
     return undefined;
   };
   const team = (id: string | null) => (id ? byId.get(id) : undefined);
+  const playerBase = `/leagues/${platform}/${leagueId}/player`;
+  // Offers someone else proposed that involve you are waiting on your answer.
+  const isMine = (a: LeagueActivity) => !!(a.teamId && byId.get(a.teamId)?.isMine);
+  const incoming = pending.filter((a) => a.kind === "trade" && !isMine(a));
+  const outgoing = pending.filter((a) => !incoming.includes(a));
   const teamName = (id: string | null) => (id ? (byId.get(id)?.name ?? "another team") : "free agency");
 
   const active = FILTERS.find((f) => f.key === filter)!;
@@ -211,10 +221,21 @@ export function ActivityFeed({
   return (
     <div className="flex flex-col gap-8">
       <Notice notice={notice} />
-      {pending.length > 0 && (
+      {incoming.length > 0 && (
+        <Group
+          header="Trade offers to you"
+          footer={`Accepting or declining from Hoops Hub isn't available yet, so these open on ${platformName}.`}
+        >
+          {incoming.map((a) => (
+            <ActivityItem key={a.id} a={a} team={team} teamName={teamName} action={pendingAction(a)} playerBase={playerBase} />
+          ))}
+        </Group>
+      )}
+
+      {outgoing.length > 0 && (
         <Group header="Your pending moves" footer="Only you can see these. Claims process when waivers clear; offers wait for the other manager.">
-          {pending.map((a) => (
-            <ActivityItem key={a.id} a={a} team={team} teamName={teamName} action={pendingAction(a)} />
+          {outgoing.map((a) => (
+            <ActivityItem key={a.id} a={a} team={team} teamName={teamName} action={pendingAction(a)} playerBase={playerBase} />
           ))}
         </Group>
       )}
@@ -257,7 +278,7 @@ export function ActivityFeed({
         days.map((d) => (
           <Group key={d.label} header={<span suppressHydrationWarning>{d.label}</span>}>
             {d.items.map((a) => (
-              <ActivityItem key={a.id} a={a} team={team} teamName={teamName} />
+              <ActivityItem key={a.id} a={a} team={team} teamName={teamName} playerBase={playerBase} />
             ))}
           </Group>
         ))

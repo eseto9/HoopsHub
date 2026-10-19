@@ -48,6 +48,27 @@ async function Leagues() {
         </Group>
       )}
 
+      {leagues.some((l) => l.alerts?.length) && (
+        <Group header="Updates">
+          {leagues.flatMap((l) =>
+            (l.alerts ?? []).map((a, i) => (
+              <Row
+                key={`${l.league.id}-${i}`}
+                icon={
+                  <IconTile color={a.urgent ? "var(--danger)" : a.kind === "claim_won" || a.kind === "trade_done" ? "var(--success)" : "var(--accent)"}>
+                    <span className="text-[15px] leading-none font-bold text-white">{a.kind.startsWith("trade") || a.kind === "offer_waiting" ? "⇄" : a.kind === "claim_won" ? "✓" : "+"}</span>
+                  </IconTile>
+                }
+                title={a.text}
+                subtitle={l.league.name}
+                href={`/leagues/${l.league.platform}/${l.league.externalId}?tab=activity`}
+                value={a.urgent ? <span className="badge">1</span> : undefined}
+              />
+            )),
+          )}
+        </Group>
+      )}
+
       {leagues.length > 0 ? (
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {leagues.map((l) => (

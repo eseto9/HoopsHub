@@ -25,6 +25,7 @@ export function RosterEditor({
   showFantasyPoints,
   title,
   editable = true,
+  playerBase,
 }: {
   slots: RosterSlot[];
   platform: string;
@@ -34,6 +35,7 @@ export function RosterEditor({
   title: string;
   /** False for other teams and public leagues: same table, no Move buttons. */
   editable?: boolean;
+  playerBase?: string;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<number | null>(null);
@@ -116,12 +118,12 @@ export function RosterEditor({
       <StatControls players={players} source={source} onSource={setSource} mode={mode} onMode={setMode} />
       <section className="flex flex-col gap-1.5">
         <h2 className="group-header">{title} · Starters</h2>
-        <StatsTable rows={tableRows(starters)} source={source} mode={mode} points={showFantasyPoints} firstColumn="Slot · Player" />
+        <StatsTable rows={tableRows(starters)} source={source} mode={mode} points={showFantasyPoints} firstColumn="Slot · Player" playerBase={playerBase} />
       </section>
       {bench.length > 0 && (
         <section className="flex flex-col gap-1.5">
           <h2 className="group-header">Bench & IR</h2>
-          <StatsTable rows={tableRows(bench)} source={source} mode={mode} points={showFantasyPoints} firstColumn="Slot · Player" />
+          <StatsTable rows={tableRows(bench)} source={source} mode={mode} points={showFantasyPoints} firstColumn="Slot · Player" playerBase={playerBase} />
         </section>
       )}
 

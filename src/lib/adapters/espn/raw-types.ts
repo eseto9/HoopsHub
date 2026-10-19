@@ -16,7 +16,7 @@ export interface EspnProTeam {
   location: string;
   name: string;
   /** Scoring period (day) -> games that day. */
-  proGamesByScoringPeriod?: Record<string, { date: number; homeProTeamId: number; awayProTeamId: number }[]>;
+  proGamesByScoringPeriod?: Record<string, { id?: number; date: number; homeProTeamId: number; awayProTeamId: number; scoringPeriodId?: number }[]>;
 }
 
 export interface EspnProTeamsResponse {
@@ -61,6 +61,8 @@ export interface EspnTeam {
   record: { overall: EspnRecordLine; home: EspnRecordLine; away: EspnRecordLine; division: EspnRecordLine };
   /** 1 = first waiver claim (observed in mTeam). */
   waiverRank?: number;
+  /** Observed (mTeam): {} when empty, else {players: {"6440": "ON_THE_BLOCK"}}. */
+  tradeBlock?: { players?: Record<string, string> };
   transactionCounter?: { acquisitions: number; drops: number; trades: number; moveToIR: number; moveToActive: number };
 }
 
@@ -161,6 +163,9 @@ export interface EspnStatEntry {
   appliedAverage?: number;
   stats?: Record<string, number>;
   averageStats?: Record<string, number>;
+  /** Split 5 (per game): the NBA game id. */
+  externalId?: string;
+  proTeamId?: number;
 }
 
 export interface EspnPlayer {
@@ -278,4 +283,30 @@ export interface EspnCommunicationMessage {
 
 export interface EspnCommunicationResponse {
   topics?: { id: string; type: string; date: number; targetId?: number; messages: EspnCommunicationMessage[] }[];
+}
+
+/**
+ * league?view=kona_playercard with X-Fantasy-Filter
+ * {players:{filterIds, filterStatsForTopScoringPeriodIds:{value:82, additionalValue:[...]}}}
+ * (captured from espn.com). Stats include split 5 entries: one per game
+ * (externalId = NBA game id, scoringPeriodId = day), plus splits 1-3.
+ */
+export interface EspnPlayerCardResponse {
+  players: (EspnPlayerPoolEntry & { player: EspnPlayer & { seasonOutlook?: string; jersey?: string } })[];
+}
+
+/** site.api.espn.com/apis/fantasy/v3/games/fba/news/players?days=30&playerId= (public). */
+export interface EspnNewsResponse {
+  news: {
+    feed: {
+      id: number;
+      type: string; // observed: Rotowire, Media, Story
+      headline: string;
+      story?: string;
+      description?: string;
+      published: string;
+      premium?: boolean;
+      links?: { web?: { href: string } };
+    }[];
+  };
 }

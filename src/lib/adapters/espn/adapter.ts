@@ -22,6 +22,8 @@ import type {
   EspnCommunicationResponse,
   EspnFanProfile,
   EspnFreeAgentsResponse,
+  EspnNewsResponse,
+  EspnPlayerCardResponse,
   EspnGame,
   EspnLeagueSettingsResponse,
   EspnMatchupsResponse,
@@ -30,11 +32,12 @@ import type {
   EspnTransactionsResponse,
 } from "./raw-types";
 import { activityPlayerIds, closedIds, communicationPlayerIds, normalizeActivity, normalizeCommunication } from "./activity";
-import { draftPlayerIds, normalizeOverview } from "./overview";
+import { draftPlayerIds, normalizeOverview, tradeBlockPlayerIds } from "./overview";
+import { gamesById, normalizePlayerCard } from "./playercard";
 import { normalizePlayerPool } from "./pool";
 import { normalizeProSchedule } from "./schedule";
 
-const TTL = { game: 3600, proTeams: 86400, settings: 120, roster: 60, matchups: 45, freeAgents: 300, fan: 600, activity: 60, players: 600 };
+const TTL = { game: 3600, proTeams: 86400, settings: 120, roster: 60, matchups: 45, freeAgents: 300, fan: 600, activity: 60, players: 600, card: 300, news: 600 };
 
 /** Headers espn.com sends with filtered player lookups (captured). */
 const KONA_HEADERS = { "X-Fantasy-Platform": "espn-fantasy-web", "X-Fantasy-Source": "kona" };
@@ -337,6 +340,33 @@ export const espnAdapter: PlatformAdapter = {
     return { ...result, feed: [...result.feed, ...messages].sort((a, b) => b.date.localeCompare(a.date)) };
   },
 
+  async getPlayerDetail(conn, leagueId, playerId) {
+    if (!/^\d+$/.test(playerId)) return null;
+    const settings = await getSettings(conn, leagueId);
+    const season = settings.seasonId;
+    const scope = cacheScope(conn);
+    // Same filter espn.com's player card sends (captured): 82 most recent games plus season/split lines.
+    const spans = [`00${season}`, `10${season}`, `00${season - 1}`, `01${season}`, `02${season}`, `03${season}`, `04${season}`];
+    const filter = { players: { filterIds: { value: [Number(playerId)] }, filterStatsForTopScoringPeriodIds: { value: 82, additionalValue: spans } } };
+    const [card, news, pro, proPrev] = await Promise.all([
+      cached(`espn:${scope}:card:${season}:${leagueId}:${playerId}`, TTL.card, () =>
+        espnFetch<EspnPlayerCardResponse>(leagueEndpoint(season, leagueId, ["kona_playercard"], { scoringPeriodId: String(settings.scoringPeriodId || 1) }), {
+          ...fetchOpts(conn),
+          headers: { ...KONA_HEADERS, "X-Fantasy-Filter": JSON.stringify(filter) },
+        }),
+      ),
+      // News is a nice-to-have; the page works without it.
+      cached(`espn:news:${playerId}`, TTL.news, () =>
+        espnFetch<EspnNewsResponse>(`https://site.api.espn.com/apis/fantasy/v3/games/fba/news/players?days=30&playerId=${playerId}`, { cookies: null }),
+      ).catch(() => null),
+      getProTeamsRaw(season),
+      getProTeamsRaw(season - 1).catch(() => null),
+    ]);
+    const games = new Map([[season, gamesById(pro)]]);
+    if (proPrev) games.set(season - 1, gamesById(proPrev));
+    return normalizePlayerCard(card, news, leagueId, normalizeProTeams(pro), normalizeProSchedule(pro), games, Date.now());
+  },
+
   async getLeagueOverview(conn, leagueId) {
     const settings = await getSettings(conn, leagueId);
     const season = settings.seasonId;
@@ -346,7 +376,7 @@ export const espnAdapter: PlatformAdapter = {
       getProTeamsRaw(season),
     ]);
     const proTeams = normalizeProTeams(proRaw);
-    const entries = await playersById(conn, settings, leagueId, draftPlayerIds(txns));
+    const entries = await playersById(conn, settings, leagueId, [...draftPlayerIds(txns), ...tradeBlockPlayerIds(settings)]);
     const players = new Map(entries.map((e) => [e.player.id, normalizePlayer(e.player, proTeams)]));
     return normalizeOverview(settings, matchups, txns, proRaw, players, Date.now());
   },

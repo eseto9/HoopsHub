@@ -6,6 +6,7 @@ import type {
   Player,
   PlayerListing,
   LeagueOverview,
+  PlayerDetail,
   RosterSlot,
   StandingsRow,
   Team,
@@ -92,6 +93,8 @@ export interface PlatformAdapter {
   getPlayerPool?(conn: AdapterConnection, leagueId: string): Promise<PlayerListing[]>;
   /** Waiver order, rules, draft results and season schedule. */
   getLeagueOverview?(conn: AdapterConnection, leagueId: string): Promise<LeagueOverview>;
+  /** Player page: splits, game log, news, schedule. null if the player doesn't exist. */
+  getPlayerDetail?(conn: AdapterConnection, leagueId: string, playerId: string): Promise<PlayerDetail | null>;
 
   // Phase 5 write operations. Optional; presence must match `capabilities`.
   setLineup?(conn: AdapterConnection, leagueId: string, teamId: string, changes: LineupChange[], period?: number): Promise<void>;

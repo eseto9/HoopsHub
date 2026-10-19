@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { moveLineupAction } from "@/app/actions/lineup";
+import { safeAction } from "@/lib/safe-action";
 import { planMove, validTargets } from "@/lib/lineup";
 import type { RosterSlot } from "@/lib/schema";
 import { Group } from "./list";
@@ -73,14 +74,14 @@ export function RosterEditor({
     const a = slots[confirm.from].player!;
     const b = slots[confirm.to].player;
     startTransition(async () => {
-      const res = await moveLineupAction({
+      const res = await safeAction(() => moveLineupAction({
         platform,
         leagueId,
         from: confirm.from,
         to: confirm.to,
         playerId: a.externalId,
         targetPlayerId: b?.externalId ?? null,
-      });
+      }));
       setConfirm(null);
       setSelected(null);
       setNotice(res.ok ? { kind: "ok", text: res.message } : { kind: "error", text: res.error, reconnect: res.reconnect });

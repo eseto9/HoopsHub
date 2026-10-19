@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { proposeTradeAction } from "@/app/actions/moves";
+import { safeAction } from "@/lib/safe-action";
 import type { Player, RosterSlot, Team } from "@/lib/schema";
 import { Group } from "./list";
 import { PlayerAvatar } from "./player-avatar";
@@ -75,14 +76,14 @@ export function TradeBuilder({
 
   function submit() {
     start(async () => {
-      const res = await proposeTradeAction({
+      const res = await safeAction(() => proposeTradeAction({
         platform,
         leagueId,
         toTeamId: theirTeam.externalId,
         sendPlayerIds: [...send],
         receivePlayerIds: [...receive],
         message: message.trim() || undefined,
-      });
+      }));
       setReview(false);
       if (res.ok) {
         router.push(`/leagues/${platform}/${leagueId}?tab=activity`);

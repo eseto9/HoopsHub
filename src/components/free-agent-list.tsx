@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { addDropAction } from "@/app/actions/moves";
+import { safeAction } from "@/lib/safe-action";
 import type { Player, RosterSlot } from "@/lib/schema";
 import { Group, Row } from "./list";
 import { PlayerAvatar } from "./player-avatar";
@@ -48,14 +49,14 @@ export function FreeAgentList({
     if (!target || drop === null) return;
     const dropPlayer = drop === "none" ? undefined : rostered.find((r) => r.player.externalId === drop)?.player;
     start(async () => {
-      const res = await addDropAction({
+      const res = await safeAction(() => addDropAction({
         platform,
         leagueId,
         addPlayerId: target.externalId,
         addName: target.name,
         dropPlayerId: dropPlayer?.externalId,
         dropName: dropPlayer?.name,
-      });
+      }));
       setTarget(null);
       setNotice(res.ok ? { kind: "ok", text: res.message } : { kind: "error", text: res.error, reconnect: res.reconnect });
       if (res.ok) router.refresh();

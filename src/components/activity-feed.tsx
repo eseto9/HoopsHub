@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { cancelPendingAction } from "@/app/actions/moves";
+import { safeAction } from "@/lib/safe-action";
 import type { ActivityMove, LeagueActivity, Team } from "@/lib/schema";
 import { Group, RowBlock } from "./list";
 import { PlayerAvatar } from "./player-avatar";
@@ -121,7 +122,7 @@ export function ActivityFeed({
     if (!cancelling) return;
     const transactionId = cancelling.id.slice(cancelling.id.indexOf(".") + 1);
     start(async () => {
-      const res = await cancelPendingAction({ platform, leagueId, transactionId });
+      const res = await safeAction(() => cancelPendingAction({ platform, leagueId, transactionId }));
       setCancelling(null);
       setNotice(res.ok ? { kind: "ok", text: res.message } : { kind: "error", text: res.error, reconnect: res.reconnect });
       if (res.ok) router.refresh();

@@ -47,3 +47,4 @@ fixtures/**/*.full.json
 
 # Netlify CLI link state
 .netlify
+certificates

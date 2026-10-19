@@ -20,6 +20,8 @@ function createAuth() {
         verification: schema.verification,
       },
     }),
+    // Local dev also runs over https (npm run dev:https) for Yahoo sign-in, which requires https redirects.
+    trustedOrigins: process.env.NODE_ENV === "development" ? ["http://localhost:3000", "https://localhost:3000"] : [],
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
     plugins: [nextCookies()],
   });

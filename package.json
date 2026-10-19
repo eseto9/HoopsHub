@@ -15,7 +15,8 @@
     "db:studio": "drizzle-kit studio",
     "fetch:sleeper": "tsx scripts/fetch-sleeper.ts",
     "fetch:espn": "tsx scripts/fetch-espn.ts",
-    "fixtures:anonymize": "node scripts/anonymize-fixtures.mjs"
+    "fixtures:anonymize": "node scripts/anonymize-fixtures.mjs",
+    "dev:https": "next dev --experimental-https --experimental-https-key certificates/localhost-key.pem --experimental-https-cert certificates/localhost.pem"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

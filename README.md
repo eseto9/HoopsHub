@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hoops Hub
 
-## Getting Started
+A fantasy basketball dashboard that brings your ESPN, Yahoo and Sleeper leagues into one place: rosters, matchups, standings and free agents across every league.
 
-First, run the development server:
+**Status:** ESPN works (private leagues via pasted cookies, public leagues by ID). Yahoo and Sleeper are next.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+Next.js 16 (App Router, Cache Components) · TypeScript · Tailwind v4 · Postgres on Neon · Drizzle ORM · Better Auth · Vitest. Deploys to Netlify.
+
+## Setup
+
+1. Install dependencies (Node 24+):
+
+   ```bash
+   npm install
+   ```
+
+2. Create a free Postgres database at [neon.tech](https://neon.tech) and copy its **pooled** connection string.
+
+3. Copy `.env.example` to `.env.local` and fill it in:
+
+   | Variable | What it is |
+   | --- | --- |
+   | `DATABASE_URL` | Neon pooled connection string |
+   | `BETTER_AUTH_SECRET` | Random secret for sessions |
+   | `BETTER_AUTH_URL` | App URL, e.g. `http://localhost:3000` |
+   | `ENCRYPTION_KEY` | 32 random bytes, base64. Encrypts stored platform credentials |
+   | `ESPN_S2`, `ESPN_SWID` | Optional, only for `npm run fetch:espn` during development |
+
+   Generate secrets with:
+
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+   ```
+
+4. Create the database tables:
+
+   ```bash
+   npm run db:migrate
+   ```
+
+5. Start the app at http://localhost:3000:
+
+   ```bash
+   npm run dev
+   ```
+
+## Connecting ESPN
+
+ESPN has no official API, so Hoops Hub uses ESPN's own fantasy endpoints.
+
+- **Public leagues:** Connections → *Add a Public League* → paste the league ID (the number after `leagueId=` in the league URL) and pick your team.
+- **Private leagues:** Connections → *Connect Your ESPN Account*. On a computer, sign in to espn.com, open DevTools → Application → Cookies → `https://www.espn.com`, and copy the `espn_s2` and `SWID` values into the form. They're encrypted at rest (AES-256-GCM) and only sent to ESPN. When they expire, the app asks you to reconnect.
+
+## Scripts
+
+| Command | Does |
+| --- | --- |
+| `npm run dev` / `build` / `start` | Next.js |
+| `npm test` | Unit tests (normalizers run against real fixtures) |
+| `npm run typecheck` | TypeScript |
+| `npm run db:generate` / `db:migrate` | Drizzle migrations |
+| `npm run fetch:espn -- <leagueId>` | Capture real ESPN responses into `fixtures/espn` |
+| `npm run fixtures:anonymize` | Replace leaguemates' names in fixtures before committing |
+
+## Architecture
+
+Each platform implements one adapter interface (`src/lib/adapters/types.ts`) that normalizes raw responses into a unified schema (`src/lib/schema`). The UI only ever reads the unified types. Platform responses are cached briefly and rate-limited per platform.
+
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+src/lib/adapters/<platform>/   raw types, normalizers, client, adapter
+src/lib/services/              connections + cross-league dashboard
+src/app/                       pages, server actions
+fixtures/                      real (anonymized) API responses for tests
+```

@@ -117,7 +117,10 @@ export interface StatLine {
   gamesPlayed: number;
   /** In this league's scoring (points leagues). */
   fantasyPointsPerGame?: number;
+  fantasyPointsTotal?: number;
   perGame: Record<string, number>;
+  /** Season totals (percentages repeat the rate). */
+  totals?: Record<string, number>;
 }
 
 export interface PlayerStats {
@@ -201,4 +204,33 @@ export interface LeagueActivity {
   /** Every team involved, including teamId. */
   teamIds: UnifiedId[];
   moves: ActivityMove[];
+}
+
+// ---------------------------------------------------------------------------
+// Player pool (Players page)
+// ---------------------------------------------------------------------------
+
+export interface GameInfo {
+  /** NBA abbreviation of the opponent. */
+  opponent: string;
+  home: boolean;
+  /** ISO tip-off time. */
+  date: string;
+}
+
+/** A player as listed on the Players page: who has him, ownership, schedule. */
+export interface PlayerListing {
+  player: Player;
+  status: "free_agent" | "waivers" | "rostered";
+  /** Fantasy team holding the player, when rostered. */
+  fantasyTeamId: UnifiedId | null;
+  waiverClearsAt?: string;
+  /** Platform-wide % of leagues rostering the player, and its recent change. */
+  percentRostered?: number;
+  percentRosteredChange?: number;
+  percentStarted?: number;
+  /** NBA games from today through Sunday (Eastern time). */
+  gamesThisWeek: number;
+  /** NBA game today, if any. */
+  today: GameInfo | null;
 }

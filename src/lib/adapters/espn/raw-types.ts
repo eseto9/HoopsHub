@@ -15,6 +15,8 @@ export interface EspnProTeam {
   abbrev: string;
   location: string;
   name: string;
+  /** Scoring period (day) -> games that day. */
+  proGamesByScoringPeriod?: Record<string, { date: number; homeProTeamId: number; awayProTeamId: number }[]>;
 }
 
 export interface EspnProTeamsResponse {
@@ -141,7 +143,7 @@ export interface EspnPlayer {
   injured: boolean;
   injuryStatus?: string; // observed: ACTIVE, DAY_TO_DAY, OUT
   active?: boolean;
-  ownership?: { percentOwned: number; percentStarted: number; averageDraftPosition: number };
+  ownership?: { percentOwned: number; percentStarted: number; percentChange?: number; averageDraftPosition: number };
 }
 
 export interface EspnPlayerPoolEntry {

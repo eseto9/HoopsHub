@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ActivityFeed } from "@/components/activity-feed";
-import { FreeAgentList } from "@/components/free-agent-list";
+import { PlayersExplorer } from "@/components/players-explorer";
 import { TradeBuilder } from "@/components/trade-builder";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { ChevronRight } from "@/components/icons";
@@ -28,7 +28,6 @@ const TABS: { key: LeagueTab; label: string }[] = [
   { key: "standings", label: "Standings" },
   { key: "teams", label: "Teams" },
 ];
-const POSITIONS = ["All", "PG", "SG", "SF", "PF", "C"];
 
 const fmt1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
@@ -180,20 +179,17 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
 
     case "players":
       return (
-        <div className="flex flex-col gap-4">
-          <Segmented
-            active={sp.pos ?? "All"}
-            items={POSITIONS.map((p) => ({ key: p, label: p, href: `${base}?tab=players${p === "All" ? "" : `&pos=${p}`}` }))}
-          />
-          <FreeAgentList
-            players={data.players}
-            mySlots={data.mySlots}
-            platform={resolved.league.platform}
-            leagueId={resolved.league.externalId}
-            platformName={platformLabel(resolved.league.platform)}
-            showFantasyPoints={points}
-          />
-        </div>
+        <PlayersExplorer
+          pool={data.pool}
+          mySlots={data.mySlots}
+          watched={data.watched}
+          teams={data.teams.map((t) => ({ id: t.id, externalId: t.externalId, name: t.name, isMine: t.isMine }))}
+          platform={resolved.league.platform}
+          leagueId={resolved.league.externalId}
+          platformName={platformLabel(resolved.league.platform)}
+          points={points}
+          base={base}
+        />
       );
 
     case "activity":

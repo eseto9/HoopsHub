@@ -37,7 +37,7 @@ export async function addDropAction(input: {
     dropPlayerId: input.dropPlayerId,
     dropName: input.dropName ? String(input.dropName).slice(0, 80) : undefined,
   });
-  if (res.ok) await refresh(input.platform, input.leagueId);
+  if (res.ok || (!res.ok && res.stale)) await refresh(input.platform, input.leagueId);
   return res;
 }
 
@@ -60,7 +60,7 @@ export async function proposeTradeAction(input: {
     receivePlayerIds: input.receivePlayerIds,
     message: input.message ? String(input.message).slice(0, 500) : undefined,
   });
-  if (res.ok) await refresh(input.platform, input.leagueId);
+  if (res.ok || (!res.ok && res.stale)) await refresh(input.platform, input.leagueId);
   return res;
 }
 
@@ -68,6 +68,6 @@ export async function cancelPendingAction(input: { platform: string; leagueId: s
   const user = await requireUser();
   if (!valid(input.platform, input.leagueId) || !TXN.test(input.transactionId)) return { ok: false, error: "Invalid request." };
   const res = await cancelPendingMove(user.id, input.platform, input.leagueId, input.transactionId);
-  if (res.ok) await refresh(input.platform, input.leagueId);
+  if (res.ok || (!res.ok && res.stale)) await refresh(input.platform, input.leagueId);
   return res;
 }

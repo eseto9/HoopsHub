@@ -113,3 +113,21 @@ export const leaguePreference = pgTable(
   },
   (t) => [uniqueIndex("league_pref_user_platform_league_idx").on(t.userId, t.platform, t.externalLeagueId)],
 );
+
+/**
+ * Hoops Hub's own watchlist (works across platforms; ESPN's own watchlist is
+ * not synced). One row per user + platform + player.
+ */
+export const watchlist = pgTable(
+  "watchlist",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    platform: platformEnum("platform").notNull(),
+    playerExternalId: text("player_external_id").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("watchlist_user_platform_player_idx").on(t.userId, t.platform, t.playerExternalId)],
+);

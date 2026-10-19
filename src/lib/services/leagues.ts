@@ -4,6 +4,7 @@ import type { AdapterConnection } from "@/lib/adapters/types";
 import { PlatformError, ReconnectRequiredError } from "@/lib/errors";
 import type { League, Platform, Team } from "@/lib/schema";
 import type { DashboardData, DashboardLeague, DashboardProblem, MatchupSummary } from "@/lib/schema/views";
+import { watchedPlayerIds } from "./watchlist";
 import { getAdapterConnections, listConnections, listLeaguePreferences, markNeedsReconnect, markSynced } from "./connections";
 
 const PLATFORM_LABEL: Record<Platform, string> = { espn: "ESPN", yahoo: "Yahoo", sleeper: "Sleeper" };
@@ -187,11 +188,16 @@ export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opt
     case "players": {
       // Your roster too (for the drop picker) when the league is connected through your account.
       const canAdd = resolved.viaAccount && adapter.capabilities.addDrop && !!myTeam;
-      const [players, mine] = await Promise.all([
-        adapter.getFreeAgents(conn, id, { position: opts.position, limit: 50 }),
+      const [pool, mine, watched] = await Promise.all([
+        adapter.getPlayerPool
+          ? adapter.getPlayerPool(conn, id)
+          : adapter.getFreeAgents(conn, id, { limit: 50 }).then((ps) =>
+              ps.map((player) => ({ player, status: "free_agent" as const, fantasyTeamId: null, gamesThisWeek: 0, today: null })),
+            ),
         canAdd ? adapter.getRoster(conn, id, myTeam!.externalId) : Promise.resolve(null),
+        watchedPlayerIds(conn.userId, league.platform),
       ]);
-      return { tab, teams, players, mySlots: mine?.slots ?? null } as const;
+      return { tab, teams, pool, mySlots: mine?.slots ?? null, watched } as const;
     }
     case "trade": {
       const other = teams.find((t) => t.externalId === opts.teamId && !t.isMine);

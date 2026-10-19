@@ -29,6 +29,8 @@ import type {
   EspnTransactionsResponse,
 } from "./raw-types";
 import { activityPlayerIds, closedIds, normalizeActivity } from "./activity";
+import { normalizePlayerPool } from "./pool";
+import { normalizeProSchedule } from "./schedule";
 
 const TTL = { game: 3600, proTeams: 86400, settings: 120, roster: 60, matchups: 45, freeAgents: 300, fan: 600, activity: 60, players: 600 };
 
@@ -50,10 +52,14 @@ async function getSeason(): Promise<number> {
   return game.currentSeasonId;
 }
 
-async function getProTeams(season: number): Promise<ProTeamMap> {
-  return cached(`espn:proTeams:${season}`, TTL.proTeams, async () =>
-    normalizeProTeams(await espnFetch<EspnProTeamsResponse>(`${ESPN_READS}/seasons/${season}?view=proTeamSchedules_wl`, { cookies: null })),
+async function getProTeamsRaw(season: number): Promise<EspnProTeamsResponse> {
+  return cached(`espn:proTeamsRaw:${season}`, TTL.proTeams, () =>
+    espnFetch<EspnProTeamsResponse>(`${ESPN_READS}/seasons/${season}?view=proTeamSchedules_wl`, { cookies: null }),
   );
+}
+
+async function getProTeams(season: number): Promise<ProTeamMap> {
+  return normalizeProTeams(await getProTeamsRaw(season));
 }
 
 function fetchOpts(conn: AdapterConnection) {
@@ -228,6 +234,30 @@ export const espnAdapter: PlatformAdapter = {
       availability: e.status === "WAIVERS" ? ("waivers" as const) : ("free_agent" as const),
       waiverClearsAt: e.waiverProcessDate ? new Date(e.waiverProcessDate).toISOString() : undefined,
     }));
+  },
+
+  /** Top 300 players by % rostered: free agents, waivers and rostered (statuses verified). */
+  async getPlayerPool(conn, leagueId) {
+    const settings = await getSettings(conn, leagueId);
+    const season = settings.seasonId;
+    const extra: Record<string, string> = settings.scoringPeriodId ? { scoringPeriodId: String(settings.scoringPeriodId) } : {};
+    const filter = {
+      players: {
+        filterStatus: { value: ["FREEAGENT", "WAIVERS", "ONTEAM"] },
+        limit: 300,
+        sortPercOwned: { sortPriority: 1, sortAsc: false },
+      },
+    };
+    const [raw, proRaw] = await Promise.all([
+      cached(`espn:${cacheScope(conn)}:pool:${season}:${leagueId}`, TTL.freeAgents, () =>
+        espnFetch<EspnFreeAgentsResponse>(leagueEndpoint(season, leagueId, ["kona_player_info"], extra), {
+          ...fetchOpts(conn),
+          headers: { ...KONA_HEADERS, "X-Fantasy-Filter": JSON.stringify(filter) },
+        }),
+      ),
+      getProTeamsRaw(season),
+    ]);
+    return normalizePlayerPool(raw.players, leagueId, normalizeProTeams(proRaw), normalizeProSchedule(proRaw), Date.now());
   },
 
   /** League activity from mTransactions2, with player names resolved by id. */

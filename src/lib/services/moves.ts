@@ -6,7 +6,9 @@ import type { Platform } from "@/lib/schema";
 import { markNeedsReconnect } from "./connections";
 import { resolveLeague } from "./leagues";
 
-export type MoveOutcome = { ok: true; message: string; pending?: boolean } | { ok: false; error: string; reconnect?: boolean };
+export type MoveOutcome =
+  | { ok: true; message: string; pending?: boolean }
+  | { ok: false; error: string; reconnect?: boolean; /** Data on screen is out of date; refresh it. */ stale?: boolean };
 
 /** Resolve the league through the user's own account and find their team. */
 async function ownTeam(userId: string, platform: Platform, leagueId: string): Promise<
@@ -29,7 +31,7 @@ async function run(conn: AdapterConnection, fn: () => Promise<MoveOutcome>): Pro
       await markNeedsReconnect(conn.id);
       return { ok: false, error: "Your connection expired. Reconnect to keep making moves.", reconnect: true };
     }
-    if (err instanceof PlatformError) return { ok: false, error: err.message };
+    if (err instanceof PlatformError) return { ok: false, error: err.message, stale: err.status === 409 };
     throw err;
   }
 }
@@ -69,5 +71,7 @@ export async function cancelPendingMove(userId: string, platform: Platform, leag
   return run(own.conn, async () => {
     await own.adapter.cancelPending!(own.conn, leagueId, own.teamId, transactionId);
     return { ok: true, message: "Cancelled." };
-  });
+  }).then((r) =>
+    !r.ok && r.stale ? { ...r, error: "That move was already declined, processed or closed. Showing the latest." } : r,
+  );
 }

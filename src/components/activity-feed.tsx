@@ -72,8 +72,8 @@ function ActivityItem({
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-semibold">
             {t?.name ?? "Unknown team"}
+            {t?.isMine && <span className="ml-1 text-[12px] font-normal text-muted">(you)</span>}
             {others.length > 0 && <span className="font-normal text-muted"> ⇄ {others.map((id) => teamName(id)).join(", ")}</span>}
-            {t?.isMine && <span className="ml-1.5 text-[12px] font-normal text-muted">(you)</span>}
           </p>
           <p className="text-[13px] text-muted">
             {KIND_LABEL[a.kind]}
@@ -125,7 +125,7 @@ export function ActivityFeed({
       const res = await safeAction(() => cancelPendingAction({ platform, leagueId, transactionId }));
       setCancelling(null);
       setNotice(res.ok ? { kind: "ok", text: res.message } : { kind: "error", text: res.error, reconnect: res.reconnect });
-      if (res.ok) router.refresh();
+      if (res.ok || ("stale" in res && res.stale)) router.refresh();
     });
   }
 

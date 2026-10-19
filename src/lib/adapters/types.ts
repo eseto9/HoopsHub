@@ -4,6 +4,7 @@ import type {
   Matchup,
   Platform,
   Player,
+  PlayerListing,
   RosterSlot,
   StandingsRow,
   Team,
@@ -86,6 +87,8 @@ export interface PlatformAdapter {
   getFreeAgents(conn: AdapterConnection, leagueId: string, query?: FreeAgentQuery): Promise<Player[]>;
   /** Completed league moves (newest first) plus the user's own open claims/offers. */
   getActivity?(conn: AdapterConnection, leagueId: string): Promise<{ feed: LeagueActivity[]; pendingForTeam: LeagueActivity[] }>;
+  /** Available and rostered players with ownership and this week's NBA schedule. */
+  getPlayerPool?(conn: AdapterConnection, leagueId: string): Promise<PlayerListing[]>;
 
   // Phase 5 write operations. Optional; presence must match `capabilities`.
   setLineup?(conn: AdapterConnection, leagueId: string, teamId: string, changes: LineupChange[], period?: number): Promise<void>;

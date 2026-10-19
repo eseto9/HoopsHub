@@ -146,7 +146,9 @@ export function normalizeTeams(raw: EspnLeagueSettingsResponse, ctx: LeagueConte
 }
 
 /** Stat keys shown in the UI. ESPN returns ~45; keep the common ones to stay lean. */
-const STAT_KEYS = [0, 6, 3, 2, 1, 17, 11, 19, 20, 28, 13, 14, 15, 16, 4];
+const STAT_KEYS = [0, 6, 3, 2, 1, 17, 11, 19, 20, 40, 13, 14, 15, 16, 4];
+/** Percentages are rates, not sums: never total them. */
+const RATE_KEYS = new Set([19, 20]);
 
 function seasonLabel(seasonId: number) {
   return `${seasonId - 1}-${String(seasonId).slice(2)}`;
@@ -156,11 +158,15 @@ function statLine(e: EspnStatEntry | undefined, label: string): StatLine | undef
   const gp = e?.stats?.["42"] ?? 0;
   if (!e || !e.averageStats || gp <= 0) return undefined;
   const perGame: Record<string, number> = {};
+  const totals: Record<string, number> = {};
   for (const id of STAT_KEYS) {
-    const v = e.averageStats[String(id)];
-    if (typeof v === "number") perGame[statInfo(id).key] = v;
+    const key = statInfo(id).key;
+    const avg = e.averageStats[String(id)];
+    if (typeof avg === "number") perGame[key] = avg;
+    const tot = RATE_KEYS.has(id) ? avg : e.stats?.[String(id)];
+    if (typeof tot === "number") totals[key] = tot;
   }
-  return { label, gamesPlayed: gp, fantasyPointsPerGame: e.appliedAverage, perGame };
+  return { label, gamesPlayed: gp, fantasyPointsPerGame: e.appliedAverage, fantasyPointsTotal: e.appliedTotal, perGame, totals };
 }
 
 /** Season actual / previous season / projection from ESPN's stat spans. */

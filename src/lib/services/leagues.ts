@@ -180,7 +180,7 @@ export async function resolveLeague(userId: string, platform: Platform, external
 export type LeagueTab = "roster" | "matchup" | "players" | "activity" | "league" | "teams" | "standings" | "trade";
 
 /** Data for one tab of the league page. Only fetches what that tab shows. */
-export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opts: { teamId?: string; position?: string; period?: number } = {}) {
+export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opts: { teamId?: string; position?: string; period?: number; matchupId?: string } = {}) {
   const { conn, league } = resolved;
   const adapter = getAdapter(league.platform);
   const id = league.externalId;
@@ -196,9 +196,11 @@ export async function getLeagueTab(resolved: ResolvedLeague, tab: LeagueTab, opt
     case "matchup": {
       const matchups = await adapter.getMatchups(conn, id, opts.period);
       const mine = myTeam ? matchups.find((m) => m.home.teamId === myTeam.id || m.away?.teamId === myTeam.id) : undefined;
-      const sides = mine ? [mine.home, mine.away].filter((s): s is NonNullable<typeof s> => !!s) : [];
+      // Any game in the league can be opened; default to yours.
+      const chosen = (opts.matchupId && matchups.find((m) => m.id === opts.matchupId)) || mine;
+      const sides = chosen ? [chosen.home, chosen.away].filter((s): s is NonNullable<typeof s> => !!s) : [];
       const rosters = await Promise.all(sides.map((s) => adapter.getRoster(conn, id, byId.get(s.teamId)!.externalId)));
-      return { tab, teams, matchup: mine ?? null, rosters, all: matchups } as const;
+      return { tab, teams, matchup: chosen ?? null, isMine: !!chosen && chosen === mine, mineId: mine?.id ?? null, rosters, all: matchups } as const;
     }
     case "players": {
       // Your roster too (for the drop picker) when the league is connected through your account.

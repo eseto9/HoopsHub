@@ -33,7 +33,7 @@ const TABS: { key: LeagueTab; label: string }[] = [
 
 const fmt1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
-type Search = { tab?: string; team?: string; pos?: string; week?: string };
+type Search = { tab?: string; team?: string; pos?: string; week?: string; m?: string };
 
 export default function LeaguePage({ params, searchParams }: PageProps<"/leagues/[platform]/[leagueId]">) {
   return (
@@ -83,7 +83,7 @@ async function LeagueView({ params, searchParams }: { params: Promise<{ platform
 
       <Segmented active={tab} items={TABS.map((t) => ({ key: t.key, label: t.label, href: `${base}?tab=${t.key}` }))} />
 
-      <Suspense key={`${tab}-${sp.team ?? ""}-${sp.pos ?? ""}-${sp.week ?? ""}`} fallback={<div className="list-group h-80 animate-pulse" />}>
+      <Suspense key={`${tab}-${sp.team ?? ""}-${sp.pos ?? ""}-${sp.week ?? ""}-${sp.m ?? ""}`} fallback={<div className="list-group h-80 animate-pulse" />}>
         <TabContent resolved={resolved} tab={tab} sp={sp} base={base} points={points} />
       </Suspense>
 
@@ -95,8 +95,9 @@ async function LeagueView({ params, searchParams }: { params: Promise<{ platform
 }
 
 async function TabContent({ resolved, tab, sp, base, points }: { resolved: ResolvedLeague; tab: LeagueTab; sp: Search; base: string; points: boolean }) {
-  const week = sp.week && /^d{1,2}$/.test(sp.week) ? Number(sp.week) : undefined;
-  const data = await getLeagueTab(resolved, tab, { teamId: sp.team, position: sp.pos && sp.pos !== "All" ? sp.pos : undefined, period: week });
+  const week = sp.week && /^\d{1,2}$/.test(sp.week) ? Number(sp.week) : undefined;
+  const matchupId = sp.m && /^(espn|sleeper|yahoo):[\w.-]{1,80}$/.test(sp.m) ? sp.m : undefined;
+  const data = await getLeagueTab(resolved, tab, { teamId: sp.team, position: sp.pos && sp.pos !== "All" ? sp.pos : undefined, period: week, matchupId });
   const preDraft = resolved.league.status === "pre_draft" || resolved.league.status === "drafting";
   // Player pages exist only where the platform has player details.
   const playerBase = getAdapter(resolved.league.platform).getPlayerDetail ? `${base}/player` : undefined;
@@ -160,22 +161,30 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
           </Link>
         </div>
       );
+      const weekQ = `tab=matchup&week=${period}`;
       const scoreboard = data.all.length > 1 && (
-        <Group header="Scoreboard">
+        <Group header="Scoreboard" footer="Tap a game to see both lineups.">
           {data.all.map((g) => {
             const h = team(g.home.teamId);
             const a = g.away ? team(g.away.teamId) : undefined;
             const isMine = h?.isMine || a?.isMine;
+            const open = data.matchup?.id === g.id;
             return (
-              <div key={g.id} className={`row-block ${isMine ? "bg-accent-soft" : ""}`}>
+              <Link
+                key={g.id}
+                href={`${base}?${weekQ}${isMine ? "" : `&m=${encodeURIComponent(g.id)}`}`}
+                aria-current={open ? "true" : undefined}
+                className={`row-block block transition-colors hover:bg-surface-2 ${open ? "bg-accent-soft" : ""}`}
+              >
                 <div className="row-body gap-3 text-[15px] tabular-nums">
                   <span className={`min-w-0 flex-1 truncate ${h?.isMine ? "font-semibold" : ""}`}>{h?.name}</span>
                   <span className="w-14 text-right">{g.home.score === undefined ? "–" : fmt1.format(g.home.score)}</span>
                   <span className="text-faint">–</span>
                   <span className="w-14">{g.away?.score === undefined ? "–" : fmt1.format(g.away.score)}</span>
                   <span className={`min-w-0 flex-1 truncate text-right ${a?.isMine ? "font-semibold" : ""}`}>{a?.name ?? "Bye"}</span>
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-faint" />
                 </div>
-              </div>
+              </Link>
             );
           })}
         </Group>
@@ -193,6 +202,16 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
       return (
         <div className="flex flex-col gap-8">
           {weekNav}
+          {!data.isMine && (
+            <div className="-mt-4 flex flex-wrap items-center justify-between gap-2 rounded-[12px] bg-surface px-4 py-2.5 text-[15px]">
+              <span className="text-muted">Viewing another game in your league.</span>
+              {data.mineId && (
+                <Link href={`${base}?${weekQ}`} scroll={false} className="font-semibold text-accent">
+                  Back to my matchup
+                </Link>
+              )}
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <Group header={`Week ${m.period} · ${m.status === "live" ? "Live" : m.status === "final" ? "Final" : "Upcoming"}`}>
               {sides.map((s) => {

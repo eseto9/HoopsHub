@@ -112,3 +112,19 @@ export function pushPlan(
   }
   return out;
 }
+
+const etParts = (ms: number) => {
+  const p = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "numeric", hour12: false }).formatToParts(new Date(ms));
+  return { weekday: p.find((x) => x.type === "weekday")?.value, hour: Number(p.find((x) => x.type === "hour")?.value) };
+};
+
+/** The Monday recap goes out between 9 AM and noon Eastern, once (keyed by the date). */
+export function recapWindow(now: number): string | null {
+  const { weekday, hour } = etParts(now);
+  return weekday === "Mon" && hour >= 9 && hour < 12 ? `recap:${etDay(now)}` : null;
+}
+
+export function recapMessage(key: string, summary: string, leagues: { name: string; outcome: string; myScore: string }[]): PushMessage {
+  const detail = leagues.map((l) => `${l.name}: ${l.outcome === "win" ? "W" : l.outcome === "loss" ? "L" : l.outcome === "tie" ? "T" : "bye"} ${l.myScore}`).join(" · ");
+  return { key, title: "Your weekly recap", body: `${summary}. ${detail}`.slice(0, 240), url: "/my-teams?view=recap", tag: "recap" };
+}

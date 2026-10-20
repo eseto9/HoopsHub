@@ -265,19 +265,32 @@ function matchupStatus(item: EspnScheduleItem, currentPeriod: number, leagueActi
   return "upcoming";
 }
 
-function side(leagueId: number, s: EspnMatchupSide, status: MatchupStatus): MatchupSide {
+function side(leagueId: number, s: EspnMatchupSide, status: MatchupStatus, categories?: Set<number>): MatchupSide {
+  if (!categories) {
+    return { teamId: teamKey(leagueId, s.teamId), score: status === "live" ? (s.totalPointsLive ?? s.totalPoints) : s.totalPoints };
+  }
+  // Category leagues: totalPoints is 0; the result is the category tally.
+  const cs = (status === "live" ? s.cumulativeScoreLive : undefined) ?? s.cumulativeScore;
+  const values: Record<string, number> = {};
+  // scoreByStat also carries supporting stats (FGM/FGA...); keep the scored categories.
+  for (const [id, v] of Object.entries(cs?.scoreByStat ?? {})) if (categories.has(Number(id)) && !v.ineligible) values[statInfo(Number(id)).key] = v.score;
   return {
     teamId: teamKey(leagueId, s.teamId),
-    score: status === "live" ? (s.totalPointsLive ?? s.totalPoints) : s.totalPoints,
+    categoryRecord: status === "upcoming" || !cs ? undefined : { wins: cs.wins, losses: cs.losses, ties: cs.ties },
+    categoryValues: status === "upcoming" ? undefined : values,
   };
 }
+
+/** ESPN's winner field: observed HOME, AWAY, TIE and UNDECIDED. */
+const WINNER: Record<string, Matchup["winner"]> = { HOME: "home", AWAY: "away", TIE: "tie" };
 
 /**
  * Matchups for one matchup period (defaults to the league's current one).
  * latestScoringPeriod is already 1 the day before opening night, so callers
  * pass whether the NBA season has actually tipped off.
  */
-export function normalizeMatchups(raw: EspnMatchupsResponse, leagueId: number, period?: number, seasonStarted = true): Matchup[] {
+/** Pass the league's category stat ids for category leagues; omit for points leagues. */
+export function normalizeMatchups(raw: EspnMatchupsResponse, leagueId: number, period?: number, seasonStarted = true, categories?: Set<number>): Matchup[] {
   const current = raw.status.currentMatchupPeriod;
   const target = period ?? current;
   const active = raw.status.isActive && raw.status.latestScoringPeriod > 0 && seasonStarted;
@@ -289,9 +302,10 @@ export function normalizeMatchups(raw: EspnMatchupsResponse, leagueId: number, p
         id: unifiedId("espn", `${leagueId}.${m.id}`),
         leagueId: leagueKey(leagueId),
         period: m.matchupPeriodId,
-        home: side(leagueId, m.home, status),
-        away: m.away ? side(leagueId, m.away, status) : null,
+        home: side(leagueId, m.home, status, categories),
+        away: m.away ? side(leagueId, m.away, status, categories) : null,
         status,
+        winner: WINNER[m.winner],
       };
     });
 }
@@ -300,7 +314,53 @@ export function normalizeMatchups(raw: EspnMatchupsResponse, leagueId: number, p
  * Standings from mTeam records. ESPN's playoffSeed is used as rank when every
  * team has one; otherwise rank by win percentage, then points for.
  */
+/**
+ * Roto points from season totals: in each category the best team gets N
+ * points and the worst 1 (ties share the average), lower-is-better
+ * categories reversed. Computed here from valuesByStat rather than read from
+ * a roto-specific field: no public roto league was available to capture.
+ */
+export function rotoTable(raw: EspnLeagueSettingsResponse): Map<number, { total: number; ranks: Record<string, number> }> {
+  const out = new Map<number, { total: number; ranks: Record<string, number> }>(raw.teams.map((t) => [t.id, { total: 0, ranks: {} }]));
+  const n = raw.teams.length;
+  for (const item of raw.settings.scoringSettings.scoringItems) {
+    const key = statInfo(item.statId).key;
+    const vals = raw.teams.map((t) => ({ id: t.id, v: t.valuesByStat?.[String(item.statId)] ?? 0 }));
+    // Best first.
+    vals.sort((a, b) => (item.isReverseItem ? a.v - b.v : b.v - a.v));
+    let i = 0;
+    while (i < vals.length) {
+      let j = i;
+      while (j + 1 < vals.length && vals[j + 1].v === vals[i].v) j++;
+      // Places i..j share the points for those places.
+      const pts = Array.from({ length: j - i + 1 }, (_, k) => n - (i + k)).reduce((a, b) => a + b, 0) / (j - i + 1);
+      for (let k = i; k <= j; k++) {
+        const row = out.get(vals[k].id)!;
+        row.total += pts;
+        row.ranks[key] = i + 1;
+      }
+      i = j + 1;
+    }
+  }
+  return out;
+}
+
 export function normalizeStandings(raw: EspnLeagueSettingsResponse): StandingsRow[] {
+  if (mapScoringType(raw.settings.scoringSettings.scoringType) === "roto") {
+    const table = rotoTable(raw);
+    const sorted = [...raw.teams].sort((a, b) => table.get(b.id)!.total - table.get(a.id)!.total);
+    return sorted.map((t, i) => ({
+      leagueId: leagueKey(raw.id),
+      teamId: teamKey(raw.id, t.id),
+      rank: i + 1,
+      wins: 0,
+      losses: 0,
+      ties: 0,
+      rotoPoints: table.get(t.id)!.total,
+      categoryRanks: table.get(t.id)!.ranks,
+      inPlayoffs: undefined,
+    }));
+  }
   const allSeeded = raw.teams.every((t) => t.playoffSeed > 0);
   const sorted = [...raw.teams].sort((a, b) =>
     allSeeded

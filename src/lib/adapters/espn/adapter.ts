@@ -5,7 +5,7 @@ import type { AdapterConnection, ConnectResult, FreeAgentQuery, LineupChange, Pl
 import { invalidate } from "@/lib/cache";
 import { cacheScope, cached, communicationEndpoint, cookiesOf, espnFetch, espnPost, ESPN_READS, fanEndpoint, leagueEndpoint, type EspnCookies } from "./client";
 import { buildAddDrop, buildCancel, buildTradeResponse, buildLineupTransaction, buildTradeProposal, transactionsUrl, type EspnTransactionResponse } from "./writes";
-import { LINEUP_SLOTS } from "./constants";
+import { LINEUP_SLOTS, mapScoringType } from "./constants";
 import {
   leagueIdsFromFanProfile,
   normalizeLeague,
@@ -241,9 +241,11 @@ export const espnAdapter: PlatformAdapter = {
 
   async getMatchups(conn, leagueId, period) {
     const season = await getSeason();
-    const [raw, pro] = await Promise.all([getMatchupsRaw(conn, season, leagueId), getProTeamsRaw(season)]);
+    const [raw, pro, settings] = await Promise.all([getMatchupsRaw(conn, season, leagueId), getProTeamsRaw(season), getSettings(conn, leagueId)]);
     const firstTip = Math.min(...pro.settings.proTeams.flatMap((t) => Object.values(t.proGamesByScoringPeriod ?? {}).flat().map((g) => g.date)));
-    return normalizeMatchups(raw, Number(leagueId), period, Date.now() >= firstTip);
+    const format = mapScoringType(settings.settings.scoringSettings.scoringType);
+    const categories = format === "h2h-categories" || format === "roto" ? new Set(settings.settings.scoringSettings.scoringItems.map((i) => i.statId)) : undefined;
+    return normalizeMatchups(raw, Number(leagueId), period, Date.now() >= firstTip, categories);
   },
 
   async getStandings(conn, leagueId) {

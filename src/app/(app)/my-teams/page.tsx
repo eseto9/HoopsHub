@@ -3,11 +3,12 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { ActivityHubView, LineupCheckView } from "@/components/hub-client";
-import { ExposureView, MatchupCenterView, NewsView, TonightView, WaiverRadarView } from "@/components/hub-views";
+import { ExposureView, MatchupCenterView, NewsView, RecapView, TonightView, WaiverRadarView } from "@/components/hub-views";
 import { MyTeamsView } from "@/components/my-teams-view";
 import { Segmented } from "@/components/segmented";
 import { combinedActivity, exposure, nameKey, waiverRadar } from "@/lib/hub";
-import { getActivityFeeds, getMatchupCenter, getMyNews, getMyTeams, getWaiverPools } from "@/lib/services/leagues";
+import { recapSummary } from "@/lib/recap";
+import { getActivityFeeds, getMatchupCenter, getMyNews, getMyTeams, getRecap, getWaiverPools } from "@/lib/services/leagues";
 import { requireUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "My Teams" };
@@ -17,6 +18,7 @@ const VIEWS = [
   { key: "lineup", label: "Lineup Check" },
   { key: "tonight", label: "Tonight" },
   { key: "matchups", label: "Matchups" },
+  { key: "recap", label: "Recap" },
   { key: "news", label: "News" },
   { key: "waivers", label: "Waivers" },
   { key: "activity", label: "Activity" },
@@ -29,6 +31,7 @@ const SUBTITLE: Record<View, string> = {
   lineup: "Starters who are out, have no game today, or empty slots, with the best bench fix.",
   tonight: "Today's NBA games with your players in them.",
   matchups: "This week's matchups in every league.",
+  recap: "How last week went in every league, and who you play next.",
   news: "Injuries and the latest news on players you own.",
   waivers: "The best available players in each of your leagues.",
   activity: "Every add, drop and trade across your leagues.",
@@ -74,6 +77,10 @@ async function ViewContent({ view }: { view: View }) {
         {rows.some((r) => r.section.matchup?.status === "live") && <AutoRefresh seconds={60} />}
       </>
     );
+  }
+  if (view === "recap") {
+    const { rows, waiting } = await getRecap(user.id);
+    return <RecapView rows={rows} waiting={waiting} summary={recapSummary(rows).text} />;
   }
   if (view === "news") {
     const { entries, injured } = await getMyNews(user.id);

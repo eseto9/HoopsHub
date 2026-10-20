@@ -1,0 +1,3307 @@
+{
+  "draftDetail": {
+    "drafted": true,
+    "inProgress": false
+  },
+  "gameId": 3,
+  "id": 1382487116,
+  "schedule": [
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 588
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 21
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 31
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 117
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 213
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 209
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 449
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 111
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 146
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 59
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.46547884
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.76027397
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 5,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 640
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 16
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 44
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 148
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 234
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 240
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 478
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 109
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 151
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 51
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.50209205
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.7218543
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 10,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 1,
+      "matchupPeriodId": 1,
+      "playoffTierType": "NONE",
+      "winner": "HOME"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 534
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 17
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 38
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 126
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 189
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 189
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 403
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 102
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 125
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 54
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.46898263
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.816
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 1,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 657
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 11
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 36
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 147
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 168
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 211
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 442
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 168
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 199
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 67
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.47737557
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.84422111
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 3,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 2,
+      "matchupPeriodId": 1,
+      "playoffTierType": "NONE",
+      "winner": "HOME"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 6,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 565
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 14
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 35
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 115
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 184
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 209
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 449
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 90
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 115
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 57
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.46547884
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.7826087
+            }
+          },
+          "ties": 0,
+          "wins": 2
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 11,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 2,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 686
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 22
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 46
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 98
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 218
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 245
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 506
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 134
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 176
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 62
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.48418972
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.76136364
+            }
+          },
+          "ties": 0,
+          "wins": 6
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 8,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 3,
+      "matchupPeriodId": 1,
+      "playoffTierType": "NONE",
+      "winner": "HOME"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 4,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 687
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 18
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 35
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 124
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 203
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 228
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 454
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 160
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 191
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 71
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.50220264
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.83769634
+            }
+          },
+          "ties": 0,
+          "wins": 4
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 6,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 4,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 487
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 32
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 39
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 143
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 231
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 176
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 403
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 70
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 96
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 65
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.43672457
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.72916667
+            }
+          },
+          "ties": 0,
+          "wins": 4
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 4,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 4,
+      "matchupPeriodId": 1,
+      "playoffTierType": "NONE",
+      "winner": "TIE"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 516
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 34
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 25
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 112
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "TIE",
+              "score": 191
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 183
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 406
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 108
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 140
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 42
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.45073892
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.77142857
+            }
+          },
+          "ties": 1,
+          "wins": 2
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 7,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 2,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 593
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 25
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 35
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 97
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "TIE",
+              "score": 191
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 210
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 408
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 120
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 146
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 53
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.51470588
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.82191781
+            }
+          },
+          "ties": 1,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 2,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 5,
+      "matchupPeriodId": 1,
+      "playoffTierType": "NONE",
+      "winner": "HOME"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 615
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 16
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 48
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 100
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 217
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 212
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 457
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 119
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 143
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 72
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.46389497
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.83216783
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 12,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 592
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 21
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 25
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 125
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 231
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 203
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 459
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 117
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 163
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 69
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.4422658
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.71779141
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 9,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 6,
+      "matchupPeriodId": 1,
+      "playoffTierType": "NONE",
+      "winner": "AWAY"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 726
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 38
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 45
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 148
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 258
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 264
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 520
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 118
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 149
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 80
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.50769231
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.79194631
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 1,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 778
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 39
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 47
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 147
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 283
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 279
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 630
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 127
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 161
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 93
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.44285714
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.78881988
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 5,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 7,
+      "matchupPeriodId": 2,
+      "playoffTierType": "NONE",
+      "winner": "HOME"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 1,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 807
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "TIE",
+              "score": 20
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 51
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 213
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 287
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 297
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 576
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 131
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 167
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 82
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.515625
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.78443114
+            }
+          },
+          "ties": 1,
+          "wins": 6
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 10,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 6,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 750
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "TIE",
+              "score": 20
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 37
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 172
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 255
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 271
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 553
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 130
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 165
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 78
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.49005425
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.78787879
+            }
+          },
+          "ties": 1,
+          "wins": 1
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 11,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 8,
+      "matchupPeriodId": 2,
+      "playoffTierType": "NONE",
+      "winner": "AWAY"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 6,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "TIE",
+              "score": 776
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 25
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 43
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 191
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 277
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 265
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 583
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 169
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 204
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 77
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.45454545
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.82843137
+            }
+          },
+          "ties": 1,
+          "wins": 1
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 3,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 1,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "TIE",
+              "score": 776
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 27
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 47
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 196
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 233
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 260
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 549
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 168
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 193
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 88
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.47358834
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.87046632
+            }
+          },
+          "ties": 1,
+          "wins": 6
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 6,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 9,
+      "matchupPeriodId": 2,
+      "playoffTierType": "NONE",
+      "winner": "HOME"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 4,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 758
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 27
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 39
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 162
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 223
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 278
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 557
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 135
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 171
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 67
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.49910233
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.78947368
+            }
+          },
+          "ties": 0,
+          "wins": 4
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 8,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 4,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 636
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 24
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 44
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 160
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 237
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 229
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 518
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 104
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 125
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 74
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.44208494
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.832
+            }
+          },
+          "ties": 0,
+          "wins": 4
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 7,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 10,
+      "matchupPeriodId": 2,
+      "playoffTierType": "NONE",
+      "winner": "TIE"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 4,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 688
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 24
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 51
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 197
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 283
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 252
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 573
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 83
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 108
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 101
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.43979058
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.76851852
+            }
+          },
+          "ties": 0,
+          "wins": 4
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 4,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 4,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 710
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 32
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 36
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 160
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 237
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 246
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 521
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 134
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 162
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 84
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.47216891
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.82716049
+            }
+          },
+          "ties": 0,
+          "wins": 4
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 12,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 11,
+      "matchupPeriodId": 2,
+      "playoffTierType": "NONE",
+      "winner": "TIE"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 713
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 21
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 51
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 127
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 203
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 254
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 520
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 125
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 149
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 80
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.48846154
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.83892617
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 2,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 702
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 30
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 43
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 145
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 248
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 252
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 519
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 138
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 176
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 60
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.48554913
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.78409091
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 9,
+        "tiebreak": 0,
+        "totalPoints": 0
+      },
+      "id": 12,
+      "matchupPeriodId": 2,
+      "playoffTierType": "NONE",
+      "winner": "AWAY"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 778
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 24
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 40
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 153
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 260
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 273
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 554
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 137
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 163
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 95
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.49277978
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.8404908
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 12,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 717
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 23
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 44
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 195
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 261
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 258
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 558
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 108
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 140
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 93
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.46236559
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.77142857
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 4,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "id": 128,
+      "matchupPeriodId": 22,
+      "playoffTierType": "WINNERS_BRACKET",
+      "winner": "AWAY"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 838
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 30
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 38
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 250
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 299
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 285
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 631
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 178
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 217
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 90
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.45166403
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.8202765
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 3,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 643
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 29
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 48
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 147
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 199
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 214
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 427
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 134
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 152
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 81
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.50117096
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.88157895
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 6,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "id": 129,
+      "matchupPeriodId": 22,
+      "playoffTierType": "WINNERS_CONSOLATION_LADDER",
+      "winner": "AWAY"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 578
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 35
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 43
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 126
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 205
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 228
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 473
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 68
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 94
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 54
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.4820296
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.72340426
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 9,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 604
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 29
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 35
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 130
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 192
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 224
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 416
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 93
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 115
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 63
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.53846154
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.80869565
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 5,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "id": 130,
+      "matchupPeriodId": 22,
+      "playoffTierType": "WINNERS_CONSOLATION_LADDER",
+      "winner": "HOME"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 5,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 484
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 10
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 35
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 138
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 160
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 155
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 304
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 122
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 140
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 52
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.50986842
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.87142857
+            }
+          },
+          "ties": 0,
+          "wins": 3
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 1,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 3,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 627
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 16
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 29
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 141
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 194
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 237
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 473
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 84
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 111
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 69
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.50105708
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.75675676
+            }
+          },
+          "ties": 0,
+          "wins": 5
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 10,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "id": 131,
+      "matchupPeriodId": 22,
+      "playoffTierType": "LOSERS_CONSOLATION_LADDER",
+      "winner": "HOME"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 1,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 719
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 21
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 44
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 120
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 192
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 256
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 495
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 128
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 167
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 79
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.51717172
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.76646707
+            }
+          },
+          "ties": 0,
+          "wins": 7
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 8,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 7,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 326
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 12
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 25
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 107
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 122
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 123
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 276
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 56
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 67
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 24
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.44565217
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.8358209
+            }
+          },
+          "ties": 0,
+          "wins": 1
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 11,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "id": 132,
+      "matchupPeriodId": 22,
+      "playoffTierType": "LOSERS_CONSOLATION_LADDER",
+      "winner": "AWAY"
+    },
+    {
+      "away": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 6,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 314
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 17
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 15
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 68
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 115
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 116
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 229
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 57
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 71
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 25
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.50655022
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 0.8028169
+            }
+          },
+          "ties": 0,
+          "wins": 2
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 7,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "home": {
+        "adjustment": 0,
+        "cumulativeScore": {
+          "losses": 2,
+          "scoreByStat": {
+            "0": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 401
+            },
+            "1": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 19
+            },
+            "2": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 26
+            },
+            "3": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 86
+            },
+            "6": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 168
+            },
+            "13": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 145
+            },
+            "14": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 302
+            },
+            "15": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 73
+            },
+            "16": {
+              "ineligible": false,
+              "rank": 0,
+              "result": null,
+              "score": 91
+            },
+            "17": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "WIN",
+              "score": 38
+            },
+            "19": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.48013245
+            },
+            "20": {
+              "ineligible": false,
+              "rank": 0,
+              "result": "LOSS",
+              "score": 0.8021978
+            }
+          },
+          "ties": 0,
+          "wins": 6
+        },
+        "eliminationMatchupPeriod": 0,
+        "gamesPlayed": 0,
+        "teamId": 2,
+        "tiebreak": 0,
+        "totalPoints": 0,
+        "totalPointsLive": 0
+      },
+      "id": 133,
+      "matchupPeriodId": 22,
+      "playoffTierType": "LOSERS_CONSOLATION_LADDER",
+      "winner": "HOME"
+    }
+  ],
+  "scoringPeriodId": 175,
+  "seasonId": 2026,
+  "segmentId": 0,
+  "status": {
+    "activatedDate": 1752176354635,
+    "createdAsLeagueType": 3,
+    "currentLeagueType": 0,
+    "currentMatchupPeriod": 22,
+    "finalScoringPeriod": 160,
+    "firstScoringPeriod": 1,
+    "isActive": true,
+    "isExpired": false,
+    "isFull": false,
+    "isPlayoffMatchupEdited": false,
+    "isToBeDeleted": false,
+    "isViewable": false,
+    "isWaiverOrderEdited": false,
+    "latestScoringPeriod": 175,
+    "previousSeasons": [],
+    "standingsUpdateDate": 1775373582463,
+    "teamsJoined": 11,
+    "transactionScoringPeriod": 175,
+    "waiverLastExecutionDate": 1775978735064,
+    "waiverNextExecutionDate": 1754128800000,
+    "waiverProcessStatus": {
+      "2025-10-20T07:45:39.518+00:00": 7,
+      "2025-10-31T07:03:31.086+00:00": 1,
+      "2025-11-03T08:14:16.966+00:00": 1,
+      "2025-11-04T08:28:55.535+00:00": 1,
+      "2025-11-07T08:23:43.946+00:00": 0,
+      "2025-11-08T09:18:53.034+00:00": 1,
+      "2025-11-10T08:46:44.534+00:00": 1,
+      "2025-11-13T09:18:30.230+00:00": 1,
+      "2025-11-14T08:22:07.293+00:00": 1,
+      "2025-11-24T09:03:14.110+00:00": 1,
+      "2026-01-18T08:32:00.216+00:00": 1,
+      "2026-01-20T08:25:25.801+00:00": 1,
+      "2026-01-28T08:14:35.905+00:00": 1,
+      "2026-02-05T08:09:17.365+00:00": 1,
+      "2026-02-25T08:42:54.501+00:00": 1,
+      "2026-03-11T07:30:04.756+00:00": 1,
+      "2026-03-18T07:14:37.279+00:00": 1,
+      "2026-03-23T07:12:45.718+00:00": 1
+    }
+  }
+}

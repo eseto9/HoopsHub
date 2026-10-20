@@ -8,8 +8,8 @@ import type { Connection, League, MatchupStatus, Platform, StandingsRow, Team } 
 export interface MatchupSummary {
   period: number;
   status: MatchupStatus;
-  me: { team: Team; score?: number };
-  opponent: { team: Team; score?: number } | null; // null = bye
+  me: { team: Team; score?: number; categoryRecord?: { wins: number; losses: number; ties: number } };
+  opponent: { team: Team; score?: number; categoryRecord?: { wins: number; losses: number; ties: number } } | null; // null = bye
 }
 
 export interface DashboardLeague {

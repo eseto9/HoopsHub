@@ -156,6 +156,8 @@ export interface MatchupSide {
   categoryValues?: Record<string, number>;
   /** H2H categories: wins-losses-ties for this side within the matchup. */
   categoryRecord?: { wins: number; losses: number; ties: number };
+  /** Fantasy points each rostered player scored in this matchup (player external id -> points), when the platform reports it. */
+  playerPoints?: Record<string, number>;
 }
 
 export type MatchupStatus = "upcoming" | "live" | "final";
@@ -168,6 +170,8 @@ export interface Matchup {
   home: MatchupSide;
   away: MatchupSide | null; // null = bye
   status: MatchupStatus;
+  /** Decided result, when the platform says so. */
+  winner?: "home" | "away" | "tie";
 }
 
 export interface StandingsRow {

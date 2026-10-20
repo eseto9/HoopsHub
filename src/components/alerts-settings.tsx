@@ -20,7 +20,7 @@ const isStandalone = () => window.matchMedia("(display-mode: standalone)").match
 
 const TYPES: { key: keyof AlertPrefs; label: string; detail: string }[] = [
   { key: "tradeOffers", label: "Trade offers", detail: "When someone sends you an offer" },
-  { key: "results", label: "Results", detail: "Waiver claims and trades that go through" },
+  { key: "results", label: "Results", detail: "Claims and trades that go through, plus a Monday recap" },
   { key: "lineup", label: "Lineup reminders", detail: "Before tip-off, if a starter is out or sitting with no game" },
 ];
 

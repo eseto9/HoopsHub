@@ -13,6 +13,8 @@ import { Group, Row } from "@/components/list";
 import { PlatformIcon, platformLabel } from "@/components/platform-badge";
 import { RosterEditor } from "@/components/roster-editor";
 import { getAdapter } from "@/lib/adapters/registry";
+import { scoreText } from "@/lib/score";
+import { CategoryBoard } from "@/components/category-board";
 import { Segmented } from "@/components/segmented";
 import { TeamAvatar } from "@/components/team-avatar";
 import { PLATFORMS, type Platform, type Team } from "@/lib/schema";
@@ -178,9 +180,15 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
               >
                 <div className="row-body gap-3 text-[15px] tabular-nums">
                   <span className={`min-w-0 flex-1 truncate ${h?.isMine ? "font-semibold" : ""}`}>{h?.name}</span>
-                  <span className="w-14 text-right">{g.home.score === undefined ? "–" : fmt1.format(g.home.score)}</span>
-                  <span className="text-faint">–</span>
-                  <span className="w-14">{g.away?.score === undefined ? "–" : fmt1.format(g.away.score)}</span>
+                  {g.home.categoryRecord ? (
+                    <span className="w-28 text-center">{scoreText(g.home)}</span>
+                  ) : (
+                    <>
+                      <span className="w-14 text-right">{scoreText(g.home)}</span>
+                      <span className="text-faint">–</span>
+                      <span className="w-14">{scoreText(g.away)}</span>
+                    </>
+                  )}
                   <span className={`min-w-0 flex-1 truncate text-right ${a?.isMine ? "font-semibold" : ""}`}>{a?.name ?? "Bye"}</span>
                   <ChevronRight className="h-3.5 w-3.5 shrink-0 text-faint" />
                 </div>
@@ -222,19 +230,28 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
                     icon={<TeamAvatar src={t?.avatarUrl} name={t?.name ?? "?"} />}
                     title={<span className={t?.isMine ? "font-semibold" : ""}>{t?.name}</span>}
                     subtitle={t?.isMine ? "You" : t?.ownerName}
-                    value={<span className="text-[22px] font-semibold text-text tabular-nums">{s.score === undefined ? "–" : fmt1.format(s.score)}</span>}
+                    value={<span className="text-[22px] font-semibold text-text tabular-nums">{scoreText(s)}</span>}
                   />
                 );
               })}
             </Group>
             {m.status === "live" && <AutoRefresh seconds={60} />}
           </div>
+          {m.away && resolved.league.scoring.categories && (
+            <CategoryBoard
+              categories={resolved.league.scoring.categories}
+              home={m.home}
+              away={m.away}
+              homeName={team(m.home.teamId)?.name ?? "Home"}
+              awayName={team(m.away.teamId)?.name ?? "Away"}
+            />
+          )}
           <MatchupView
             points={points}
             playerBase={playerBase}
             sides={data.rosters.map(({ team: t, slots }) => ({
               team: { id: t.id, name: t.name, isMine: t.isMine },
-              score: sides.find((x) => x.teamId === t.id)?.score,
+              scoreText: sides.find((x) => x.teamId === t.id) ? scoreText(sides.find((x) => x.teamId === t.id)) : undefined,
               slots,
             }))}
           />
@@ -302,6 +319,54 @@ async function TabContent({ resolved, tab, sp, base, points }: { resolved: Resol
 
     case "standings": {
       const team = (id: string) => data.teams.find((t) => t.id === id);
+      const cats = resolved.league.scoring.categories ?? [];
+      if (data.standings.some((r) => r.rotoPoints !== undefined)) {
+        return (
+          <section className="flex flex-col gap-1.5">
+            <div className="list-group overflow-x-auto">
+              <table className="w-full border-separate border-spacing-0 text-[14px] tabular-nums">
+                <thead>
+                  <tr className="text-[11px] font-semibold text-muted uppercase [&>th]:border-b-[0.5px] [&>th]:border-separator [&>th]:px-2.5 [&>th]:py-2 [&>th]:text-right">
+                    <th className="sticky left-0 z-[2] bg-surface !pl-4 !text-left shadow-[1px_0_0_var(--separator)]">Team</th>
+                    <th>Roto Pts</th>
+                    {cats.map((c) => (
+                      <th key={c.stat} title={c.higherIsBetter ? undefined : "Lower is better"}>
+                        {c.label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.standings.map((r) => {
+                    const t = team(r.teamId);
+                    return (
+                      <tr key={r.teamId} className={`[&>td]:border-t-[0.5px] [&>td]:border-separator first:[&>td]:border-t-0 ${t?.isMine ? "[&>td]:bg-accent-soft" : ""}`}>
+                        <td className="sticky left-0 z-[1] bg-surface py-2 pr-2 pl-4 shadow-[1px_0_0_var(--separator)]">
+                          <Link href={t ? `${base}?tab=roster&team=${t.externalId}` : base} className="flex w-[190px] items-center gap-2.5 sm:w-[260px]">
+                            <span className="w-5 shrink-0 text-right text-[13px] font-semibold text-muted">{r.rank}</span>
+                            <TeamAvatar src={t?.avatarUrl} name={t?.name ?? "?"} />
+                            <span className={`min-w-0 truncate ${t?.isMine ? "font-semibold" : ""}`}>{t?.name}</span>
+                          </Link>
+                        </td>
+                        <td className="px-2.5 py-2 text-right font-semibold">{fmt1.format(r.rotoPoints ?? 0)}</td>
+                        {cats.map((c) => (
+                          <td key={c.stat} className="px-2.5 py-2 text-right text-muted">
+                            {r.categoryRanks?.[c.stat] ?? "–"}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="group-footer">
+              Roto points: in each category the best team gets {data.standings.length}, the next one less, down to 1 (ties share). Category columns show each team&apos;s
+              rank. Calculated by Hoops Hub from season totals.
+            </p>
+          </section>
+        );
+      }
       const cutoff = data.standings.findIndex((r) => r.inPlayoffs === false);
       return (
         <section className="flex flex-col gap-1.5">

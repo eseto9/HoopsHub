@@ -61,6 +61,8 @@ export interface EspnTeam {
   record: { overall: EspnRecordLine; home: EspnRecordLine; away: EspnRecordLine; division: EspnRecordLine };
   /** 1 = first waiver claim (observed in mTeam). */
   waiverRank?: number;
+  /** Season total per stat id (observed in mTeam, category leagues; FG%/FT% as fractions). */
+  valuesByStat?: Record<string, number>;
   /** Observed (mTeam): {} when empty, else {players: {"6440": "ON_THE_BLOCK"}}. */
   tradeBlock?: { players?: Record<string, string> };
   transactionCounter?: { acquisitions: number; drops: number; trades: number; moveToIR: number; moveToActive: number };
@@ -204,10 +206,21 @@ export interface EspnRosterResponse {
   teams?: { id: number; roster: { entries: EspnRosterEntry[] } }[];
 }
 
+export interface EspnCategoryScore {
+  wins: number;
+  losses: number;
+  ties: number;
+  /** Stat id -> this side's value and result (WIN/LOSS/TIE once decided, null before). */
+  scoreByStat?: Record<string, { score: number; result: "WIN" | "LOSS" | "TIE" | null; ineligible?: boolean }>;
+}
+
 export interface EspnMatchupSide {
   teamId: number;
   totalPoints: number;
   totalPointsLive?: number;
+  /** Category leagues (verified in fixtures/espn/league-1382487116 and league-13937). */
+  cumulativeScore?: EspnCategoryScore;
+  cumulativeScoreLive?: EspnCategoryScore;
 }
 
 export interface EspnScheduleItem {

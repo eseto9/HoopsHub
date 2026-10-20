@@ -5,9 +5,10 @@ import { PlatformError, ReconnectRequiredError } from "@/lib/errors";
 import type { League, LeagueActivity, NewsItem, Platform, Player, PlayerListing, RosterSlot, Team } from "@/lib/schema";
 import type { DashboardData, DashboardLeague, DashboardProblem, MatchupSummary } from "@/lib/schema/views";
 import { watchedPlayerIds } from "./watchlist";
-import { activityAlerts, pushPlan } from "@/lib/alerts";
+import { activityAlerts, pushPlan, recapMessage, recapWindow } from "@/lib/alerts";
 import { claimAlert, getAlertPrefs, sendToUser } from "./push";
 import { exposure, nameKey } from "@/lib/hub";
+import { recapLeague, recapSummary, type RecapLeague } from "@/lib/recap";
 import { mapLimit, playerNews } from "@/lib/nba/news";
 import { getAdapterConnections, listConnections, listLeaguePreferences, markNeedsReconnect, markSynced } from "./connections";
 
@@ -48,8 +49,8 @@ async function summarize(conn: AdapterConnection, league: League): Promise<Dashb
       matchup = {
         period: m.period,
         status: m.status,
-        me: { team: myTeam, score: mine.score },
-        opponent: theirs && oppTeam ? { team: oppTeam, score: theirs.score } : null,
+        me: { team: myTeam, score: mine.score, categoryRecord: mine.categoryRecord },
+        opponent: theirs && oppTeam ? { team: oppTeam, score: theirs.score, categoryRecord: theirs.categoryRecord } : null,
       };
     }
   }
@@ -418,10 +419,58 @@ export async function runAlertsForUser(userId: string, now = Date.now()): Promis
     prefs,
     now,
   );
+  // Monday morning: one recap of last week across all leagues ("Results" switch).
+  const recapKey = prefs.results ? recapWindow(now) : null;
+  if (recapKey) {
+    const { rows } = await getRecap(userId);
+    if (rows.length) plan.push(recapMessage(recapKey, recapSummary(rows).text, rows.map((r) => ({ name: r.league.name, outcome: r.outcome, myScore: r.myScore }))));
+  }
   let sent = 0;
   for (const m of plan) {
     if (!(await claimAlert(userId, m.key))) continue;
     sent += (await sendToUser(userId, { title: m.title, body: m.body, url: m.url, tag: m.tag })) > 0 ? 1 : 0;
   }
   return sent;
+}
+
+/** Weekly recap: last finished week in each league, plus the week ahead. */
+export async function getRecap(userId: string): Promise<{ rows: RecapLeague[]; waiting: string[] }> {
+  const { items } = await loadMyTeams(userId);
+  const rows: RecapLeague[] = [];
+  const waiting: string[] = [];
+  await Promise.all(
+    items.map(async ({ section, resolved }) => {
+      if (!resolved || section.error) return;
+      const adapter = getAdapter(section.league.platform);
+      const id = section.league.externalId;
+      try {
+        const thisWeek = await adapter.getMatchups(resolved.conn, id);
+        const period = thisWeek[0]?.period ?? 1;
+        if (period <= 1) {
+          waiting.push(section.league.name);
+          return;
+        }
+        const [lastWeek, standings, teams] = await Promise.all([
+          adapter.getMatchups(resolved.conn, id, period - 1),
+          adapter.getStandings(resolved.conn, id),
+          adapter.getTeams(resolved.conn, id),
+        ]);
+        const mine = section.myTeam.id;
+        const row = recapLeague({
+          league: section.league,
+          myTeamId: mine,
+          teams,
+          lastWeek,
+          standing: standings.find((s) => s.teamId === mine),
+          thisWeek: thisWeek.find((m) => m.home.teamId === mine || m.away?.teamId === mine) ?? null,
+          slots: section.slots,
+        });
+        if (row) rows.push(row);
+        else waiting.push(section.league.name);
+      } catch {
+        waiting.push(section.league.name);
+      }
+    }),
+  );
+  return { rows: rows.sort((a, b) => a.league.name.localeCompare(b.league.name)), waiting };
 }

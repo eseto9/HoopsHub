@@ -256,8 +256,8 @@ export function normalizeMatchups(leagueId: string, raw: SleeperMatchup[], week:
       id: unifiedId("sleeper", `${leagueId}.${week}.${key}`),
       leagueId: leagueKey(leagueId),
       period: week,
-      home: { teamId: teamKey(leagueId, a.roster_id), score: scored ? a.points : undefined },
-      away: b ? { teamId: teamKey(leagueId, b.roster_id), score: scored ? b.points : undefined } : null,
+      home: { teamId: teamKey(leagueId, a.roster_id), score: scored ? a.points : undefined, playerPoints: scored ? a.players_points : undefined },
+      away: b ? { teamId: teamKey(leagueId, b.roster_id), score: scored ? b.points : undefined, playerPoints: scored ? b.players_points : undefined } : null,
       status,
     }))
     .sort((x, y) => x.id.localeCompare(y.id, undefined, { numeric: true }));

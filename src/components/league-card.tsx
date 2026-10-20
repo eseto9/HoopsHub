@@ -1,5 +1,6 @@
 import type { LeagueFormat, LeagueStatus, MatchupStatus } from "@/lib/schema";
 import type { DashboardLeague } from "@/lib/schema/views";
+import { scoreLead, scoreText } from "@/lib/score";
 import { Trophy, Versus } from "./icons";
 import { Group, IconTile, Row } from "./list";
 import { PlatformIcon, platformLabel } from "./platform-badge";
@@ -41,9 +42,9 @@ function StatusPill({ status }: { status: MatchupStatus }) {
 export function LeagueCard({ data }: { data: DashboardLeague }) {
   const { league, myTeam, standing, matchup, teamCount } = data;
   const preDraft = league.status === "pre_draft" || league.status === "drafting";
-  const me = matchup?.me.score;
-  const opp = matchup?.opponent?.score;
-  const showScore = matchup && matchup.status !== "upcoming" && me !== undefined;
+  const me = matchup?.me;
+  const opp = matchup?.opponent;
+  const showScore = matchup && matchup.status !== "upcoming" && (me?.score !== undefined || !!me?.categoryRecord);
 
   return (
     <Group header={`${platformLabel(league.platform)} · ${FORMAT[league.format]}`}>
@@ -63,8 +64,14 @@ export function LeagueCard({ data }: { data: DashboardLeague }) {
           value={
             !preDraft && standing ? (
               <span className="text-[15px]">
-                {standing.wins}-{standing.losses}
-                {standing.ties ? `-${standing.ties}` : ""}
+                {standing.rotoPoints !== undefined ? (
+                  `${fmt.format(standing.rotoPoints)} roto pts`
+                ) : (
+                  <>
+                    {standing.wins}-{standing.losses}
+                    {standing.ties ? `-${standing.ties}` : ""}
+                  </>
+                )}
               </span>
             ) : undefined
           }
@@ -110,8 +117,10 @@ export function LeagueCard({ data }: { data: DashboardLeague }) {
           subtitle={
             showScore ? (
               <span className="tabular-nums">
-                <span className={me! >= (opp ?? 0) ? "font-semibold text-text" : ""}>{fmt.format(me!)}</span>
-                {opp !== undefined && <> – {fmt.format(opp)}</>}
+                <span className={(scoreLead(me, opp) ?? 0) >= 0 ? "font-semibold text-text" : ""}>{scoreText(me)}</span>
+                {/* A category tally already says both sides; points need the other score. */}
+                {opp && !me?.categoryRecord && <> – {scoreText(opp)}</>}
+                {me?.categoryRecord && " in categories"}
               </span>
             ) : (
               `Week ${matchup.period}`

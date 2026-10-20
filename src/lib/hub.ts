@@ -24,7 +24,8 @@ export function nameKey(name: string | undefined): string {
 export function playerValue(p: Player | null | undefined): number {
   const s = p?.stats;
   const line = s?.current ?? s?.projected ?? s?.previous;
-  return line?.fantasyPointsPerGame ?? line?.perGame.pts ?? 0;
+  // Category leagues have no fantasy points (ESPN reports 0), so use points per game.
+  return line?.fantasyPointsPerGame || line?.perGame.pts || 0;
 }
 
 export interface LeagueRoster {

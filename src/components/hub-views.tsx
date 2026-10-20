@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { isStarterSlot, playerValue, slate, startersGamesLeft, type Exposure, type LeagueRoster, type WaiverPick } from "@/lib/hub";
 import type { InjuryStatus, League, RosterSlot } from "@/lib/schema";
+import type { RecapLeague } from "@/lib/recap";
 import type { MyNewsEntry, MyTeamSection } from "@/lib/services/leagues";
+import { leadText, scoreLead, scoreText } from "@/lib/score";
 import { LocalDate, LocalDateTime } from "./local-time";
 import { PlatformIcon } from "./platform-badge";
 import { PlayerAvatar } from "./player-avatar";
@@ -101,9 +103,9 @@ export function MatchupCenterView({ rows }: { rows: { section: MyTeamSection; op
         const base = `/leagues/${s.league.platform}/${s.league.externalId}`;
         const mineLeft = startersGamesLeft(s.slots);
         const theirsLeft = opponentSlots ? startersGamesLeft(opponentSlots) : undefined;
-        const me = m?.me.score;
-        const them = m?.opponent?.score;
-        const lead = me !== undefined && them !== undefined ? me - them : undefined;
+        const me = m?.me;
+        const them = m?.opponent;
+        const lead = scoreLead(me, them);
         return (
           <Link key={s.league.id} href={`${base}?tab=matchup`} className="list-group flex flex-col gap-3 p-4 transition-colors hover:bg-surface-2">
             <div className="flex items-center gap-2">
@@ -117,16 +119,14 @@ export function MatchupCenterView({ rows }: { rows: { section: MyTeamSection; op
             {m && (
               <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-[15px] tabular-nums">
                 <span className="truncate font-semibold">{s.myTeam.name}</span>
-                <span className="text-right text-[22px] font-semibold">{me === undefined ? "–" : f1.format(me)}</span>
+                <span className="text-right text-[22px] font-semibold">{scoreText(me)}</span>
                 <span className="truncate text-muted">{m.opponent?.team.name ?? "Bye"}</span>
-                <span className="text-right text-[22px] text-muted">{them === undefined ? "–" : f1.format(them)}</span>
+                <span className="text-right text-[22px] text-muted">{scoreText(them)}</span>
               </div>
             )}
             <div className="flex flex-wrap gap-x-4 gap-y-1 border-t-[0.5px] border-separator pt-2 text-[13px] text-muted">
               {lead !== undefined && m?.status !== "upcoming" && (
-                <span className={lead > 0 ? "text-success" : lead < 0 ? "text-danger" : ""}>
-                  {lead > 0 ? `Up ${f1.format(lead)}` : lead < 0 ? `Down ${f1.format(-lead)}` : "Tied"}
-                </span>
+                <span className={lead > 0 ? "text-success" : lead < 0 ? "text-danger" : ""}>{leadText(me, them)}</span>
               )}
               {mineLeft !== undefined && (
                 <span>
@@ -372,3 +372,107 @@ export function ExposureView({ rows, leagueCount }: { rows: Exposure[]; leagueCo
   );
 }
 
+
+// ---------------------------------------------------------------------------
+// Weekly Recap
+// ---------------------------------------------------------------------------
+
+const OUTCOME = {
+  win: { label: "Won", cls: "bg-success text-white" },
+  loss: { label: "Lost", cls: "bg-danger text-white" },
+  tie: { label: "Tied", cls: "bg-fill text-text" },
+  bye: { label: "Bye", cls: "bg-fill text-muted" },
+} as const;
+
+export function RecapView({ rows, waiting, summary }: { rows: RecapLeague[]; waiting: string[]; summary: string }) {
+  if (!rows.length) {
+    return (
+      <p className="px-5 py-10 text-center text-[15px] text-muted">
+        Your first recap appears once a week finishes{waiting.length ? ` (${waiting.join(", ")})` : ""}. Week 1 ends Sunday night.
+      </p>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-6">
+      <p className="px-1 text-[22px] font-bold">{summary}</p>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {rows.map((r) => {
+          const base = `/leagues/${r.league.platform}/${r.league.externalId}`;
+          const o = OUTCOME[r.outcome];
+          return (
+            <section key={r.league.id} className="list-group flex flex-col gap-3 p-4">
+              <div className="flex items-center gap-2">
+                <PlatformIcon platform={r.league.platform} />
+                <span className="min-w-0 flex-1">
+                  <Link href={base} className="block truncate text-[15px] font-semibold">
+                    {r.league.name}
+                  </Link>
+                  <span className="block text-[13px] text-muted">Week {r.week}</span>
+                </span>
+                <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-bold ${o.cls}`}>{o.label}</span>
+              </div>
+
+              {r.outcome !== "bye" && (
+                <Link href={`${base}?tab=matchup&week=${r.week}`} className="flex items-baseline justify-between gap-3 tabular-nums">
+                  <span className="text-[26px] font-semibold">{r.myScore}</span>
+                  {!r.myScore.includes("-") && <span className="text-[17px] text-muted">{r.oppScore}</span>}
+                  <span className="min-w-0 flex-1 truncate text-right text-[14px] text-muted">vs {r.oppName}</span>
+                </Link>
+              )}
+
+              <ul className="flex flex-col gap-1 text-[14px]">
+                {r.margin && r.outcome !== "bye" && !r.margin.includes("-") && (
+                  <li className="text-muted">
+                    {r.outcome === "win" ? "Won" : r.outcome === "loss" ? "Lost" : "Tied"} {r.outcome === "tie" ? "" : r.margin}
+                  </li>
+                )}
+                {r.weekRank && (
+                  <li className="text-muted">
+                    {r.weekRank.rank === 1 ? "Highest score in the league" : `${ordinal(r.weekRank.rank)}-highest score of ${r.weekRank.of}`}
+                    {r.leagueHigh && !r.leagueHigh.mine && ` · top was ${r.leagueHigh.name} (${r.leagueHigh.score})`}
+                  </li>
+                )}
+                {r.record && (
+                  <li className="text-muted">
+                    Record {r.record}
+                    {r.standing && ` · ${ordinal(r.standing.rank)} of ${r.standing.of}`}
+                  </li>
+                )}
+              </ul>
+
+              {r.topPerformers.length > 0 && (
+                <div className="flex flex-col gap-1.5 border-t-[0.5px] border-separator pt-3">
+                  <span className="text-[11px] font-semibold text-muted uppercase">Top performers</span>
+                  {r.topPerformers.map((p) => (
+                    <span key={p.player.id} className="flex items-center gap-2 text-[14px]">
+                      <PlayerAvatar src={p.player.headshotUrl} name={p.player.name} size="sm" />
+                      <span className="min-w-0 flex-1 truncate">{p.player.name}</span>
+                      <span className="font-semibold tabular-nums">{f1.format(p.points)}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {r.next && (
+                <div className="border-t-[0.5px] border-separator pt-3 text-[14px]">
+                  <span className="text-[11px] font-semibold text-muted uppercase">This week</span>
+                  <p>
+                    vs <span className="font-semibold">{r.next.oppName ?? "Bye"}</span>
+                    {r.next.gamesLeft !== undefined && <span className="text-muted"> · {r.next.gamesLeft} games for your starters</span>}
+                  </p>
+                </div>
+              )}
+            </section>
+          );
+        })}
+      </div>
+      {waiting.length > 0 && <p className="px-1 text-[13px] text-muted">No finished week yet in: {waiting.join(", ")}.</p>}
+    </div>
+  );
+}
+
+function ordinal(n: number) {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}

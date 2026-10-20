@@ -21,7 +21,7 @@ export function MatchupView({
   points,
   playerBase,
 }: {
-  sides: { team: Pick<Team, "id" | "name" | "isMine">; score?: number; slots: RosterSlot[] }[];
+  sides: { team: Pick<Team, "id" | "name" | "isMine">; scoreText?: string; slots: RosterSlot[] }[];
   points: boolean;
   playerBase?: string;
 }) {
@@ -32,7 +32,6 @@ export function MatchupView({
   const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => false);
   const grid = useRef<HTMLDivElement>(null);
   const syncing = useRef(false);
-  const fmt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
   const shown = sides.map((s) => s.slots.filter((x) => showBench || (x.slot !== "BN" && x.slot !== "IR")));
   // Pad the shorter side so the same slot sits on the same row.
@@ -74,7 +73,7 @@ export function MatchupView({
                   {s.team.name}
                   {s.team.isMine ? " (you)" : ""}
                 </span>
-                {s.score !== undefined && <span className="text-[15px] font-semibold text-text normal-case tabular-nums">{fmt.format(s.score)}</span>}
+                {s.scoreText && <span className="text-[15px] font-semibold text-text normal-case tabular-nums">{s.scoreText}</span>}
               </h2>
               <StatsTable
                 rows={[

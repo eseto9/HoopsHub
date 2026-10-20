@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { MyTeamSection } from "@/lib/services/leagues";
+import { scoreText } from "@/lib/score";
 import { PlatformIcon, platformLabel } from "./platform-badge";
 import { StatControls, StatsTable, availableSources, type StatMode, type StatSource } from "./stats-table";
 
-const fmt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const isBench = (slot: string) => slot === "BN" || slot === "IR" || slot === "TAXI";
 const STATUS = { live: "Live", final: "Final", upcoming: "Upcoming" } as const;
 
@@ -78,9 +78,13 @@ export function MyTeamsView({ sections }: { sections: MyTeamSection[] }) {
                   <span className="text-[13px] text-muted">
                     Week {m.period} · {STATUS[m.status]}
                   </span>
-                  <span className="font-semibold">{m.me.score === undefined ? "–" : fmt.format(m.me.score)}</span>
-                  <span className="text-faint">–</span>
-                  <span className="font-semibold">{m.opponent?.score === undefined ? "–" : fmt.format(m.opponent.score)}</span>
+                  <span className="font-semibold">{scoreText(m.me)}</span>
+                  {!m.me.categoryRecord && (
+                    <>
+                      <span className="text-faint">–</span>
+                      <span className="font-semibold">{scoreText(m.opponent)}</span>
+                    </>
+                  )}
                   <span className="max-w-[160px] truncate text-muted">{m.opponent ? m.opponent.team.name : "Bye"}</span>
                 </Link>
               )}

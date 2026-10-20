@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activityAlerts, pushPlan } from "@/lib/alerts";
+import { activityAlerts, pushPlan, recapMessage, recapWindow } from "@/lib/alerts";
 import type { LeagueActivity } from "@/lib/schema";
 
 const me = "espn:1.12" as const;
@@ -77,5 +77,23 @@ describe("push plan", () => {
     expect(plan[0]).toMatchObject({ title: "Lineup check: Test League", body: "1 starter out. Games start soon.", url: "/my-teams?view=lineup" });
     expect(plan[0].key).toBe("lineup:espn:1:2026-11-01");
     expect(pushPlan([], rosters, { ...prefs, lineup: false }, tip - 30 * 60_000)).toEqual([]);
+  });
+});
+
+describe("Monday recap timing", () => {
+  it("fires Monday 9 AM to noon Eastern, once per date", () => {
+    expect(recapWindow(Date.parse("2026-10-26T13:30:00Z"))).toBe("recap:2026-10-26"); // Mon 9:30 AM EDT
+    expect(recapWindow(Date.parse("2026-10-26T12:30:00Z"))).toBeNull(); // Mon 8:30 AM
+    expect(recapWindow(Date.parse("2026-10-26T16:30:00Z"))).toBeNull(); // Mon 12:30 PM
+    expect(recapWindow(Date.parse("2026-10-27T13:30:00Z"))).toBeNull(); // Tuesday
+  });
+
+  it("writes a short summary with each league's result", () => {
+    const m = recapMessage("recap:2026-10-26", "2-1 last week across 3 leagues", [
+      { name: "Work", outcome: "win", myScore: "512.0" },
+      { name: "Cats", outcome: "loss", myScore: "3-5-1" },
+    ]);
+    expect(m).toMatchObject({ title: "Your weekly recap", url: "/my-teams?view=recap" });
+    expect(m.body).toBe("2-1 last week across 3 leagues. Work: W 512.0 · Cats: L 3-5-1");
   });
 });
